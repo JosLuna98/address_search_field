@@ -1,7 +1,7 @@
 # Address Search Text Field
 
 A text field that displays an address search bar that finds a location from a reference and gets nearby addresses. Selecting the desired address returns an object with the latitude, longitude, and full address of the place.
-It's use [location](https://pub.dev/packages/location), [geolocator](https://pub.dev/packages/geolocator), [geocoder](https://pub.dev/packages/geocoder) plugins.
+It uses [location](https://pub.dev/packages/location), [geolocator](https://pub.dev/packages/geolocator), [geocoder](https://pub.dev/packages/geocoder) plugins.
 
 ## Getting Started
 
@@ -36,12 +36,15 @@ android {
 
 ### Android
 
-On Android you'll need to add either the `ACCESS_COARSE_LOCATION` or the `ACCESS_FINE_LOCATION` permission to your Android Manifest. To do so open the AndroidManifest.xml file (located under android/app/src/main) and add one of the following two lines as direct children of the `<manifest>` tag:
+On Android you'll need to add either the `ACCESS_COARSE_LOCATION` or the `ACCESS_FINE_LOCATION` permission to your Android Manifest file (located under android/app/src/main). To do so add one of the following two lines as direct children of the `<manifest>` tag:
 
 ``` xml
-<uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+```
+Also you should add internet permission
+``` xml
+<uses-permission android:name="android.permission.INTERNET"/>
 ```
 
 ### iOS
@@ -53,22 +56,13 @@ On iOS you'll need to add the `NSLocationWhenInUseUsageDescription` to your Info
 <string>This app needs access to location when open.</string>
 ```
 
-If you would like to access the device's location when your App is running in the background, you should also add the `NSLocationAlwaysAndWhenInUseUsageDescription` (if your App support iOS 10 or earlier you should also add the key `NSLocationAlwaysUsageDescription`) key to your Info.plist file:
-
-``` xml
-<key>NSLocationAlwaysUsageDescription</key>
-<string>This app needs access to location when in the background.</string>
-<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-<string>This app needs access to location when open and in the background.</string>
-```
-
 ## Usage
 
 Import the package:
 ```dart
 import 'package:address_search_text_field/address_search_text_field.dart';
 ```
-Implement it by creating a SearchAddressTextField variable. You can call the widget using **widget** function and giving it a context and country, also can add exceptions for the found addresses and a InputDecoration for TextField.
+Implement it by creating a SearchAddressTextField variable. You can call **widget** function whichreturns a TextField Widget giving it a context and country, also can add exceptions for the found addresses and a InputDecoration for TextField.
 ```dart
 class MyHomePage extends StatelessWidget {
   final SearchAddressTextField searchAddress = SearchAddressTextField();
@@ -100,16 +94,49 @@ class MyHomePage extends StatelessWidget {
                 child: Text("get data"),
                 color: Colors.blue,
                 onPressed: () {
-                  AddressPoint point = searchAddress.values;
+                  AddressPoint point = searchAddress.result;
                   print(point.toString());
-                }
-              )
-            ]
-          )
-        )
-      )
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
 ```
-Then you just need to call **values** function to get an AddressPoint object with the found address and coordinates.
+Then you just need to call the **result** getter function to get an AddressPoint object with the found address and coordinates.
+
+```dart
+Widget searchAddress = SearchAddressTextField.widget();
+```
+
+| Parameters | Description |
+|------------|-------------|
+| context | BuildContext (Not Null) (required) |
+| decoration | InputDecoration (optional)|
+| country | String (Not Null) (required) |
+| exceptions | List < String > (optional)|
+
+## Outcomes
+
+```dart
+AddressPoint point = SearchAddressTextField.result;
+```
+
+There are three possible outcomes:
+1. If no search has been performed then the object will have null values ​​in its address, latitude and longitude variables.
+2. If a place has been found from the reference, all the variables will be initialized.
+3. If the desired location has not been found and the reference entered by the user is selected, there will be no latitude and longitude values ​​and the address will be the user's reference since nothing was found.
+
+![](https://raw.githubusercontent.com/JosLuna98/address_search_text_field/master/screenshot/untitled.gif)
+
+
+The user usually has to tap the text field in the search bar again to find the place with its full reference
+
+![](https://raw.githubusercontent.com/JosLuna98/address_search_text_field/master/screenshot/untitled2.gif)
+
+##  License
+
+MIT License
