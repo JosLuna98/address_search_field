@@ -10,6 +10,7 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^0.1.2
+  toast: ^0.1.5
   address_search_text_field:
     path: ../
 
