@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:address_search_text_field/address_search_text_field.dart';
+import 'package:toast/toast.dart';
 
 void main() => runApp(MyApp());
 
@@ -46,14 +47,20 @@ class MyHomePage extends StatelessWidget {
                 child: Text("get data"),
                 color: Colors.blue,
                 onPressed: () {
-                  AddressPoint point = searchAddress.values;
-                  print(point.toString());
-                }
-              )
-            ]
-          )
-        )
-      )
+                  // I use toast dependency to better show the result
+                  AddressPoint point = searchAddress.result;
+                  Toast.show(
+                    point.toString(),
+                    context,
+                    duration: Toast.LENGTH_LONG,
+                    gravity: Toast.BOTTOM,
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
