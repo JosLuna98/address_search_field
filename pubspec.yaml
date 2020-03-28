@@ -1,7 +1,6 @@
 name: address_search_text_field
 description: A text field that displays an address search bar that finds a location from a reference and gets nearby addresses. Selecting the desired address returns an object with the latitude, longitude, and full address of the place.
 version: 0.0.1
-author: José Luna<josluna1098@gmail.com>
 homepage: https://github.com/JosLuna98/address_search_text_field.git
 
 environment:
@@ -10,10 +9,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  google_maps_flutter: 0.5.25+1
-  geolocator: 5.3.0
-  geocoder: 0.2.1
-  location: 3.0.0
+  google_maps_flutter: ^0.5.25+1
+  geolocator: ^5.3.0
+  geocoder: ^0.2.1
+  location: ^3.0.0
 
 dev_dependencies:
   flutter_test:
