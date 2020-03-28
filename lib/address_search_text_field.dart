@@ -266,7 +266,7 @@ class AddressPoint {
   double longitude = 0.0;
 
   /// Exclusive constructor to be used in [AddressSearchTextField] class.
-  /// 
+  ///
   /// It sets the [TextEditingController] in this class.
   AddressPoint._(controller) : _ctrl = controller;
 
@@ -286,7 +286,7 @@ class AddressPoint {
   /// of this class.
   set address(String value) => _ctrl.text = value;
 
-  /// Controls what this object returns when it's used in 
+  /// Controls what this object returns when it's used in
   /// [AddressSearchTextField] class.
   AddressPoint _values(String country) {
     return AddressPoint(
