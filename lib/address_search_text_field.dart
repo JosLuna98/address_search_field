@@ -6,12 +6,21 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:location/location.dart';
 
+/// Describes the configuration for an [Element].
 class SearchAddressTextField {
   static final TextEditingController _controller = TextEditingController();
   static final AddressPoint _addressPoint = AddressPoint._(_controller);
   static final Location _locationService = Location();
   static String _country;
 
+  /// Default constructor to create an instance.
+  SearchAddressTextField();
+
+  /// Creates a custom TextField Widget wich [onTap]
+  /// shows a custom AlertDialog with a search bar
+  /// and a list with results.
+  ///
+  /// Returns a TextField.
   static Widget widget({
     @required BuildContext context,
     InputDecoration decoration = const InputDecoration(),
@@ -24,6 +33,7 @@ class SearchAddressTextField {
       readOnly: true,
       controller: _controller,
       decoration: decoration,
+      textCapitalization: TextCapitalization.words,
       onTap: () => showDialog(
         context: context,
         builder: (BuildContext _context) =>
@@ -32,8 +42,10 @@ class SearchAddressTextField {
     );
   }
 
-  AddressPoint get values => _addressPoint._values(_country);
+  /// Returns an [AddressPoint] object.
+  AddressPoint get result => _addressPoint._values(_country);
 
+  /// Initialize the gps service and ask for permissions.
   static void _initService() async {
     bool serviceEnabled = await _locationService.serviceEnabled();
     if (!serviceEnabled) {
@@ -157,6 +169,12 @@ class _ContentState extends State<_Content> {
     );
   }
 
+  /// Returns a widget depending on the state of the search
+  /// process and its result.
+  ///
+  /// Returns [CircularProgressIndicator] while it's searching the address.
+  /// Returns [Text] with `"No hay resultados..."` message if search failed.
+  /// Returns [ListView] if search found places.
   Widget _list(BuildContext context) {
     if (_loading)
       return CircularProgressIndicator();
@@ -188,6 +206,10 @@ class _ContentState extends State<_Content> {
     }
   }
 
+  /// Listener for widget's [TextEditingController] that will
+  /// search for addresses by user's reference.
+  ///
+  /// The reference is used to get coordinates and find nearby places.
   void _listener() async {
     if (!_loading) {
       _places.clear();
@@ -216,6 +238,7 @@ class _ContentState extends State<_Content> {
             await Geocoder.local.findAddressesFromCoordinates(coordinates);
         addresses.asMap().forEach((index, value) {
           String place = value.addressLine;
+          // Checks if place is not duplicated, if it's a country place and if it's not into exceptions
           if (!_places.contains(place) &&
               place.endsWith(country) &&
               !exceptions.contains(place)) _places.add(place);
@@ -232,13 +255,22 @@ class _ContentState extends State<_Content> {
   }
 }
 
+/// An object to control the results from [AddressSearchTextField] class.
 class AddressPoint {
   TextEditingController _ctrl = TextEditingController();
+
+  /// Returns latitude in double
   double latitude = 0.0;
+
+  /// Returns longitude in double
   double longitude = 0.0;
 
+  /// Exclusive constructor to be used in [AddressSearchTextField] class.
+  /// 
+  /// It sets the [TextEditingController] in this class.
   AddressPoint._(controller) : _ctrl = controller;
 
+  /// Default contructor to use out of this file.
   AddressPoint(
       {@required this.latitude,
       @required this.longitude,
@@ -246,9 +278,16 @@ class AddressPoint {
       : _ctrl = TextEditingController.fromValue(
             TextEditingValue(text: address ?? ""));
 
+  /// Returns the text in the [TextEditingController] of an instance
+  /// of this class.
   String get address => _ctrl.text;
+
+  /// Sets a text in the [TextEditingController] of an instance
+  /// of this class.
   set address(String value) => _ctrl.text = value;
 
+  /// Controls what this object returns when it's used in 
+  /// [AddressSearchTextField] class.
   AddressPoint _values(String country) {
     return AddressPoint(
       address: (_ctrl.text.isNotEmpty) ? _ctrl.text : null,
@@ -257,6 +296,7 @@ class AddressPoint {
     );
   }
 
+  /// Returns a [String] to read variables values of the object.
   @override
   String toString() =>
       "address: ${(_ctrl.text.isNotEmpty) ? _ctrl.text : null}, lat: ${(latitude != 0.0) ? latitude : null}, lng: ${(longitude != 0.0) ? longitude : null}";
