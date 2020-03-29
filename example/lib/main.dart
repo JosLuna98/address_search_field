@@ -29,7 +29,7 @@ class MyHomePage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              SearchAddressTextField.widget(
+              AddressSearchTextField.widget(
                 context: context,
                 country: "Ecuador",
                 exceptions: [
@@ -38,6 +38,7 @@ class MyHomePage extends StatelessWidget {
                   "Ecuador"
                 ],
                 onDone: (AddressPoint point) {
+                  // I use toast dependency to better show the result
                   Toast.show(
                     point.toString(),
                     context,

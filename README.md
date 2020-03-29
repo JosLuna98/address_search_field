@@ -9,7 +9,7 @@ To use this plugin, add `address_search_text_field` as a [dependency in your pub
 
 ```yaml
 dependencies:
-  address_search_text_field: ^1.0.0
+  address_search_text_field: ^1.1.0
 ```
 
 ### Android
@@ -53,7 +53,9 @@ On iOS you'll need to add the `NSLocationWhenInUseUsageDescription` to your Info
 
 ``` xml
 <key>NSLocationWhenInUseUsageDescription</key>
-<string>This app needs access to location when open.</string>
+<true/>
+<key>NSLocationAlwaysUsageDescription</key>
+<true/>
 ```
 
 ## Usage
@@ -62,10 +64,17 @@ Import the package:
 ```dart
 import 'package:address_search_text_field/address_search_text_field.dart';
 ```
-Implement it by creating a SearchAddressTextField variable. You can call **widget** function which returns a TextField Widget. It requires context, country and onDone as parameters, also can add exceptions for found addresses, InputDecoration and TextStyle for TextField.
+Implement it by creating an AddressSearchTextField variable. You can call **widget** function which returns a TextField Widget. It requires context, country and onDone as parameters, also can add exceptions for found addresses, InputDecoration and TextStyle for TextField.
 
 ```dart
-Widget searchAddress = SearchAddressTextField.widget();
+Widget addressSearch = AddressSearchTextField.widget(
+  context: context,
+  decoration: InputDecoration(),
+  style: TextStyle(),
+  country: country,
+  exceptions: <String>[],
+  onDone: (AddressPoint value) {},
+);
 ```
 
 | Parameters | Description |
@@ -77,7 +86,7 @@ Widget searchAddress = SearchAddressTextField.widget();
 | exceptions | List < String > (optional)|
 | onDone | Function(AddressPoint) (required) |
 
-At onDone function you get an AddressPoint object with the found address and coordinates. [Example](https://pub.dev/packages/address_search_text_field#-example-tab-)
+At onDone function you get an AddressPoint object with confirmation if place has been found, full address and coordinates. [Example](https://pub.dev/packages/address_search_text_field#-example-tab-)
 
 ## Outcomes
 
