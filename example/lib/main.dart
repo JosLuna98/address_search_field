@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:address_search_text_field/address_search_text_field.dart';
-import 'package:toast/toast.dart';
+import 'package:toast/toast.dart'; // External library
 
 void main() => runApp(MyApp());
 
@@ -18,8 +18,6 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatelessWidget {
-  final SearchAddressTextField searchAddress = SearchAddressTextField();
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -39,16 +37,7 @@ class MyHomePage extends StatelessWidget {
                   "Esmeraldas Province, Ecuador",
                   "Ecuador"
                 ],
-              ),
-              SizedBox(
-                height: 15.0,
-              ),
-              FlatButton(
-                child: Text("get data"),
-                color: Colors.blue,
-                onPressed: () {
-                  // I use toast dependency to better show the result
-                  AddressPoint point = searchAddress.result;
+                onDone: (AddressPoint point) {
                   Toast.show(
                     point.toString(),
                     context,
