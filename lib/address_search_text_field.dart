@@ -7,8 +7,8 @@ import 'package:geocoder/geocoder.dart';
 import 'package:location/location.dart';
 
 /// Describes the configuration for a [Widget].
-/// 
-/// Creates a custom [TextField] wich [onTap()] shows 
+///
+/// Creates a custom [TextField] wich [onTap()] shows
 /// a custom [AlertDialog] with a search bar and a
 /// list with results.
 class AddressSearchTextField {
@@ -87,7 +87,7 @@ class __AddressSearchState extends State<_AddressSearch> {
   final AddressPoint _addressPoint = AddressPoint._();
   final List<String> _places = List();
   bool _loading;
-  
+
   /// Creates an [_AddressSearch] widget.
   __AddressSearchState(
       this.controller, this.country, this.exceptions, this.onDone);
@@ -299,7 +299,7 @@ class AddressPoint {
       ((_latitude != null && _latitude != 0.0) &&
           (_longitude != null && _longitude != 0.0)));
 
-  /// Returns a [String] with full address or reference if it 
+  /// Returns a [String] with full address or reference if it
   /// exists, otherwise it returns null.
   String get address {
     if (_address.isEmpty) return null;
