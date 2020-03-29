@@ -6,20 +6,21 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:location/location.dart';
 
-/// Describes the configuration for an [Element].
-class SearchAddressTextField {
+/// Describes the configuration for a [Widget].
+/// 
+/// Creates a custom [TextField] wich [onTap()] shows 
+/// a custom [AlertDialog] with a search bar and a
+/// list with results.
+class AddressSearchTextField {
   static final TextEditingController _controller = TextEditingController();
-  static final AddressPoint _addressPoint = AddressPoint._(_controller);
   static final Location _locationService = Location();
 
-  /// Default constructor to create an instance.
-  SearchAddressTextField();
+  /// Constructor to run location service.
+  AddressSearchTextField() {
+    _initService();
+  }
 
-  /// Creates a custom TextField Widget wich [onTap]
-  /// shows a custom AlertDialog with a search bar
-  /// and a list with results.
-  ///
-  /// Returns a TextField.
+  /// creates and returns a [TextField].
   static Widget widget({
     @required BuildContext context,
     InputDecoration decoration = const InputDecoration(),
@@ -28,7 +29,6 @@ class SearchAddressTextField {
     List<String> exceptions = const [],
     @required void Function(AddressPoint value) onDone,
   }) {
-    _initService();
     return TextField(
       readOnly: true,
       controller: _controller,
@@ -38,12 +38,12 @@ class SearchAddressTextField {
       onTap: () => showDialog(
         context: context,
         builder: (BuildContext _context) =>
-            _Content(_addressPoint, _controller, country, exceptions, onDone),
+            _AddressSearch(_controller, country, exceptions, onDone),
       ),
     );
   }
 
-  /// Initialize the gps service and ask for permissions.
+  /// Initialize gps service and ask for permissions.
   static void _initService() async {
     bool serviceEnabled = await _locationService.serviceEnabled();
     if (!serviceEnabled) {
@@ -63,39 +63,39 @@ class SearchAddressTextField {
   }
 }
 
-class _Content extends StatefulWidget {
-  final AddressPoint addressPoint;
+/// Widget based in an [AlertDialog] with a search bar and list of results.
+class _AddressSearch extends StatefulWidget {
   final TextEditingController controller;
   final String country;
   final List<String> exceptions;
   final void Function(AddressPoint value) onDone;
 
-  _Content(this.addressPoint, this.controller, this.country, this.exceptions,
-      this.onDone);
+  /// Constructs the [StatefulWidget] from a concrete [country].
+  _AddressSearch(this.controller, this.country, this.exceptions, this.onDone);
 
   @override
-  _ContentState createState() =>
-      _ContentState(addressPoint, controller, country, exceptions, onDone);
+  __AddressSearchState createState() =>
+      __AddressSearchState(controller, country, exceptions, onDone);
 }
 
-class _ContentState extends State<_Content> {
-  final AddressPoint addressPoint;
+/// State of [_AddressSearch].
+class __AddressSearchState extends State<_AddressSearch> {
   final TextEditingController controller;
   final String country;
   final List<String> exceptions;
   final void Function(AddressPoint value) onDone;
+  final AddressPoint _addressPoint = AddressPoint._();
   final List<String> _places = List();
   bool _loading;
-
-  _ContentState(this.addressPoint, this.controller, this.country,
-      this.exceptions, this.onDone);
-
-  /// Returns an [AddressPoint] object.
-  AddressPoint get result => addressPoint._values(country);
+  
+  /// Creates an [_AddressSearch] widget.
+  __AddressSearchState(
+      this.controller, this.country, this.exceptions, this.onDone);
 
   @override
   void initState() {
     super.initState();
+    _addressPoint._country = country;
     _loading = false;
     controller.addListener(_listener);
   }
@@ -149,7 +149,8 @@ class _ContentState extends State<_Content> {
                 GestureDetector(
                   child: Icon(Icons.send),
                   onTap: () {
-                    onDone(result);
+                    _addressPoint._address = controller.text;
+                    onDone(_addressPoint);
                     Navigator.of(context).pop();
                   },
                 ),
@@ -175,11 +176,11 @@ class _ContentState extends State<_Content> {
     );
   }
 
-  /// Returns a widget depending on the state of the search
+  /// Returns a [Widget] depending on the state of the search
   /// process and its result.
   ///
   /// Returns [CircularProgressIndicator] while it's searching the address.
-  /// Returns [Text] with `"No hay resultados..."` message if search failed.
+  /// Returns [Text] with `No hay resultados...` message if search failed.
   /// Returns [ListView] if search found places.
   Widget _list(BuildContext context) {
     if (_loading)
@@ -199,7 +200,8 @@ class _ContentState extends State<_Content> {
               ),
               onTap: () {
                 controller.text = _places[index];
-                onDone(result);
+                _addressPoint._address = controller.text;
+                onDone(_addressPoint);
                 Navigator.of(context).pop();
               },
             );
@@ -213,7 +215,7 @@ class _ContentState extends State<_Content> {
     }
   }
 
-  /// Listener for widget's [TextEditingController] that will
+  /// [Listener] for widget's [TextEditingController] that will
   /// search for addresses by user's reference.
   ///
   /// The reference is used to get coordinates and find nearby places.
@@ -232,15 +234,15 @@ class _ContentState extends State<_Content> {
               .placemarkFromAddress(controller.text + ", Esmeraldas, Ecuador");
         }
         if (placeMarks.isNotEmpty) {
-          addressPoint.latitude = placeMarks[0].position.latitude;
-          addressPoint.longitude = placeMarks[0].position.longitude;
+          _addressPoint._latitude = placeMarks[0].position.latitude;
+          _addressPoint._longitude = placeMarks[0].position.longitude;
         }
       } on NoSuchMethodError catch (_) {} on PlatformException catch (_) {} catch (_) {
         debugPrint("ERROR CATCHED: " + _.toString());
       }
       try {
         Coordinates coordinates =
-            Coordinates(addressPoint.latitude, addressPoint.longitude);
+            Coordinates(_addressPoint._latitude, _addressPoint._longitude);
         List<Address> addresses =
             await Geocoder.local.findAddressesFromCoordinates(coordinates);
         addresses.asMap().forEach((index, value) {
@@ -263,48 +265,67 @@ class _ContentState extends State<_Content> {
 }
 
 /// An object to control the results from [AddressSearchTextField] class.
+///
+/// Saves info about a found place in a concrete [country].
 class AddressPoint {
-  TextEditingController _ctrl = TextEditingController();
+  String _address;
+  double _latitude;
+  double _longitude;
+  String _country;
 
-  /// Returns latitude in double
-  double latitude = 0.0;
+  /// Constructs an [AddressPoint] object to save and use the [AddressSearchTextfield] result.
+  AddressPoint({
+    @required String address,
+    @required double latitude,
+    @required double longitude,
+    @required String country,
+  })  : _address = address,
+        _latitude = latitude,
+        _longitude = longitude,
+        _country = country;
 
-  /// Returns longitude in double
-  double longitude = 0.0;
+  /// Constructs an [AddressPoint] object to only be used in this file.
+  AddressPoint._()
+      : _address = "",
+        _latitude = 0.0,
+        _longitude = 0.0,
+        _country = "";
 
-  /// Exclusive constructor to be used in [AddressSearchTextField] class.
-  ///
-  /// It sets the [TextEditingController] in this class.
-  AddressPoint._(controller) : _ctrl = controller;
+  /// Returns a [String] with country name given in the constructor.
+  String get country => _country;
 
-  /// Default contructor to use out of this file.
-  AddressPoint(
-      {@required this.latitude,
-      @required this.longitude,
-      @required String address})
-      : _ctrl = TextEditingController.fromValue(
-            TextEditingValue(text: address ?? ""));
+  /// Returns a [bool] to know if object has a found [address].
+  bool get found => (_address.toLowerCase().endsWith(_country.toLowerCase()) &&
+      ((_latitude != null && _latitude != 0.0) &&
+          (_longitude != null && _longitude != 0.0)));
 
-  /// Returns the text in the [TextEditingController] of an instance
-  /// of this class.
-  String get address => _ctrl.text;
+  /// Returns a [String] with full address or reference if it 
+  /// exists, otherwise it returns null.
+  String get address {
+    if (_address.isEmpty) return null;
+    if (!found)
+      return (_address + ", " + _country)
+          .split(' ')
+          .map((word) => word[0].toUpperCase() + word.substring(1))
+          .join(' ');
+    return _address;
+  }
 
-  /// Sets a text in the [TextEditingController] of an instance
-  /// of this class.
-  set address(String value) => _ctrl.text = value;
+  /// Returns a [double] with point's latitude if
+  /// it exists, otherwise it returns null.
+  double get latitude {
+    if (found) return _latitude;
+    return null;
+  }
 
-  /// Controls what this object returns when it's used in
-  /// [AddressSearchTextField] class.
-  AddressPoint _values(String country) {
-    return AddressPoint(
-      address: (_ctrl.text.isNotEmpty) ? _ctrl.text : null,
-      latitude: (_ctrl.text.endsWith(country)) ? latitude : null,
-      longitude: (_ctrl.text.endsWith(country)) ? longitude : null,
-    );
+  /// Returns a [double] with point's longitude if
+  /// it exists, otherwise it returns null.
+  double get longitude {
+    if (found) return _longitude;
+    return null;
   }
 
   /// Returns a [String] to read variables values of the object.
   @override
-  String toString() =>
-      "address: ${(_ctrl.text.isNotEmpty) ? _ctrl.text : null}, lat: ${(latitude != 0.0) ? latitude : null}, lng: ${(longitude != 0.0) ? longitude : null}";
+  String toString() => "addr: $address, lat: $latitude, lng: $longitude";
 }
