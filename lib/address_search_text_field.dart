@@ -11,7 +11,6 @@ class SearchAddressTextField {
   static final TextEditingController _controller = TextEditingController();
   static final AddressPoint _addressPoint = AddressPoint._(_controller);
   static final Location _locationService = Location();
-  static String _country;
 
   /// Default constructor to create an instance.
   SearchAddressTextField();
@@ -24,26 +23,25 @@ class SearchAddressTextField {
   static Widget widget({
     @required BuildContext context,
     InputDecoration decoration = const InputDecoration(),
+    TextStyle style = const TextStyle(),
     @required String country,
     List<String> exceptions = const [],
+    @required void Function(AddressPoint value) onDone,
   }) {
     _initService();
-    _country = country;
     return TextField(
       readOnly: true,
       controller: _controller,
       decoration: decoration,
+      style: style,
       textCapitalization: TextCapitalization.words,
       onTap: () => showDialog(
         context: context,
         builder: (BuildContext _context) =>
-            _Content(_addressPoint, _controller, country, exceptions),
+            _Content(_addressPoint, _controller, country, exceptions, onDone),
       ),
     );
   }
-
-  /// Returns an [AddressPoint] object.
-  AddressPoint get result => _addressPoint._values(_country);
 
   /// Initialize the gps service and ask for permissions.
   static void _initService() async {
@@ -70,11 +68,14 @@ class _Content extends StatefulWidget {
   final TextEditingController controller;
   final String country;
   final List<String> exceptions;
-  _Content(this.addressPoint, this.controller, this.country, this.exceptions);
+  final void Function(AddressPoint value) onDone;
+
+  _Content(this.addressPoint, this.controller, this.country, this.exceptions,
+      this.onDone);
 
   @override
   _ContentState createState() =>
-      _ContentState(addressPoint, controller, country, exceptions);
+      _ContentState(addressPoint, controller, country, exceptions, onDone);
 }
 
 class _ContentState extends State<_Content> {
@@ -82,11 +83,15 @@ class _ContentState extends State<_Content> {
   final TextEditingController controller;
   final String country;
   final List<String> exceptions;
-  _ContentState(
-      this.addressPoint, this.controller, this.country, this.exceptions);
-
+  final void Function(AddressPoint value) onDone;
   final List<String> _places = List();
   bool _loading;
+
+  _ContentState(this.addressPoint, this.controller, this.country,
+      this.exceptions, this.onDone);
+
+  /// Returns an [AddressPoint] object.
+  AddressPoint get result => addressPoint._values(country);
 
   @override
   void initState() {
@@ -144,6 +149,7 @@ class _ContentState extends State<_Content> {
                 GestureDetector(
                   child: Icon(Icons.send),
                   onTap: () {
+                    onDone(result);
                     Navigator.of(context).pop();
                   },
                 ),
@@ -193,6 +199,7 @@ class _ContentState extends State<_Content> {
               ),
               onTap: () {
                 controller.text = _places[index];
+                onDone(result);
                 Navigator.of(context).pop();
               },
             );
