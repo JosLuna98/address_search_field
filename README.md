@@ -9,7 +9,7 @@ To use this plugin, add `address_search_text_field` as a [dependency in your pub
 
 ```yaml
 dependencies:
-  address_search_text_field: ^0.1.0+1
+  address_search_text_field: ^1.0.0
 ```
 
 ### Android
@@ -62,51 +62,7 @@ Import the package:
 ```dart
 import 'package:address_search_text_field/address_search_text_field.dart';
 ```
-Implement it by creating a SearchAddressTextField variable. You can call **widget** function whichreturns a TextField Widget giving it a context and country, also can add exceptions for the found addresses and a InputDecoration for TextField.
-```dart
-class MyHomePage extends StatelessWidget {
-  final SearchAddressTextField searchAddress = SearchAddressTextField();
-
-  @override
-  Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
-    return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Container(
-          width: size.width * 0.80,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              SearchAddressTextField.widget(
-                context: context,
-                country: "Ecuador",
-                exceptions: [
-                  "Esmeraldas, Ecuador",
-                  "Esmeraldas Province, Ecuador",
-                  "Ecuador"
-                ],
-              ),
-              SizedBox(
-                height: 15.0,
-              ),
-              FlatButton(
-                child: Text("get data"),
-                color: Colors.blue,
-                onPressed: () {
-                  AddressPoint point = searchAddress.result;
-                  print(point.toString());
-                },
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-```
-Then you just need to call the **result** getter function to get an AddressPoint object with the found address and coordinates.
+Implement it by creating a SearchAddressTextField variable. You can call **widget** function which returns a TextField Widget. It requires context, country and onDone as parameters, also can add exceptions for found addresses, InputDecoration and TextStyle for TextField.
 
 ```dart
 Widget searchAddress = SearchAddressTextField.widget();
@@ -116,13 +72,19 @@ Widget searchAddress = SearchAddressTextField.widget();
 |------------|-------------|
 | context | BuildContext (Not Null) (required) |
 | decoration | InputDecoration (optional)|
+| style | TextStyle (optional) |
 | country | String (Not Null) (required) |
 | exceptions | List < String > (optional)|
+| onDone | Function(AddressPoint) (required) |
+
+At onDone function you get an AddressPoint object with the found address and coordinates. [Example](https://pub.dev/packages/address_search_text_field#-example-tab-)
 
 ## Outcomes
 
 ```dart
-AddressPoint point = SearchAddressTextField.result;
+onDone: (AddressPoint point) {
+  print(point.toString());
+}
 ```
 
 There are three possible outcomes:
@@ -130,12 +92,10 @@ There are three possible outcomes:
 2. If a place has been found from the reference, all the variables will be initialized.
 3. If the desired location has not been found and the reference entered by the user is selected, there will be no latitude and longitude values ​​and the address will be the user's reference since nothing was found.
 
+**NOTE:** User usually has to tap the text field in the search bar again to find the place with its full reference
+
 ![](https://raw.githubusercontent.com/JosLuna98/address_search_text_field/master/screenshot/untitled.gif)
 
-
-The user usually has to tap the text field in the search bar again to find the place with its full reference
-
-![](https://raw.githubusercontent.com/JosLuna98/address_search_text_field/master/screenshot/untitled2.gif)
 
 ##  License
 
