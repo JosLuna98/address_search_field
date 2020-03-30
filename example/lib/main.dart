@@ -44,11 +44,14 @@ class _PageOneState extends State<PageOne> {
                   "Esmeraldas Province, Ecuador",
                   "Ecuador"
                 ],
+                coordForRef: true,
                 onDone: (AddressPoint point) async {
-                  AddressPoint point2 = await AddressPoint.fromPoint(
-                    latitude: point.latitude,
-                    longitude: point.longitude,
-                  );
+                  AddressPoint point2;
+                  if (point.latitude != null)
+                    point2 = await AddressPoint.fromPoint(
+                      latitude: point.latitude,
+                      longitude: point.longitude,
+                    );
                   setState(() {
                     texto = "${point.toString()}\n\n${point2.toString()}";
                   });
@@ -86,10 +89,6 @@ class PageTwo extends StatelessWidget {
           "Ecuador"
         ],
         onDone: (AddressPoint point) async {
-          await AddressPoint.fromPoint(
-            latitude: point.latitude,
-            longitude: point.longitude,
-          );
           // I use toast dependency to prettier show the result
           Toast.show(
             point.toString(),
