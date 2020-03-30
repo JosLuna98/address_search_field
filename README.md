@@ -9,7 +9,7 @@ To use this plugin, add `address_search_text_field` as a [dependency in your pub
 
 ```yaml
 dependencies:
-  address_search_text_field: ^1.2.0
+  address_search_text_field: ^1.2.1
 ```
 
 ### Android
@@ -74,6 +74,7 @@ Widget addressSearchTextField = AddressSearchTextField.widget(
   style: TextStyle(),
   country: country,
   exceptions: <String>[],
+  coordForRef: bool,
   onDone: (AddressPoint value) {},
 );
 ```
@@ -86,6 +87,7 @@ Widget addressSearchTextField = AddressSearchTextField.widget(
 | style | TextStyle (optional) |
 | country | String (Not Null) (required) |
 | exceptions | List < String > (optional)|
+| coordForRef | bool (optional) |
 | onDone | Function(AddressPoint) (required) |
 
 ```dart
@@ -93,6 +95,7 @@ Widget addressSearchBox = AddressSearchBox(
   controller: controller,
   country: country,
   exceptions: <String>[],
+  coordForRef: bool,
   onDone: (AddressPoint value) {},
 );
 ```
@@ -102,6 +105,7 @@ Widget addressSearchBox = AddressSearchBox(
 | controller | TextEditingController (optional)
 | country | String (Not Null) (required) |
 | exceptions | List < String > (optional)|
+| coordForRef | bool (optional) |
 | onDone | Function(AddressPoint) (required) |
 
 At onDone function you get an AddressPoint object with confirmation if place has been found, full address and coordinates. [Example](https://pub.dev/packages/address_search_text_field#-example-tab-)
