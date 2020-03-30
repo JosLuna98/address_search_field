@@ -90,7 +90,7 @@ class PageTwo extends StatelessWidget {
             latitude: point.latitude,
             longitude: point.longitude,
           );
-          // I use toast dependency to pretty show the result
+          // I use toast dependency to prettier show the result
           Toast.show(
             point.toString(),
             context,
