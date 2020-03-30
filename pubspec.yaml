@@ -1,6 +1,6 @@
 name: address_search_text_field
-description: A textfield displays an address search box that gets nearby addresses by a reference. Selecting can get an object with the latitude, longitude, and full address of a place.
-version: 1.2.0
+description: An address search box that gets nearby addresses by typing a reference, returns an object with place primary data. The object can also find an address using coordinates.
+version: 1.2.1
 author: José Luna <josluna1098@gmail.com>
 homepage: https://github.com/JosLuna98/address_search_text_field.git
 
@@ -19,4 +19,4 @@ dev_dependencies:
     sdk: flutter
 
 flutter:
-
+  uses-material-design: true

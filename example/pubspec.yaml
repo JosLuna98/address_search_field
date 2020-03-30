@@ -1,5 +1,5 @@
 name: example
-description: A new Flutter application for example of address search text field.
+description: A flutter application for example of address_search_text_field plugin.
 
 version: 1.0.0+1
 
@@ -9,14 +9,13 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  cupertino_icons: ^0.1.2
   toast: ^0.1.5
-  address_search_text_field:
-    path: ../
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  address_search_text_field:
+    path: ../
 
 flutter:
   uses-material-design: true
