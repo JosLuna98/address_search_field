@@ -9,7 +9,7 @@ To use this plugin, add `address_search_text_field` as a [dependency in your pub
 
 ```yaml
 dependencies:
-  address_search_text_field: ^1.1.0
+  address_search_text_field: ^1.2.0
 ```
 
 ### Android
@@ -67,8 +67,9 @@ import 'package:address_search_text_field/address_search_text_field.dart';
 Implement it by creating an AddressSearchTextField variable. You can call **widget** function which returns a TextField Widget. It requires context, country and onDone as parameters, also can add exceptions for found addresses, InputDecoration and TextStyle for TextField.
 
 ```dart
-Widget addressSearch = AddressSearchTextField.widget(
+Widget addressSearchTextField = AddressSearchTextField.widget(
   context: context,
+  controller: controller,
   decoration: InputDecoration(),
   style: TextStyle(),
   country: country,
@@ -80,8 +81,25 @@ Widget addressSearch = AddressSearchTextField.widget(
 | Parameters | Description |
 |------------|-------------|
 | context | BuildContext (Not Null) (required) |
+| controller | TextEditingController (optional)
 | decoration | InputDecoration (optional)|
 | style | TextStyle (optional) |
+| country | String (Not Null) (required) |
+| exceptions | List < String > (optional)|
+| onDone | Function(AddressPoint) (required) |
+
+```dart
+Widget addressSearchBox = AddressSearchBox(
+  controller: controller,
+  country: country,
+  exceptions: <String>[],
+  onDone: (AddressPoint value) {},
+);
+```
+
+| Parameters | Description |
+|------------|-------------|
+| controller | TextEditingController (optional)
 | country | String (Not Null) (required) |
 | exceptions | List < String > (optional)|
 | onDone | Function(AddressPoint) (required) |
