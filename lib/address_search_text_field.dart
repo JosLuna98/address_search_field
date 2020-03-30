@@ -6,80 +6,105 @@ import 'package:geolocator/geolocator.dart';
 import 'package:geocoder/geocoder.dart';
 import 'package:location/location.dart';
 
+/// Check gps service and ask for permissions.
+void _initService() async {
+  final Location _locationService = Location();
+
+  bool serviceEnabled = await _locationService.serviceEnabled();
+  if (!serviceEnabled) {
+    serviceEnabled = await _locationService.requestService();
+    if (!serviceEnabled) {
+      return;
+    }
+  }
+
+  PermissionStatus permissionGranted = await _locationService.hasPermission();
+  if (permissionGranted == PermissionStatus.denied) {
+    permissionGranted = await _locationService.requestPermission();
+    if (permissionGranted != PermissionStatus.granted) {
+      return;
+    }
+  }
+}
+
 /// Describes the configuration for a [Widget].
 ///
-/// Creates a custom [TextField] wich [onTap()] shows
+/// Creates a [TextField] wich [onTap] shows
 /// a custom [AlertDialog] with a search bar and a
-/// list with results.
+/// list with results called [AddressSearchBox].
 class AddressSearchTextField {
   static final TextEditingController _controller = TextEditingController();
-  static final Location _locationService = Location();
 
   /// Constructor to run location service.
   AddressSearchTextField() {
     _initService();
   }
 
-  /// creates and returns a [TextField].
+  /// creates and returns a [TextField] which calls
+  /// an [AddressSearchBox] widget.
+  ///
+  /// The controller for [TextField] may be null because
+  /// it would initialize with an internal [TextEditingController].
   static Widget widget({
     @required BuildContext context,
+    TextEditingController controller,
     InputDecoration decoration = const InputDecoration(),
     TextStyle style = const TextStyle(),
     @required String country,
     List<String> exceptions = const [],
     @required void Function(AddressPoint value) onDone,
   }) {
+    assert(country.isNotEmpty, "Country can't be empty");
     return TextField(
       readOnly: true,
-      controller: _controller,
+      controller: controller ?? _controller,
       decoration: decoration,
       style: style,
       textCapitalization: TextCapitalization.words,
       onTap: () => showDialog(
         context: context,
-        builder: (BuildContext _context) =>
-            _AddressSearch(_controller, country, exceptions, onDone),
+        builder: (BuildContext _context) => AddressSearchBox(
+          controller: controller ?? _controller,
+          country: country,
+          exceptions: exceptions,
+          onDone: onDone,
+        ),
       ),
     );
   }
-
-  /// Initialize gps service and ask for permissions.
-  static void _initService() async {
-    bool serviceEnabled = await _locationService.serviceEnabled();
-    if (!serviceEnabled) {
-      serviceEnabled = await _locationService.requestService();
-      if (!serviceEnabled) {
-        return;
-      }
-    }
-
-    PermissionStatus permissionGranted = await _locationService.hasPermission();
-    if (permissionGranted == PermissionStatus.denied) {
-      permissionGranted = await _locationService.requestPermission();
-      if (permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-  }
 }
 
-/// Widget based in an [AlertDialog] with a search bar and list of results.
-class _AddressSearch extends StatefulWidget {
+/// Widget based in an [AlertDialog] with a search bar and list of results,
+/// all in one box.
+class AddressSearchBox extends StatefulWidget {
+  /// [TextEditingController] to manage text in the searchbar.
   final TextEditingController controller;
+
+  /// Country to look for an address.
   final String country;
+
+  /// Resulting addresses to be ignored
   final List<String> exceptions;
+
+  /// Callback to run when search ends.
   final void Function(AddressPoint value) onDone;
 
-  /// Constructs the [StatefulWidget] from a concrete [country].
-  _AddressSearch(this.controller, this.country, this.exceptions, this.onDone);
+  /// Constructs an [AddressSearchBox] widget from a concrete [country].
+  AddressSearchBox({
+    TextEditingController controller,
+    @required this.country,
+    this.exceptions = const <String>[],
+    @required this.onDone,
+  })  : assert(country.isNotEmpty, "Country can't be empty"),
+        this.controller = controller ?? TextEditingController();
 
   @override
-  __AddressSearchState createState() =>
-      __AddressSearchState(controller, country, exceptions, onDone);
+  _AddressSearchBoxState createState() =>
+      _AddressSearchBoxState(controller, country, exceptions, onDone);
 }
 
-/// State of [_AddressSearch].
-class __AddressSearchState extends State<_AddressSearch> {
+/// State of [AddressSearchBox].
+class _AddressSearchBoxState extends State<AddressSearchBox> {
   final TextEditingController controller;
   final String country;
   final List<String> exceptions;
@@ -87,16 +112,20 @@ class __AddressSearchState extends State<_AddressSearch> {
   final AddressPoint _addressPoint = AddressPoint._();
   final List<String> _places = List();
   bool _loading;
+  bool _waiting;
 
-  /// Creates an [_AddressSearch] widget.
-  __AddressSearchState(
-      this.controller, this.country, this.exceptions, this.onDone);
+  /// Creates the state of an [AddressSearchBox] widget.
+  _AddressSearchBoxState(
+      this.controller, this.country, this.exceptions, this.onDone) {
+    _initService();
+  }
 
   @override
   void initState() {
     super.initState();
     _addressPoint._country = country;
     _loading = false;
+    _waiting = false;
     controller.addListener(_listener);
   }
 
@@ -108,71 +137,82 @@ class __AddressSearchState extends State<_AddressSearch> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          Container(
-            height: 60.0,
-            width: size.width * 0.80,
-            padding: EdgeInsets.symmetric(horizontal: 15.0),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(10.0),
-                topRight: Radius.circular(10.0),
+      content: _waiting
+          ? Container(
+              height: size.height * 0.28 + 60.0,
+              width: size.width * 0.80,
+              alignment: Alignment.centerLeft,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10.0)),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black45,
-                  blurRadius: 12.0,
-                  spreadRadius: 1.0,
-                )
-              ],
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            )
+          : Column(
+              mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                SizedBox(
-                  width: size.width * 0.63,
-                  child: TextField(
-                    controller: controller,
-                    autofocus: true,
-                    autocorrect: false,
-                    decoration: InputDecoration(
-                        prefix: Padding(
-                          padding: EdgeInsets.only(left: 5.0, right: 8.0),
-                          child: Icon(Icons.search),
+                Container(
+                  height: 60.0,
+                  width: size.width * 0.80,
+                  padding: EdgeInsets.symmetric(horizontal: 15.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10.0),
+                      topRight: Radius.circular(10.0),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black45,
+                        blurRadius: 12.0,
+                        spreadRadius: 1.0,
+                      )
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: <Widget>[
+                      SizedBox(
+                        width: size.width * 0.63,
+                        child: TextField(
+                          controller: controller,
+                          autofocus: true,
+                          autocorrect: false,
+                          decoration: InputDecoration(
+                              prefix: Padding(
+                                padding: EdgeInsets.only(left: 5.0, right: 8.0),
+                                child: Icon(Icons.search),
+                              ),
+                              hintText: "Dirección"),
                         ),
-                        hintText: "Dirección"),
+                      ),
+                      GestureDetector(
+                        child: Icon(Icons.send),
+                        onTap: () {
+                          _addressPoint._address = controller.text;
+                          _asyncFunct();
+                        },
+                      ),
+                    ],
                   ),
                 ),
-                GestureDetector(
-                  child: Icon(Icons.send),
-                  onTap: () {
-                    _addressPoint._address = controller.text;
-                    onDone(_addressPoint);
-                    Navigator.of(context).pop();
-                  },
+                Container(
+                  height: size.height * 0.28,
+                  width: size.width * 0.80,
+                  alignment: Alignment.centerLeft,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(10.0),
+                      bottomRight: Radius.circular(10.0),
+                    ),
+                  ),
+                  child: Center(
+                    child: _list(context),
+                  ),
                 ),
               ],
             ),
-          ),
-          Container(
-            height: size.height * 0.28,
-            width: size.width * 0.80,
-            alignment: Alignment.centerLeft,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(10.0),
-                bottomRight: Radius.circular(10.0),
-              ),
-            ),
-            child: Center(
-              child: _list(context),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -201,8 +241,7 @@ class __AddressSearchState extends State<_AddressSearch> {
               onTap: () {
                 controller.text = _places[index];
                 _addressPoint._address = controller.text;
-                onDone(_addressPoint);
-                Navigator.of(context).pop();
+                _asyncFunct();
               },
             );
           },
@@ -262,18 +301,40 @@ class __AddressSearchState extends State<_AddressSearch> {
       }
     }
   }
+
+  /// If the user runs an asynchronous process in [onDone] function
+  /// it will display an [CircularProgressIndicator] (changing [_waiting]
+  /// vairable) in the [AddressSearchBox] until the process ends.
+  void _asyncFunct() async {
+    setState(() {
+      _waiting = true;
+    });
+    await Future.delayed(
+      Duration(),
+      () => onDone(_addressPoint),
+    );
+    try {
+      setState(() => _waiting = false);
+    } catch (_) {
+      _waiting = false;
+    }
+  }
 }
 
-/// An object to control the results from [AddressSearchTextField] class.
+/// An object to control the results from [AddressSearchBox] class.
 ///
 /// Saves info about a found place in a concrete [country].
+///
+/// It also allows to generate a new asynchonous object from latitude and
+/// longitude values passed to [fromPoint] method.
 class AddressPoint {
   String _address;
   double _latitude;
   double _longitude;
   String _country;
 
-  /// Constructs an [AddressPoint] object to save and use the [AddressSearchTextfield] result.
+  /// Constructs an [AddressPoint] object to save and
+  /// use the [AddressSearchBox] result.
   AddressPoint({
     @required String address,
     @required double latitude,
@@ -290,6 +351,33 @@ class AddressPoint {
         _latitude = 0.0,
         _longitude = 0.0,
         _country = "";
+
+  /// Generates an [AddressPoint] from finding address from latitude
+  /// and longitude values passed.
+  static Future<AddressPoint> fromPoint(
+      {@required double latitude, @required double longitude}) async {
+    assert(latitude != null && longitude != null,
+        "fromPoint method won't work without coordinates");
+    _initService();
+    String address;
+    String country;
+    try {
+      Coordinates coordinates = Coordinates(latitude, longitude);
+      List<Address> addresses =
+          await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      address = addresses[0].addressLine;
+      country = address.split(", ").last;
+      return AddressPoint(
+        address: address,
+        latitude: latitude,
+        longitude: longitude,
+        country: country,
+      );
+    } on NoSuchMethodError catch (_) {} on PlatformException catch (_) {} catch (_) {
+      debugPrint("ERROR CATCHED: " + _.toString());
+    }
+    return null;
+  }
 
   /// Returns a [String] with country name given in the constructor.
   String get country => _country;
