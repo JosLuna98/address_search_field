@@ -52,6 +52,7 @@ class AddressSearchTextField {
     TextStyle style = const TextStyle(),
     @required String country,
     List<String> exceptions = const [],
+    bool coordForRef = false,
     @required void Function(AddressPoint value) onDone,
   }) {
     assert(country.isNotEmpty, "Country can't be empty");
@@ -67,6 +68,7 @@ class AddressSearchTextField {
           controller: controller ?? _controller,
           country: country,
           exceptions: exceptions,
+          coordForRef: coordForRef,
           onDone: onDone,
         ),
       ),
@@ -77,14 +79,17 @@ class AddressSearchTextField {
 /// Widget based in an [AlertDialog] with a search bar and list of results,
 /// all in one box.
 class AddressSearchBox extends StatefulWidget {
-  /// [TextEditingController] to manage text in the searchbar.
+  /// Manages text in the address search bar.
   final TextEditingController controller;
 
   /// Country to look for an address.
   final String country;
 
-  /// Resulting addresses to be ignored
+  /// Resulting addresses to be ignored.
   final List<String> exceptions;
+
+  /// If it finds coordinates, they will be set to the reference.
+  final bool coordForRef;
 
   /// Callback to run when search ends.
   final void Function(AddressPoint value) onDone;
@@ -94,13 +99,14 @@ class AddressSearchBox extends StatefulWidget {
     TextEditingController controller,
     @required this.country,
     this.exceptions = const <String>[],
+    this.coordForRef = false,
     @required this.onDone,
   })  : assert(country.isNotEmpty, "Country can't be empty"),
         this.controller = controller ?? TextEditingController();
 
   @override
-  _AddressSearchBoxState createState() =>
-      _AddressSearchBoxState(controller, country, exceptions, onDone);
+  _AddressSearchBoxState createState() => _AddressSearchBoxState(
+      controller, country, exceptions, coordForRef, onDone);
 }
 
 /// State of [AddressSearchBox].
@@ -108,15 +114,17 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
   final TextEditingController controller;
   final String country;
   final List<String> exceptions;
+  final bool coordForRef;
   final void Function(AddressPoint value) onDone;
   final AddressPoint _addressPoint = AddressPoint._();
   final List<String> _places = List();
+  Size _size = Size(0.0, 0.0);
   bool _loading;
   bool _waiting;
 
   /// Creates the state of an [AddressSearchBox] widget.
-  _AddressSearchBoxState(
-      this.controller, this.country, this.exceptions, this.onDone) {
+  _AddressSearchBoxState(this.controller, this.country, this.exceptions,
+      this.coordForRef, this.onDone) {
     _initService();
   }
 
@@ -131,90 +139,73 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    _size = MediaQuery.of(context).size;
     return AlertDialog(
       contentPadding: EdgeInsets.all(0.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
       content: _waiting
-          ? Container(
-              height: size.height * 0.28 + 60.0,
-              width: size.width * 0.80,
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(10.0)),
-              ),
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            )
+          ? _loadingIndicator
           : Column(
               mainAxisSize: MainAxisSize.min,
               children: <Widget>[
-                Container(
-                  height: 60.0,
-                  width: size.width * 0.80,
-                  padding: EdgeInsets.symmetric(horizontal: 15.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10.0),
-                      topRight: Radius.circular(10.0),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black45,
-                        blurRadius: 12.0,
-                        spreadRadius: 1.0,
-                      )
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      SizedBox(
-                        width: size.width * 0.63,
-                        child: TextField(
-                          controller: controller,
-                          autofocus: true,
-                          autocorrect: false,
-                          decoration: InputDecoration(
-                              prefix: Padding(
-                                padding: EdgeInsets.only(left: 5.0, right: 8.0),
-                                child: Icon(Icons.search),
-                              ),
-                              hintText: "Dirección"),
-                        ),
-                      ),
-                      GestureDetector(
-                        child: Icon(Icons.send),
-                        onTap: () {
-                          _addressPoint._address = controller.text;
-                          _asyncFunct();
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  height: size.height * 0.28,
-                  width: size.width * 0.80,
-                  alignment: Alignment.centerLeft,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(10.0),
-                      bottomRight: Radius.circular(10.0),
-                    ),
-                  ),
-                  child: Center(
-                    child: _list(context),
-                  ),
-                ),
+                _addressSearchBar,
+                _addressSearchResult,
               ],
             ),
     );
   }
+
+  /// Returns the address search bar widget to write an address reference.
+  Widget get _addressSearchBar => Container(
+        height: 60.0,
+        width: _size.width * 0.80,
+        padding: EdgeInsets.symmetric(horizontal: 15.0),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(10.0),
+            topRight: Radius.circular(10.0),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black45,
+              blurRadius: 12.0,
+              spreadRadius: 1.0,
+            )
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            SizedBox(
+              width: _size.width * 0.63,
+              child: TextField(
+                controller: controller,
+                autofocus: true,
+                autocorrect: false,
+                decoration: InputDecoration(
+                    prefix: Padding(
+                      padding: EdgeInsets.only(left: 5.0, right: 8.0),
+                      child: Icon(Icons.search),
+                    ),
+                    hintText: "Dirección"),
+              ),
+            ),
+            GestureDetector(
+              child: Icon(Icons.send),
+              onTap: () async {
+                _addressPoint._address = controller.text;
+                if (_places.isNotEmpty && coordForRef)
+                  _addressPoint._address += ", " + country;
+                controller.text = _addressPoint.address;
+                _asyncFunct();
+              },
+            ),
+          ],
+        ),
+      );
 
   /// Returns a [Widget] depending on the state of the search
   /// process and its result.
@@ -222,37 +213,60 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
   /// Returns [CircularProgressIndicator] while it's searching the address.
   /// Returns [Text] with `No hay resultados...` message if search failed.
   /// Returns [ListView] if search found places.
-  Widget _list(BuildContext context) {
-    if (_loading)
-      return CircularProgressIndicator();
-    else {
-      if (_places.isNotEmpty)
-        return ListView.separated(
-          padding: EdgeInsets.all(10.0),
-          itemCount: _places.length,
-          separatorBuilder: (BuildContext context, int index) =>
-              (index != _places.length - 1) ? Divider() : Container(),
-          itemBuilder: (BuildContext context, int index) {
-            return GestureDetector(
-              child: ListTile(
-                title: Text(_places[index]),
-                trailing: Icon(Icons.send),
-              ),
-              onTap: () {
-                controller.text = _places[index];
-                _addressPoint._address = controller.text;
-                _asyncFunct();
-              },
-            );
-          },
-        );
-      else
-        return Text(
-          "No hay resultado...",
-          style: TextStyle(color: Colors.grey.shade500),
-        );
-    }
-  }
+  Widget get _addressSearchResult => Container(
+        height: _size.height * 0.28,
+        width: _size.width * 0.80,
+        alignment: Alignment.centerLeft,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(10.0),
+            bottomRight: Radius.circular(10.0),
+          ),
+        ),
+        child: Center(
+          child: _loading
+              ? CircularProgressIndicator()
+              : ((_places.isNotEmpty)
+                  ? ListView.separated(
+                      padding: EdgeInsets.all(10.0),
+                      itemCount: _places.length,
+                      separatorBuilder: (BuildContext context, int index) =>
+                          (index != _places.length - 1)
+                              ? Divider()
+                              : Container(),
+                      itemBuilder: (BuildContext context, int index) {
+                        return GestureDetector(
+                          child: ListTile(
+                            title: Text(_places[index]),
+                            trailing: Icon(Icons.send),
+                          ),
+                          onTap: () {
+                            controller.text = _places[index];
+                            _addressPoint._address = controller.text;
+                            _asyncFunct();
+                          },
+                        );
+                      },
+                    )
+                  : Text(
+                      "No hay resultado...",
+                      style: TextStyle(color: Colors.grey.shade500),
+                    )),
+        ),
+      );
+
+  /// Returns a [CircularProgressIndicator] while [onDone] function is processing.
+  Widget get _loadingIndicator => Container(
+        height: _size.height * 0.28 + 60.0,
+        width: _size.width * 0.80,
+        alignment: Alignment.centerLeft,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(10.0)),
+        ),
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
 
   /// [Listener] for widget's [TextEditingController] that will
   /// search for addresses by user's reference.
@@ -379,7 +393,7 @@ class AddressPoint {
     return null;
   }
 
-  /// Returns a [String] with country name given in the constructor.
+  /// Returns country name given in the constructor.
   String get country => _country;
 
   /// Returns a [bool] to know if object has a found [address].
@@ -387,7 +401,7 @@ class AddressPoint {
       ((_latitude != null && _latitude != 0.0) &&
           (_longitude != null && _longitude != 0.0)));
 
-  /// Returns a [String] with full address or reference if it
+  /// Returns full address or reference if it
   /// exists, otherwise it returns null.
   String get address {
     if (_address.isEmpty) return null;
@@ -399,14 +413,14 @@ class AddressPoint {
     return _address;
   }
 
-  /// Returns a [double] with point's latitude if
+  /// Returns latitude if
   /// it exists, otherwise it returns null.
   double get latitude {
     if (found) return _latitude;
     return null;
   }
 
-  /// Returns a [double] with point's longitude if
+  /// Returns longitude if
   /// it exists, otherwise it returns null.
   double get longitude {
     if (found) return _longitude;
