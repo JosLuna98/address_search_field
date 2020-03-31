@@ -1,3 +1,8 @@
+## [1.2.2]
+
+* **AddressPoint** returns valid latitude and longitude values when *found* is false.
+* UI issues in **AddressSearchBox** fixed.
+
 ## [1.2.1]
 
 * Dependency in example app fixed.

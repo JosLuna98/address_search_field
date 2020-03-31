@@ -147,12 +147,14 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
       ),
       content: _waiting
           ? _loadingIndicator
-          : Column(
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                _addressSearchBar,
-                _addressSearchResult,
-              ],
+          : SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  _addressSearchBar,
+                  _addressSearchResult,
+                ],
+              ),
             ),
     );
   }
@@ -180,7 +182,7 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
             SizedBox(
-              width: _size.width * 0.63,
+              width: _size.width * 0.80 - 70.0,
               child: TextField(
                 controller: controller,
                 autofocus: true,
@@ -417,14 +419,14 @@ class AddressPoint {
   /// it exists, otherwise it returns null.
   double get latitude {
     if (found) return _latitude;
-    return null;
+    return 0.0;
   }
 
   /// Returns longitude if
   /// it exists, otherwise it returns null.
   double get longitude {
     if (found) return _longitude;
-    return null;
+    return 0.0;
   }
 
   /// Returns a [String] to read variables values of the object.
