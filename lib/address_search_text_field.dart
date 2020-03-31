@@ -53,7 +53,7 @@ class AddressSearchTextField {
     @required String country,
     List<String> exceptions = const [],
     bool coordForRef = false,
-    @required void Function(AddressPoint value) onDone,
+    @required void Function(AddressPoint point) onDone,
   }) {
     assert(country.isNotEmpty, "Country can't be empty");
     return TextField(
@@ -92,7 +92,7 @@ class AddressSearchBox extends StatefulWidget {
   final bool coordForRef;
 
   /// Callback to run when search ends.
-  final void Function(AddressPoint value) onDone;
+  final void Function(AddressPoint point) onDone;
 
   /// Constructs an [AddressSearchBox] widget from a concrete [country].
   AddressSearchBox({
