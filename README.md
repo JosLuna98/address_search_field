@@ -1,6 +1,6 @@
 # Address Search Text Field
 
-A text field that displays an address search bar that finds a location from a reference and gets nearby addresses. Selecting the desired address returns an object with the latitude, longitude, and full address of the place.
+A text field that displays an address search box that finds a location by typing a reference and gets nearby addresses. Selecting the desired address returns an object with the latitude, longitude, and full address of the place.
 It uses [location](https://pub.dev/packages/location), [geolocator](https://pub.dev/packages/geolocator), [geocoder](https://pub.dev/packages/geocoder) plugins.
 
 ## Getting Started
@@ -9,7 +9,7 @@ To use this plugin, add `address_search_text_field` as a [dependency in your pub
 
 ```yaml
 dependencies:
-  address_search_text_field: ^1.2.2
+  address_search_text_field: ^1.3.0
 ```
 
 ### Android
@@ -64,24 +64,25 @@ Import the package:
 ```dart
 import 'package:address_search_text_field/address_search_text_field.dart';
 ```
-Implement it by creating an AddressSearchTextField variable. You can call **widget** function which returns a TextField Widget. It requires context, country and onDone as parameters, also can add exceptions for found addresses, InputDecoration and TextStyle for TextField.
+
+Implement it by calling AddressSearchTextField widget. It requires *country* and *onDon*e as parameters, also can add TextEditingController as *controller*, InputDecoration as *decoration* and TextStyle as *style* for TextField and a List<String> as *exceptions* for found addresses. 
+
+**NOTE:** *coordForRef* parameter will set the first data in the list of found addresses to *point* in *OnDone* function if user select their reference like an address.
 
 ```dart
-Widget addressSearchTextField = AddressSearchTextField.widget(
-  context: context,
+Widget addressSearchTextField = AddressSearchTextField(
   controller: controller,
   decoration: InputDecoration(),
   style: TextStyle(),
   country: country,
   exceptions: <String>[],
   coordForRef: bool,
-  onDone: (AddressPoint value) {},
+  onDone: (AddressPoint point) {},
 );
 ```
 
 | Parameters | Description |
 |------------|-------------|
-| context | BuildContext (Not Null) (required) |
 | controller | TextEditingController (optional)
 | decoration | InputDecoration (optional)|
 | style | TextStyle (optional) |
@@ -96,7 +97,7 @@ Widget addressSearchBox = AddressSearchBox(
   country: country,
   exceptions: <String>[],
   coordForRef: bool,
-  onDone: (AddressPoint value) {},
+  onDone: (AddressPoint point) {},
 );
 ```
 
@@ -108,7 +109,7 @@ Widget addressSearchBox = AddressSearchBox(
 | coordForRef | bool (optional) |
 | onDone | Function(AddressPoint) (required) |
 
-At onDone function you get an AddressPoint object with confirmation if place has been found, full address and coordinates. [Example](https://pub.dev/packages/address_search_text_field#-example-tab-)
+At *onDone* function you get an AddressPoint object with confirmation if place has been found in *found* method, full address and coordinates. [Example](https://pub.dev/packages/address_search_text_field#-example-tab-)
 
 ## Outcomes
 

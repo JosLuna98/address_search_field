@@ -1,3 +1,8 @@
+## [1.3.0]
+
+* Static method *widget* removed from **AddressSearchTextField**, it's a stateless widget now.
+* **AddressSearchTextField** widget doesn't need context parameter.
+
 ## [1.2.2]
 
 * **AddressPoint** returns valid latitude and longitude values when *found* is false.

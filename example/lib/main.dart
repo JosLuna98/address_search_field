@@ -36,8 +36,7 @@ class _PageOneState extends State<PageOne> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              AddressSearchTextField.widget(
-                context: context,
+              AddressSearchTextField(
                 country: "Ecuador",
                 exceptions: [
                   "Esmeraldas, Ecuador",
