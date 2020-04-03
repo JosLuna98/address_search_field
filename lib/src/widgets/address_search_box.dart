@@ -51,8 +51,8 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
   /// Creates the state of an [AddressSearchBox] widget.
   _AddressSearchBoxState(this.controller, this.country, this.exceptions,
       this.coordForRef, this.onDone) {
-        LocationService.init();
-      }
+    LocationService.init();
+  }
 
   @override
   void initState() {

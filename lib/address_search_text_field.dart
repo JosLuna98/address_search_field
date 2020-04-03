@@ -13,7 +13,7 @@ part 'src/widgets/address_search_box.dart';
 /// A [TextField] wich [onTap] shows
 /// a custom [AlertDialog] with a search bar and a
 /// list with results called [AddressSearchBox].
-class AddressSearchTextField extends StatelessWidget{
+class AddressSearchTextField extends StatelessWidget {
   /// Controls the text being edited.
   ///
   /// If null, this widget will create its own [TextEditingController].
@@ -58,7 +58,7 @@ class AddressSearchTextField extends StatelessWidget{
     this.exceptions = const <String>[],
     this.coordForRef = false,
     @required this.onDone,
-  }) : assert(country.isNotEmpty, "Country can't be empty"),
+  })  : assert(country.isNotEmpty, "Country can't be empty"),
         this.controller = controller ?? TextEditingController() {
     LocationService.init();
   }
@@ -84,4 +84,3 @@ class AddressSearchTextField extends StatelessWidget{
     );
   }
 }
-
