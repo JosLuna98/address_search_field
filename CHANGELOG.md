@@ -1,4 +1,4 @@
-## [1.3.0]
+## [1.3.0+1]
 
 * Static method *widget* removed from **AddressSearchTextField**, it's a stateless widget now.
 * **AddressSearchTextField** widget doesn't need context parameter.
