@@ -41,7 +41,7 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
   final String country;
   final List<String> exceptions;
   final bool coordForRef;
-  final void Function(AddressPoint value) onDone;
+  final FutureOr<void> Function(AddressPoint value) onDone;
   final AddressPoint _addressPoint = AddressPoint._();
   final List<String> _places = List();
   Size _size = Size(0.0, 0.0);
@@ -202,60 +202,55 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
   ///
   /// The reference is used to get coordinates and find nearby places.
   Future<void> _listener() async {
-    if (!_loading) {
-      _places.clear();
-      try {
-        setState(() => _loading = true);
-      } catch (_) {
-        _loading = true;
+    _places.clear();
+    try {
+      setState(() => _loading = true);
+    } catch (_) {
+      _loading = true;
+    }
+    try {
+      List<Placemark> placeMarks;
+      if (controller.text.isNotEmpty) {
+        placeMarks = await Geolocator()
+            .placemarkFromAddress(controller.text + ", Esmeraldas, Ecuador");
       }
-      try {
-        List<Placemark> placeMarks;
-        if (controller.text.isNotEmpty) {
-          placeMarks = await Geolocator()
-              .placemarkFromAddress(controller.text + ", Esmeraldas, Ecuador");
-        }
-        if (placeMarks.isNotEmpty) {
-          _addressPoint._latitude = placeMarks[0].position.latitude;
-          _addressPoint._longitude = placeMarks[0].position.longitude;
-        }
-      } on NoSuchMethodError catch (_) {} on PlatformException catch (_) {} catch (_) {
-        debugPrint("ERROR CATCHED: " + _.toString());
+      if (placeMarks.isNotEmpty) {
+        _addressPoint._latitude = placeMarks[0].position.latitude;
+        _addressPoint._longitude = placeMarks[0].position.longitude;
       }
-      try {
-        Coordinates coordinates =
-            Coordinates(_addressPoint._latitude, _addressPoint._longitude);
-        List<Address> addresses =
-            await Geocoder.local.findAddressesFromCoordinates(coordinates);
-        addresses.asMap().forEach((index, value) {
-          String place = value.addressLine;
-          // Checks if place is not duplicated, if it's a country place and if it's not into exceptions
-          if (!_places.contains(place) &&
-              place.endsWith(country) &&
-              !exceptions.contains(place)) _places.add(place);
-        });
-      } on NoSuchMethodError catch (_) {} on PlatformException catch (_) {} catch (_) {
-        debugPrint("ERROR CATCHED: " + _.toString());
-      }
-      try {
-        setState(() => _loading = false);
-      } catch (_) {
-        _loading = false;
-      }
+    } on NoSuchMethodError catch (_) {} on PlatformException catch (_) {} catch (_) {
+      debugPrint("ERROR CATCHED: " + _.toString());
+    }
+    try {
+      Coordinates coordinates =
+          Coordinates(_addressPoint._latitude, _addressPoint._longitude);
+      List<Address> addresses =
+          await Geocoder.local.findAddressesFromCoordinates(coordinates);
+      addresses.asMap().forEach((index, value) {
+        String place = value.addressLine;
+        // Checks if place is not duplicated, if it's a country place and if it's not into exceptions
+        if (!_places.contains(place) &&
+            place.endsWith(country) &&
+            !exceptions.contains(place)) _places.add(place);
+      });
+    } on NoSuchMethodError catch (_) {} on PlatformException catch (_) {} catch (_) {
+      debugPrint("ERROR CATCHED: " + _.toString());
+    }
+    try {
+      setState(() => _loading = false);
+    } catch (_) {
+      _loading = false;
     }
   }
 
   /// If the user runs an asynchronous process in [onDone] function
   /// it will display an [CircularProgressIndicator] (changing [_waiting]
   /// vairable) in the [AddressSearchBox] until the process ends.
-  Future<void> _asyncFunct() async {
+  FutureOr<void> _asyncFunct() async {
     setState(() {
       _waiting = true;
     });
-    await Future.delayed(
-      Duration(),
-      () => onDone(_addressPoint),
-    );
+    await onDone(_addressPoint);
     try {
       setState(() => _waiting = false);
     } catch (_) {

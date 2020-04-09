@@ -9,7 +9,7 @@ To use this plugin, add `address_search_text_field` as a [dependency in your pub
 
 ```yaml
 dependencies:
-  address_search_text_field: ^1.3.0+1
+  address_search_text_field: ^1.3.1
 ```
 
 ### Android
@@ -53,9 +53,7 @@ On iOS you'll need to add the `NSLocationWhenInUseUsageDescription` to your Info
 
 ``` xml
 <key>NSLocationWhenInUseUsageDescription</key>
-<true/>
-<key>NSLocationAlwaysUsageDescription</key>
-<true/>
+<string>Permission to get your location</string>
 ```
 
 ## Usage
@@ -109,7 +107,17 @@ Widget addressSearchBox = AddressSearchBox(
 | coordForRef | bool (optional) |
 | onDone | Function(AddressPoint) (required) |
 
-At *onDone* function you get an AddressPoint object with confirmation if place has been found in *found* method, full address and coordinates. [Example](https://pub.dev/packages/address_search_text_field#-example-tab-)
+At *onDone* function you get an AddressPoint object with confirmation if place has been found (in *found* method), full address and coordinates. [Example](https://pub.dev/packages/address_search_text_field#-example-tab-)
+
+This plugin also has a **LocationService** class with an async static function called *init* to check and ask for location permissions, and a static variable called *controller* to use the [Location Package](https://pub.dev/packages/location) methods  anywhere in your code.
+
+### Example
+
+```dart
+() async => await LocationService.init();
+
+LocationService.controller.getLocation();
+```
 
 ## Outcomes
 
@@ -123,8 +131,6 @@ There are three possible outcomes:
 1. If no search has been performed then the object will have null values ​​in its address, latitude and longitude variables.
 2. If a place has been found from the reference, all the variables will be initialized.
 3. If the desired location has not been found and the reference entered by the user is selected, there will be no latitude and longitude values ​​and the address will be the user's reference since nothing was found.
-
-**NOTE:** User usually has to tap the text field in the search bar again to find the place with its full reference
 
 ![](https://raw.githubusercontent.com/JosLuna98/address_search_text_field/master/screenshot/untitled.gif)
 

@@ -1,3 +1,7 @@
+## [1.3.1]
+
+* Limiter to search for an address removed.
+
 ## [1.3.0+1]
 
 * Static method *widget* removed from **AddressSearchTextField**, it's a stateless widget now.

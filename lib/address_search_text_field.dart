@@ -1,5 +1,6 @@
 library address_search_text_field;
 
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
@@ -45,7 +46,7 @@ class AddressSearchTextField extends StatelessWidget {
   final bool coordForRef;
 
   /// Callback to run when search ends.
-  final void Function(AddressPoint point) onDone;
+  final FutureOr<void> Function(AddressPoint point) onDone;
 
   /// Creates a [TextField] wich [onTap] shows
   /// a custom [AlertDialog] with a search bar and a
