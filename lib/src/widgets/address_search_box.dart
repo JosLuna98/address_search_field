@@ -47,6 +47,7 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
   Size _size = Size(0.0, 0.0);
   bool _loading;
   bool _waiting;
+  bool _searched;
 
   /// Creates the state of an [AddressSearchBox] widget.
   _AddressSearchBoxState(this.controller, this.country, this.exceptions,
@@ -60,7 +61,7 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
     _addressPoint._country = country;
     _loading = false;
     _waiting = false;
-    controller.addListener(() async => await _listener());
+    _searched = false;
   }
 
   @override
@@ -117,20 +118,25 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
                 decoration: InputDecoration(
                     prefix: Padding(
                       padding: EdgeInsets.only(left: 5.0, right: 8.0),
-                      child: Icon(Icons.search),
+                      child: Icon(Icons.location_city),
                     ),
                     hintText: "Dirección"),
               ),
             ),
             GestureDetector(
-              child: Icon(Icons.send),
-              onTap: () async {
-                _addressPoint._address = controller.text;
-                if (_places.isNotEmpty && coordForRef)
-                  _addressPoint._address += ", " + country;
-                controller.text = _addressPoint.address;
-                await _asyncFunct();
-              },
+              child: Icon((!_searched) ? Icons.search : Icons.send),
+              onTap: (!_searched)
+                  ? () async {
+                      await _searchAddress();
+                      setState(() => _searched = true);
+                    }
+                  : () async {
+                      _addressPoint._address = controller.text;
+                      if (_places.isNotEmpty && coordForRef)
+                        _addressPoint._address += ", " + country;
+                      controller.text = _addressPoint.address;
+                      await _asyncFunct();
+                    },
             ),
           ],
         ),
@@ -197,12 +203,9 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
         ),
       );
 
-  /// [Listener] for widget's [TextEditingController] that will
-  /// search for addresses by user's reference.
-  ///
-  /// The reference is used to get coordinates and find nearby places.
-  Future<void> _listener() async {
-    _places.clear();
+  /// It uses the user's reference to search for nearby addresses
+  /// and places to obtain coordinates.
+  Future<void> _searchAddress() async {
     try {
       setState(() => _loading = true);
     } catch (_) {
@@ -252,9 +255,14 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
     });
     await onDone(_addressPoint);
     try {
-      setState(() => _waiting = false);
+      setState(() {
+        _waiting = false;
+      });
     } catch (_) {
       _waiting = false;
+    } finally {
+      _searched = false;
+      _places.clear();
     }
   }
 }

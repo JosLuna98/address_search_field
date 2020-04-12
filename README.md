@@ -9,7 +9,7 @@ To use this plugin, add `address_search_text_field` as a [dependency in your pub
 
 ```yaml
 dependencies:
-  address_search_text_field: ^1.3.1
+  address_search_text_field: ^1.3.2
 ```
 
 ### Android
@@ -111,7 +111,7 @@ At *onDone* function you get an AddressPoint object with confirmation if place h
 
 This plugin also has a **LocationService** class with an async static function called *init* to check and ask for location permissions, and a static variable called *controller* to use the [Location Package](https://pub.dev/packages/location) methods  anywhere in your code.
 
-### Example
+**Example**
 
 ```dart
 () async => await LocationService.init();

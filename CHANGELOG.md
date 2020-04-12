@@ -1,3 +1,7 @@
+## [1.3.2]
+
+* sufix icon in **AddressSearchBox** modified to can limit addresses requests.
+
 ## [1.3.1]
 
 * Limiter to search for an address removed.

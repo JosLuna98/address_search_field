@@ -23,7 +23,8 @@ class PageOne extends StatefulWidget {
 }
 
 class _PageOneState extends State<PageOne> {
-  String texto = "";
+  TextEditingController controller = TextEditingController();
+  String text = "";
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +38,7 @@ class _PageOneState extends State<PageOne> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               AddressSearchTextField(
+                controller: controller,
                 country: "Ecuador",
                 exceptions: [
                   "Esmeraldas, Ecuador",
@@ -52,14 +54,14 @@ class _PageOneState extends State<PageOne> {
                       longitude: point.longitude,
                     );
                   setState(() {
-                    texto = "${point.toString()}\n\n${point2.toString()}";
+                    text = "${point.toString()}\n\n${point2.toString()}";
                   });
                   Navigator.of(context).pop();
                 },
               ),
               Container(
                 margin: EdgeInsets.symmetric(vertical: 30.0),
-                child: Text(texto),
+                child: Text(text),
               ),
               FlatButton(
                 onPressed: () => Navigator.push(context,
