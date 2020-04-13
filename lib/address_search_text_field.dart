@@ -36,6 +36,9 @@ class AddressSearchTextField extends StatelessWidget {
   /// If null, defaults to the `subtitle1` text style from the current [Theme].
   final TextStyle style;
 
+  /// Tapping outside the box dismiss the widget. default true.
+  final bool barrierDismissible;
+
   /// Country to look for an address.
   final String country;
 
@@ -55,10 +58,11 @@ class AddressSearchTextField extends StatelessWidget {
     TextEditingController controller,
     this.decoration = const InputDecoration(),
     this.style = const TextStyle(),
+    this.barrierDismissible = true,
     @required this.country,
     this.exceptions = const <String>[],
     this.coordForRef = false,
-    @required this.onDone,
+    this.onDone,
   })  : assert(country.isNotEmpty, "Country can't be empty"),
         this.controller = controller ?? TextEditingController() {
     LocationService.init();
@@ -73,6 +77,7 @@ class AddressSearchTextField extends StatelessWidget {
       style: this.style,
       textCapitalization: TextCapitalization.words,
       onTap: () => showDialog(
+        barrierDismissible: this.barrierDismissible,
         context: context,
         builder: (BuildContext context) => AddressSearchBox(
           controller: this.controller,

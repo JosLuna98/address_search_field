@@ -26,7 +26,7 @@ class AddressSearchBox extends StatefulWidget {
     @required this.country,
     this.exceptions = const <String>[],
     this.coordForRef = false,
-    @required this.onDone,
+    this.onDone,
   })  : assert(country.isNotEmpty, "Country can't be empty"),
         this.controller = controller ?? TextEditingController();
 
@@ -67,22 +67,24 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
   @override
   Widget build(BuildContext context) {
     _size = MediaQuery.of(context).size;
-    return AlertDialog(
+    return SimpleDialog(
       contentPadding: EdgeInsets.all(0.0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.all(Radius.circular(10.0)),
       ),
-      content: _waiting
-          ? _loadingIndicator
-          : SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  _addressSearchBar,
-                  _addressSearchResult,
-                ],
+      children: <Widget>[
+        _waiting
+            ? _loadingIndicator
+            : SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    _addressSearchBar,
+                    _addressSearchResult,
+                  ],
+                ),
               ),
-            ),
+      ],
     );
   }
 
@@ -112,6 +114,12 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
             SizedBox(
               width: _size.width * 0.80 - 70.0,
               child: TextField(
+                onEditingComplete: () async {
+                  await _searchAddress();
+                  setState(() => _searched = true);
+                },
+                onChanged: (_) =>
+                    (_searched) ? setState(() => _searched = false) : null,
                 controller: controller,
                 autofocus: true,
                 autocorrect: false,
@@ -253,7 +261,7 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
     setState(() {
       _waiting = true;
     });
-    await onDone(_addressPoint);
+    if (onDone != null) await onDone(_addressPoint);
     try {
       setState(() {
         _waiting = false;

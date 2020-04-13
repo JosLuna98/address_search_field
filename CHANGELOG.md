@@ -1,3 +1,9 @@
+## [1.3.3]
+
+* A *barrierDismissible* parameter added in **AddressSearchTextField**.
+* The *onEditingComplete* and *onChanged* internal functions in **AddressSearchBox** adapted to new functionalities.
+* The *onDone* function is no longer required.
+
 ## [1.3.2]
 
 * sufix icon in **AddressSearchBox** modified to can limit addresses requests.
