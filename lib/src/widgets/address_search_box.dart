@@ -27,7 +27,10 @@ class AddressSearchBox extends StatefulWidget {
   final bool coordForRef;
 
   /// Callback to run when search ends.
-  final void Function(AddressPoint point) onDone;
+  final FutureOr<void> Function(AddressPoint point) onDone;
+
+  /// Callback to run if the user no sends data.
+  final FutureOr<void> Function() onCleaned;
 
   /// Constructs an [AddressSearchBox] widget from a concrete [country].
   AddressSearchBox({
@@ -39,12 +42,22 @@ class AddressSearchBox extends StatefulWidget {
     this.exceptions = const <String>[],
     this.coordForRef = false,
     this.onDone,
+    this.onCleaned,
   })  : assert(country.isNotEmpty, "Country can't be empty"),
         this.controller = controller ?? TextEditingController();
 
   @override
-  _AddressSearchBoxState createState() => _AddressSearchBoxState(controller,
-      country, city, hintText, noResultsText, exceptions, coordForRef, onDone);
+  _AddressSearchBoxState createState() => _AddressSearchBoxState(
+        controller,
+        country,
+        city,
+        hintText,
+        noResultsText,
+        exceptions,
+        coordForRef,
+        onDone,
+        onCleaned,
+      );
 }
 
 /// State of [AddressSearchBox].
@@ -57,6 +70,7 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
   final List<String> exceptions;
   final bool coordForRef;
   final FutureOr<void> Function(AddressPoint value) onDone;
+  final FutureOr<void> Function() onCleaned;
   final AddressPoint _addressPoint = AddressPoint._();
   final List<String> _places = List();
   Size _size = Size(0.0, 0.0);
@@ -73,6 +87,7 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
     this.exceptions,
     this.coordForRef,
     this.onDone,
+    this.onCleaned,
   ) {
     LocationService.init();
   }
@@ -159,7 +174,9 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
                       }
                       await _asyncFunct(notFound: true && !coordForRef);
                     }
-                  : null,
+                  : ((onCleaned != null)
+                      ? () async => await onCleaned()
+                      : null),
             ),
           ],
         ),

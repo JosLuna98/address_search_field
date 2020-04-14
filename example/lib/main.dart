@@ -60,6 +60,7 @@ class _PageOneState extends State<PageOne> {
                   });
                   Navigator.of(context).pop();
                 },
+                onCleaned: () => print("limpio"),
               ),
               Container(
                 margin: EdgeInsets.symmetric(vertical: 30.0),

@@ -1,3 +1,7 @@
+## [1.3.5]
+
+* The *onCleaned* function parameter added in **AddressSearchTextField** and **AddressSearchBox**.
+
 ## [1.3.4]
 
 * Limiter sufix icon in **AddressSearchBox** to search for an address removed.

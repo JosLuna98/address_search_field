@@ -60,6 +60,9 @@ class AddressSearchTextField extends StatelessWidget {
   /// Callback to run when search ends.
   final FutureOr<void> Function(AddressPoint point) onDone;
 
+  /// Callback to run if the user no sends data.
+  final FutureOr<void> Function() onCleaned;
+
   /// Creates a [TextField] wich [onTap] shows
   /// a custom [AlertDialog] with a search bar and a
   /// list with results called [AddressSearchBox].
@@ -75,6 +78,7 @@ class AddressSearchTextField extends StatelessWidget {
     this.exceptions = const <String>[],
     this.coordForRef = false,
     this.onDone,
+    this.onCleaned,
   })  : assert(country.isNotEmpty, "Country can't be empty"),
         this.controller = controller ?? TextEditingController() {
     LocationService.init();
@@ -100,6 +104,7 @@ class AddressSearchTextField extends StatelessWidget {
           exceptions: this.exceptions,
           coordForRef: this.coordForRef,
           onDone: this.onDone,
+          onCleaned: this.onCleaned,
         ),
       ),
     );
