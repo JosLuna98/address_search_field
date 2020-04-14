@@ -1,4 +1,4 @@
-## [1.3.3+1]
+## [1.3.3+2]
 
 * A bug when the user selects their reference in **AddressSearchBox** widget fixed.
 

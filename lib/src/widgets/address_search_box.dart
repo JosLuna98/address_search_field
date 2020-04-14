@@ -140,10 +140,11 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
                     }
                   : () async {
                       _addressPoint._address = controller.text;
-                      if (_places.isNotEmpty && coordForRef)
+                      if (_places.isNotEmpty && coordForRef) {
                         _addressPoint._address += ", " + country;
-                      controller.text = _addressPoint.address;
-                      await _asyncFunct(notFound: true);
+                        controller.text = _addressPoint.address;
+                      }
+                      await _asyncFunct(notFound: true && !coordForRef);
                     },
             ),
           ],
