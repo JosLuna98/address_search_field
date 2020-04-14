@@ -1,3 +1,9 @@
+## [1.3.4]
+
+* Limiter sufix icon in **AddressSearchBox** to search for an address removed.
+* The search for an address is optimized.
+* New *city*, *hintText* and *noResultsText* parameters added in **AddressSearchTextField** and **AddressSearchBox**.
+
 ## [1.3.3+2]
 
 * A bug when the user selects their reference in **AddressSearchBox** widget fixed.
@@ -34,7 +40,7 @@
 ## [1.2.0]
 
 * Parameter for the controller added to **AddressSearchTextField**
-* Private *_AddressSearch* widget is now public and is called **AddressSearchBox**, it can be used independently.
+* Private *_AddressSearch* widget is now public and is named **AddressSearchBox**, it can be used independently.
 * *onDone* function in **AddressSearchBox** can now be asynchronous and have a CircularProgressIndicator while it's running.
 * *onDone* function now doesn't pop the widget, you have to add the code to close it.
 * **AddressPoint** object has a new method to find an address from passed latitude and longitude values.
@@ -55,7 +61,7 @@
 
 ## [0.1.0+1]
 
-* *values* is now called *result*.
+* *values* is now named *result*.
 * Update documentation.
 
 ## [0.0.1]

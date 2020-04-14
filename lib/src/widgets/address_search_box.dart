@@ -8,8 +8,17 @@ class AddressSearchBox extends StatefulWidget {
   /// If null, this widget will create its own [TextEditingController].
   final TextEditingController controller;
 
-  /// Country to look for an address.
+  /// Country where look for an address.
   final String country;
+
+  /// City where look for an address.
+  final String city;
+
+  /// Hint text for [AddressSearchBox].
+  final String hintText;
+
+  /// Message when there are no results in [AddressSearchBox].
+  final String noResultsText;
 
   /// Resulting addresses to be ignored.
   final List<String> exceptions;
@@ -24,6 +33,9 @@ class AddressSearchBox extends StatefulWidget {
   AddressSearchBox({
     TextEditingController controller,
     @required this.country,
+    this.city = "",
+    @required this.hintText,
+    @required this.noResultsText,
     this.exceptions = const <String>[],
     this.coordForRef = false,
     this.onDone,
@@ -31,14 +43,17 @@ class AddressSearchBox extends StatefulWidget {
         this.controller = controller ?? TextEditingController();
 
   @override
-  _AddressSearchBoxState createState() => _AddressSearchBoxState(
-      controller, country, exceptions, coordForRef, onDone);
+  _AddressSearchBoxState createState() => _AddressSearchBoxState(controller,
+      country, city, hintText, noResultsText, exceptions, coordForRef, onDone);
 }
 
 /// State of [AddressSearchBox].
 class _AddressSearchBoxState extends State<AddressSearchBox> {
   final TextEditingController controller;
   final String country;
+  final String city;
+  final String hintText;
+  final String noResultsText;
   final List<String> exceptions;
   final bool coordForRef;
   final FutureOr<void> Function(AddressPoint value) onDone;
@@ -47,11 +62,18 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
   Size _size = Size(0.0, 0.0);
   bool _loading;
   bool _waiting;
-  bool _searched;
 
   /// Creates the state of an [AddressSearchBox] widget.
-  _AddressSearchBoxState(this.controller, this.country, this.exceptions,
-      this.coordForRef, this.onDone) {
+  _AddressSearchBoxState(
+    this.controller,
+    this.country,
+    this.city,
+    this.hintText,
+    this.noResultsText,
+    this.exceptions,
+    this.coordForRef,
+    this.onDone,
+  ) {
     LocationService.init();
   }
 
@@ -61,7 +83,6 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
     _addressPoint._country = country;
     _loading = false;
     _waiting = false;
-    _searched = false;
   }
 
   @override
@@ -114,12 +135,8 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
             SizedBox(
               width: _size.width * 0.80 - 70.0,
               child: TextField(
-                onEditingComplete: () async {
-                  await _searchAddress();
-                  setState(() => _searched = true);
-                },
-                onChanged: (_) =>
-                    (_searched) ? setState(() => _searched = false) : null,
+                onEditingComplete: () async => await _searchAddress(),
+                onChanged: (_) async => await _searchAddress(),
                 controller: controller,
                 autofocus: true,
                 autocorrect: false,
@@ -128,24 +145,21 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
                       padding: EdgeInsets.only(left: 5.0, right: 8.0),
                       child: Icon(Icons.location_city),
                     ),
-                    hintText: "Dirección"),
+                    hintText: hintText),
               ),
             ),
             GestureDetector(
-              child: Icon((!_searched) ? Icons.search : Icons.send),
-              onTap: (!_searched)
+              child: Icon(Icons.send),
+              onTap: (controller.text.isNotEmpty)
                   ? () async {
-                      await _searchAddress();
-                      setState(() => _searched = true);
-                    }
-                  : () async {
                       _addressPoint._address = controller.text;
                       if (_places.isNotEmpty && coordForRef) {
                         _addressPoint._address += ", " + country;
                         controller.text = _addressPoint.address;
                       }
                       await _asyncFunct(notFound: true && !coordForRef);
-                    },
+                    }
+                  : null,
             ),
           ],
         ),
@@ -155,7 +169,7 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
   /// process and its result.
   ///
   /// Returns [CircularProgressIndicator] while it's searching the address.
-  /// Returns [Text] with `No hay resultados...` message if search failed.
+  /// Returns [Text] with [noResultsText] text if search failed.
   /// Returns [ListView] if search found places.
   Widget get _addressSearchResult => Container(
         height: _size.height * 0.28,
@@ -193,7 +207,7 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
                       },
                     )
                   : Text(
-                      "No hay resultado...",
+                      noResultsText,
                       style: TextStyle(color: Colors.grey.shade500),
                     )),
         ),
@@ -215,44 +229,57 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
   /// It uses the user's reference to search for nearby addresses
   /// and places to obtain coordinates.
   Future<void> _searchAddress() async {
+    _loading = true;
     try {
-      setState(() => _loading = true);
-    } catch (_) {
-      _loading = true;
-    }
-    try {
-      List<Placemark> placeMarks;
-      if (controller.text.isNotEmpty) {
-        placeMarks = await Geolocator()
-            .placemarkFromAddress(controller.text + ", Esmeraldas, Ecuador");
+      setState(() {});
+    } catch (_) {}
+    final int length = controller.text.length;
+    await Future.delayed(Duration(seconds: 2), () async {
+      if (controller.text.isEmpty) {
+        _places.clear();
+        _loading = false;
+        try {
+          setState(() {});
+        } catch (_) {}
+      } else if (length == controller.text.length) {
+        try {
+          List<Placemark> placeMarks;
+          if (controller.text.isNotEmpty) {
+            final String address = (city.isEmpty)
+                ? controller.text + ", " + country
+                : controller.text + ", " + city + ", " + country;
+            placeMarks = await Geolocator().placemarkFromAddress(address);
+          }
+          if (placeMarks.isNotEmpty) {
+            _addressPoint._latitude = placeMarks[0].position.latitude;
+            _addressPoint._longitude = placeMarks[0].position.longitude;
+            final Coordinates coordinates =
+                Coordinates(_addressPoint._latitude, _addressPoint._longitude);
+            final List<Address> addresses =
+                await Geocoder.local.findAddressesFromCoordinates(coordinates);
+            if (_places.isNotEmpty) {
+              _places.clear();
+              setState(() {});
+            }
+            addresses.asMap().forEach((index, value) {
+              final String place = value.addressLine;
+              // Checks if place is not duplicated, if it's a country place and if it's not into exceptions
+              if (!_places.contains(place) &&
+                  place.endsWith(country) &&
+                  !exceptions.contains(place)) _places.add(place);
+              if (addresses.length == index + 1) {
+                _loading = false;
+                try {
+                  setState(() {});
+                } catch (_) {}
+              }
+            });
+          }
+        } on NoSuchMethodError catch (_) {} on PlatformException catch (_) {} catch (_) {
+          debugPrint("ERROR CATCHED: " + _.toString());
+        }
       }
-      if (placeMarks.isNotEmpty) {
-        _addressPoint._latitude = placeMarks[0].position.latitude;
-        _addressPoint._longitude = placeMarks[0].position.longitude;
-      }
-    } on NoSuchMethodError catch (_) {} on PlatformException catch (_) {} catch (_) {
-      debugPrint("ERROR CATCHED: " + _.toString());
-    }
-    try {
-      Coordinates coordinates =
-          Coordinates(_addressPoint._latitude, _addressPoint._longitude);
-      List<Address> addresses =
-          await Geocoder.local.findAddressesFromCoordinates(coordinates);
-      addresses.asMap().forEach((index, value) {
-        String place = value.addressLine;
-        // Checks if place is not duplicated, if it's a country place and if it's not into exceptions
-        if (!_places.contains(place) &&
-            place.endsWith(country) &&
-            !exceptions.contains(place)) _places.add(place);
-      });
-    } on NoSuchMethodError catch (_) {} on PlatformException catch (_) {} catch (_) {
-      debugPrint("ERROR CATCHED: " + _.toString());
-    }
-    try {
-      setState(() => _loading = false);
-    } catch (_) {
-      _loading = false;
-    }
+    });
   }
 
   /// If the user runs an asynchronous process in [onDone] function
@@ -267,15 +294,10 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
       _addressPoint._longitude = 0.0;
     }
     if (onDone != null) await onDone(_addressPoint);
+    _waiting = false;
+    _places.clear();
     try {
-      setState(() {
-        _waiting = false;
-      });
-    } catch (_) {
-      _waiting = false;
-    } finally {
-      _searched = false;
-      _places.clear();
-    }
+      setState(() {});
+    } catch (_) {}
   }
 }

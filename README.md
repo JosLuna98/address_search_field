@@ -9,7 +9,7 @@ To use this plugin, add `address_search_text_field` as a [dependency in your pub
 
 ```yaml
 dependencies:
-  address_search_text_field: ^1.3.3+2
+  address_search_text_field: ^1.3.4
 ```
 
 ### Android
@@ -63,8 +63,6 @@ Import the package:
 import 'package:address_search_text_field/address_search_text_field.dart';
 ```
 
-Implement it by calling AddressSearchTextField widget. It requires *country* and *onDon*e as parameters, also can add TextEditingController as *controller*, InputDecoration as *decoration* and TextStyle as *style* for TextField and a List<String> as *exceptions* for found addresses. 
-
 **NOTE:** *coordForRef* parameter will set the first data in the list of found addresses to *point* in *OnDone* function if user select their reference like an address.
 
 ```dart
@@ -73,7 +71,10 @@ Widget addressSearchTextField = AddressSearchTextField(
   decoration: InputDecoration(),
   style: TextStyle(),
   barrierDismissible: bool,
-  country: country,
+  country: String,
+  city: String,
+  hintText: String,
+  noResultsText: String,
   exceptions: <String>[],
   coordForRef: bool,
   onDone: (AddressPoint point) {},
@@ -87,14 +88,20 @@ Widget addressSearchTextField = AddressSearchTextField(
 | style | TextStyle (optional) |
 | barrierDismissible | bool (optional) |
 | country | String (Not Null) (required) |
+| city | String (optional) |
+| hintText | String (required) |
+| noResultsText | String (required) |
 | exceptions | List < String > (optional)|
 | coordForRef | bool (optional) |
 | onDone | Function(AddressPoint) (optional) |
 
 ```dart
 Widget addressSearchBox = AddressSearchBox(
-  controller: controller,
-  country: country,
+  controller: TextEditingController(),
+  country: String,
+  city: String,
+  hintText: String,
+  noResultText: String,
   exceptions: <String>[],
   coordForRef: bool,
   onDone: (AddressPoint point) {},
@@ -105,6 +112,9 @@ Widget addressSearchBox = AddressSearchBox(
 |------------|-------------|
 | controller | TextEditingController (optional)
 | country | String (Not Null) (required) |
+| city | String (optional) |
+| hintText | String (required) |
+| noResultsText | String (required) |
 | exceptions | List < String > (optional)|
 | coordForRef | bool (optional) |
 | onDone | Function(AddressPoint) (optional) |

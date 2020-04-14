@@ -40,6 +40,9 @@ class _PageOneState extends State<PageOne> {
               AddressSearchTextField(
                 controller: controller,
                 country: "Ecuador",
+                city: "Esmeraldas",
+                hintText: "Dirección",
+                noResultsText: "No hay resultados...",
                 exceptions: [
                   "Esmeraldas, Ecuador",
                   "Esmeraldas Province, Ecuador",
@@ -83,6 +86,9 @@ class PageTwo extends StatelessWidget {
       appBar: AppBar(),
       body: AddressSearchBox(
         country: "Ecuador",
+        city: "Esmeraldas",
+        hintText: "Dirección",
+        noResultsText: "No hay resultados...",
         exceptions: [
           "Esmeraldas, Ecuador",
           "Esmeraldas Province, Ecuador",

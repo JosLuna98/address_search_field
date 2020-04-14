@@ -39,8 +39,17 @@ class AddressSearchTextField extends StatelessWidget {
   /// Tapping outside the box dismiss the widget. default true.
   final bool barrierDismissible;
 
-  /// Country to look for an address.
+  /// Country where look for an address.
   final String country;
+
+  /// City where look for an address.
+  final String city;
+
+  /// Hint text for [AddressSearchBox].
+  final String hintText;
+
+  /// Message when there are no results in [AddressSearchBox].
+  final String noResultsText;
 
   /// Resulting addresses to be ignored.
   final List<String> exceptions;
@@ -60,6 +69,9 @@ class AddressSearchTextField extends StatelessWidget {
     this.style = const TextStyle(),
     this.barrierDismissible = true,
     @required this.country,
+    this.city = "",
+    @required this.hintText,
+    @required this.noResultsText,
     this.exceptions = const <String>[],
     this.coordForRef = false,
     this.onDone,
@@ -82,6 +94,9 @@ class AddressSearchTextField extends StatelessWidget {
         builder: (BuildContext context) => AddressSearchBox(
           controller: this.controller,
           country: this.country,
+          city: this.city,
+          hintText: this.hintText,
+          noResultsText: this.noResultsText,
           exceptions: this.exceptions,
           coordForRef: this.coordForRef,
           onDone: this.onDone,
