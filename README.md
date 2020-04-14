@@ -9,7 +9,7 @@ To use this plugin, add `address_search_text_field` as a [dependency in your pub
 
 ```yaml
 dependencies:
-  address_search_text_field: ^1.3.3
+  address_search_text_field: ^1.3.3+1
 ```
 
 ### Android

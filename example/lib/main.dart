@@ -45,7 +45,6 @@ class _PageOneState extends State<PageOne> {
                   "Esmeraldas Province, Ecuador",
                   "Ecuador"
                 ],
-                coordForRef: true,
                 onDone: (AddressPoint point) async {
                   AddressPoint point2;
                   if (point.latitude != null)

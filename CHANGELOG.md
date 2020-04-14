@@ -1,3 +1,7 @@
+## [1.3.3+1]
+
+* A bug when the user selects their reference in **AddressSearchBox** widget fixed.
+
 ## [1.3.3]
 
 * A *barrierDismissible* parameter added in **AddressSearchTextField**.

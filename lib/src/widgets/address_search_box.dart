@@ -143,7 +143,7 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
                       if (_places.isNotEmpty && coordForRef)
                         _addressPoint._address += ", " + country;
                       controller.text = _addressPoint.address;
-                      await _asyncFunct();
+                      await _asyncFunct(notFound: true);
                     },
             ),
           ],
@@ -257,10 +257,14 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
   /// If the user runs an asynchronous process in [onDone] function
   /// it will display an [CircularProgressIndicator] (changing [_waiting]
   /// vairable) in the [AddressSearchBox] until the process ends.
-  FutureOr<void> _asyncFunct() async {
+  FutureOr<void> _asyncFunct({bool notFound = false}) async {
     setState(() {
       _waiting = true;
     });
+    if (notFound) {
+      _addressPoint._latitude = 0.0;
+      _addressPoint._longitude = 0.0;
+    }
     if (onDone != null) await onDone(_addressPoint);
     try {
       setState(() {
