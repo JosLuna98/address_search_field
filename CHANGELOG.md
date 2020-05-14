@@ -1,3 +1,7 @@
+## [1.3.5+1]
+
+* discontinued
+
 ## [1.3.5]
 
 * The *onCleaned* function parameter added in **AddressSearchTextField** and **AddressSearchBox**.
