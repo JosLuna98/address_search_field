@@ -105,8 +105,8 @@ onDone: (AddressPoint point) {
   bool found = point.found;
   String address = point.address;
   String country = point.country;
-  Double latitude = point.latitude;
-  Double longitude = point.longitude;
+  double latitude = point.latitude;
+  double longitude = point.longitude;
 }
 ```
 
