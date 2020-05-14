@@ -1,4 +1,5 @@
 # Address Search Text Field
+# This plugin is discontinued, please see [Address Search Field](https://pub.dev/packages/address_search_field)
 
 A text field that displays an address search box that finds a location by typing a reference and gets nearby addresses. Selecting the desired address returns an object with the latitude, longitude, and full address of the place.
 It uses [location](https://pub.dev/packages/location), [geolocator](https://pub.dev/packages/geolocator), [geocoder](https://pub.dev/packages/geocoder) plugins.
