@@ -1,36 +1,17 @@
-# Address Search Text Field
-# This plugin is discontinued, please see [Address Search Field](https://pub.dev/packages/address_search_field)
+# Address Search Field
 
-A text field that displays an address search box that finds a location by typing a reference and gets nearby addresses. Selecting the desired address returns an object with the latitude, longitude, and full address of the place.
+A text field that displays an address search box to find a location by typing a reference and gets nearby addresses. Selecting the desired address returns an object with the latitude, longitude, and full address of the place.
 It uses [location](https://pub.dev/packages/location), [geolocator](https://pub.dev/packages/geolocator), [geocoder](https://pub.dev/packages/geocoder) plugins.
+
+![](https://raw.githubusercontent.com/JosLuna98/address_search_field/master/screenshot/untitled.gif)
 
 ## Getting Started
 
-To use this plugin, add `address_search_text_field` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
+To use this plugin, add `address_search_field` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
 
 ```yaml
 dependencies:
-  address_search_text_field: ^1.3.5+1
-```
-
-### Android
-
-**NOTE:** As plugins switched to the AndroidX version of the Android Support Libraries. This means you need to make sure your Android project is also upgraded to support AndroidX. Detailed instructions can be found [here](https://flutter.dev/docs/development/packages-and-plugins/androidx-compatibility).
-
-1. Add the following to your "gradle.properties" file:
-
-```
-android.useAndroidX=true
-android.enableJetifier=true
-```
-2. Make sure you set the `compileSdkVersion` in your "android/app/build.gradle" file to 28:
-
-```
-android {
-  compileSdkVersion 28
-
-  ...
-}
+  address_search_field: ^1.0.0
 ```
 
 ## Permissions
@@ -43,7 +24,7 @@ On Android you'll need to add either the `ACCESS_COARSE_LOCATION` or the `ACCESS
 <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 ```
-Also you should add internet permission
+Also you have to add internet permission
 ``` xml
 <uses-permission android:name="android.permission.INTERNET"/>
 ```
@@ -61,13 +42,41 @@ On iOS you'll need to add the `NSLocationWhenInUseUsageDescription` to your Info
 
 Import the package:
 ```dart
-import 'package:address_search_text_field/address_search_text_field.dart';
+import 'package:address_search_field/address_search_field.dart';
 ```
 
-**NOTE:** *coordForRef* parameter will set the first data in the list of found addresses to *point* in *OnDone* function if user select their reference like an address.
+* This widget is a search box to write a reference about a place and find an address.
 
 ```dart
-Widget addressSearchTextField = AddressSearchTextField(
+AddressSearchBox(
+  controller: TextEditingController(),
+  country: String,
+  city: String,
+  hintText: String,
+  noResultText: String,
+  exceptions: <String>[],
+  coordForRef: bool,
+  onDone: (AddressPoint point) {},
+  onCleaned: () {},
+);
+```
+
+| Parameters | Type | Description |
+|------------|------|-------------|
+| controller | Optional | The controller allows you to interact with the text in the field. |
+| country | Required, Not Null | You have to set in which country to search. |
+| city | Optional | You may set in which city to search. |
+| hintText | Required, Not Null | Text suggestion according to your language in the search box. |
+| noResultsText | Required, Not Null | Message according to your language when the search box doesn't find anything. |
+| exceptions | Optional| Results you don't want to show. |
+| coordForRef | Optional | It's false by default. With the value true, it will use what the user typed in the search box as a valid Address. |
+| onDone | Optional | When the search stops, it gives you an AddressPoint object with confirmation if a place has been found, full address, and coordinates. |
+| onCleaned | Optional | When the search box is closed with an empty text field, this function is executed. |
+
+* This widget is a `TextField` that displays a` AddressSearchBox` by tapping it. It has 3 more parameters to personalize the `TextField`.
+
+```dart
+AddressSearchField(
   controller: TextEditingController(),
   decoration: InputDecoration(),
   style: TextStyle(),
@@ -83,64 +92,21 @@ Widget addressSearchTextField = AddressSearchTextField(
 );
 ```
 
-| Parameters | Description |
-|------------|-------------|
-| controller | TextEditingController (optional)
-| decoration | InputDecoration (optional)|
-| style | TextStyle (optional) |
-| barrierDismissible | bool (optional) |
-| country | String (Not Null) (required) |
-| city | String (optional) |
-| hintText | String (required) |
-| noResultsText | String (required) |
-| exceptions | List < String > (optional)|
-| coordForRef | bool (optional) |
-| onDone | Function(AddressPoint) (optional) |
-| onCleaned | Function() (optional) |
+| Parameters | Type | Description |
+|------------|------|-------------|
+| decoration | Optional | The decoration to show around the text field. |
+| style | Optional | The style to use for the text being edited. |
+| barrierDismissible | Optional | It's true by default. With the value false, it won't close the search box when you tap outside it. |
 
-```dart
-Widget addressSearchBox = AddressSearchBox(
-  controller: TextEditingController(),
-  country: String,
-  city: String,
-  hintText: String,
-  noResultText: String,
-  exceptions: <String>[],
-  coordForRef: bool,
-  onDone: (AddressPoint point) {},
-  onCleaned: () {},
-);
-```
-
-| Parameters | Description |
-|------------|-------------|
-| controller | TextEditingController (optional)
-| country | String (Not Null) (required) |
-| city | String (optional) |
-| hintText | String (required) |
-| noResultsText | String (required) |
-| exceptions | List < String > (optional)|
-| coordForRef | bool (optional) |
-| onDone | Function(AddressPoint) (optional) |
-| onCleaned | Function() (optional) |
-
-At *onDone* function you get an AddressPoint object with confirmation if place has been found (in *found* method), full address and coordinates. [Example](https://pub.dev/packages/address_search_text_field#-example-tab-)
-
-This plugin also has a **LocationService** class with an async static function called *init* to check and ask for location permissions, and a static variable called *controller* to use the [Location Package](https://pub.dev/packages/location) methods  anywhere in your code.
-
-**Example**
-
-```dart
-() async => await LocationService.init();
-
-LocationService.controller.getLocation();
-```
-
-## Outcomes
+* When the address search is complete, you can get an `AddressPoint` object that provides the following values:
 
 ```dart
 onDone: (AddressPoint point) {
-  print(point.toString());
+  bool found = point.found;
+  String address = point.address;
+  String country = point.country;
+  Double latitude = point.latitude;
+  Double longitude = point.longitude;
 }
 ```
 
@@ -149,8 +115,21 @@ There are three possible outcomes:
 2. If a place has been found from the reference, all the variables will be initialized.
 3. If the desired location has not been found and the reference entered by the user is selected, there will be no latitude and longitude values ​​and the address will be the user's reference since nothing was found.
 
-![](https://raw.githubusercontent.com/JosLuna98/address_search_text_field/master/screenshot/untitled.gif)
+**NOTE:** You can also find an address by it's coordinates using `await AddressPoint.fromPoint(latitude, longitude)`. If the address is not found, it will return `null`.
 
+```dart
+AddressPoint point = await AddressPoint.fromPoint(latitude, longitude);
+if (point != null) print(point.address);
+```
+
+* This plugin also has an async static function called **initLocationService** to verify and request location permissions. You can use optional callbacks when location service is not enabled or if permission is not granted.
+
+```dart
+() async => await initLocationService(
+  noServiceEnabled: () {},
+  noPermissionGranted: () {},
+);
+```
 
 ##  License
 

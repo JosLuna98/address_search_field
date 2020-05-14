@@ -1,4 +1,4 @@
-part of '../../address_search_text_field.dart';
+part of '../../address_search_field.dart';
 
 /// An object to control the results from [AddressSearchBox] class.
 ///
@@ -37,7 +37,7 @@ class AddressPoint {
       {@required double latitude, @required double longitude}) async {
     assert(latitude != null && longitude != null,
         "fromPoint method won't work without coordinates");
-    await LocationService.init();
+    await initLocationService();
     String address;
     String country;
     try {

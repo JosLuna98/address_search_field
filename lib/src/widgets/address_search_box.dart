@@ -1,4 +1,4 @@
-part of '../../address_search_text_field.dart';
+part of '../../address_search_field.dart';
 
 /// Widget based in an [AlertDialog] with a search bar and list of results,
 /// all in one box.
@@ -44,6 +44,9 @@ class AddressSearchBox extends StatefulWidget {
     this.onDone,
     this.onCleaned,
   })  : assert(country.isNotEmpty, "Country can't be empty"),
+        assert(country != null),
+        assert(hintText != null),
+        assert(noResultsText != null),
         this.controller = controller ?? TextEditingController();
 
   @override
@@ -89,7 +92,7 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
     this.onDone,
     this.onCleaned,
   ) {
-    LocationService.init();
+    initLocationService();
   }
 
   @override

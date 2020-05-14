@@ -1,6 +1,6 @@
-# example
+# address_search_field_example
 
-A new Flutter application for example of address search text field.
+Demonstrates how to use the address_search_field plugin.
 
 ## Getting Started
 
