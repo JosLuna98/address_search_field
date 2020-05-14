@@ -1,6 +1,6 @@
 name: address_search_field
 description: An address search box that gets nearby addresses by typing a reference, returns an object with place primary data. The object can also find an address using coordinates.
-version: 1.0.0
+version: 1.4.0
 homepage: https://github.com/JosLuna98/address_search_field.git
 
 environment:
