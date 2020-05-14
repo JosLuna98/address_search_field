@@ -5,6 +5,13 @@ It uses [location](https://pub.dev/packages/location), [geolocator](https://pub.
 
 ![](https://raw.githubusercontent.com/JosLuna98/address_search_field/master/screenshot/untitled.gif)
 
+**NOTE:** This package was made with Flutter 1.17 and Dart 2.8, make sure you have your environment within the version range.
+```yaml
+environment:
+  sdk: ">=2.7.0 <3.0.0"
+  flutter: ">=1.10.0"
+```
+
 ## Getting Started
 
 To use this plugin, add `address_search_field` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
