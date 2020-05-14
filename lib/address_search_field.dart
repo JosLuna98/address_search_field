@@ -1,5 +1,5 @@
-/// An address search box that gets nearby addresses by typing a reference, 
-/// returns an object with place primary data. The object can also find an 
+/// An address search box that gets nearby addresses by typing a reference,
+/// returns an object with place primary data. The object can also find an
 /// address using coordinates.
 library address_search_field;
 
