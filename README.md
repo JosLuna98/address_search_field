@@ -118,8 +118,10 @@ There are three possible outcomes:
 **NOTE:** You can also find an address by it's coordinates using `await AddressPoint.fromPoint(latitude, longitude)`. If the address is not found, it will return `null`.
 
 ```dart
-AddressPoint point = await AddressPoint.fromPoint(latitude, longitude);
-if (point != null) print(point.address);
+() async {
+  AddressPoint point = await AddressPoint.fromPoint(latitude, longitude);
+  if (point != null) print(point.address);
+}
 ```
 
 * This plugin also has an async static function called **initLocationService** to verify and request location permissions. You can use optional callbacks when location service is not enabled or if permission is not granted.
