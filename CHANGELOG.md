@@ -1,3 +1,7 @@
+## 1.4.1
+
+* Fix possible bug from useless conditional
+
 ## 1.4.0
 
 * Remake of [AddressSearchTextField](https://pub.dev/packages/address_search_text_field) Plugin due to the update of Flutter 1.17 and Dart 2.8

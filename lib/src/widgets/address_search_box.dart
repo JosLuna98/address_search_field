@@ -287,13 +287,11 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
               if (!_places.contains(place) &&
                   place.endsWith(country) &&
                   !exceptions.contains(place)) _places.add(place);
-              if (addresses.length == index + 1) {
-                _loading = false;
-                try {
-                  setState(() {});
-                } catch (_) {}
-              }
             });
+            _loading = false;
+            try {
+              setState(() {});
+            } catch (_) {}
           }
         } on NoSuchMethodError catch (_) {} on PlatformException catch (_) {} catch (_) {
           debugPrint("ERROR CATCHED: " + _.toString());
