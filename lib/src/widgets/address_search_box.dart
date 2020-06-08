@@ -288,14 +288,14 @@ class _AddressSearchBoxState extends State<AddressSearchBox> {
                   place.endsWith(country) &&
                   !exceptions.contains(place)) _places.add(place);
             });
-            _loading = false;
-            try {
-              setState(() {});
-            } catch (_) {}
           }
         } on NoSuchMethodError catch (_) {} on PlatformException catch (_) {} catch (_) {
           debugPrint("ERROR CATCHED: " + _.toString());
         }
+        _loading = false;
+        try {
+          setState(() {});
+        } catch (_) {}
       }
     });
   }
