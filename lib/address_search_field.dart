@@ -61,7 +61,8 @@ class AddressSearchField extends StatelessWidget {
   final bool coordForRef;
 
   /// Callback to run when search ends.
-  final FutureOr<void> Function(AddressPoint point) onDone;
+  final FutureOr<void> Function(BuildContext dialogContext, AddressPoint point)
+      onDone;
 
   /// Callback to run if the user no sends data.
   final FutureOr<void> Function() onCleaned;

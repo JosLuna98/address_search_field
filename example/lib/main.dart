@@ -44,7 +44,7 @@ class _PageOneState extends State<PageOne> {
                   "Esmeraldas Province, Ecuador",
                   "Ecuador"
                 ],
-                onDone: (AddressPoint point) async {
+                onDone: (BuildContext dialogContext, AddressPoint point) async {
                   AddressPoint point2;
                   if (point.latitude != null)
                     point2 = await AddressPoint.fromPoint(
@@ -54,7 +54,7 @@ class _PageOneState extends State<PageOne> {
                   setState(() {
                     text = "${point.toString()}\n\n${point2.toString()}";
                   });
-                  Navigator.of(context).pop();
+                  Navigator.of(dialogContext).pop();
                 },
                 onCleaned: () => print("clean"),
               ),
@@ -91,7 +91,8 @@ class PageTwo extends StatelessWidget {
           "Esmeraldas Province, Ecuador",
           "Ecuador"
         ],
-        onDone: (AddressPoint point) {
+        onDone: (_, AddressPoint point) {
+          FocusScope.of(context).requestFocus(FocusNode());
           // I use toast dependency to prettier show the result
           Toast.show(
             point.toString(),

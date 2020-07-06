@@ -18,7 +18,7 @@ To use this plugin, add `address_search_field` as a [dependency in your pubspec.
 
 ```yaml
 dependencies:
-  address_search_field: ^1.4.1
+  address_search_field: ^1.4.2
 ```
 
 ## Permissions
@@ -63,7 +63,7 @@ AddressSearchBox(
   noResultText: String,
   exceptions: <String>[],
   coordForRef: bool,
-  onDone: (AddressPoint point) {},
+  onDone: (BuildContext dialogContext, AddressPoint point) {},
   onCleaned: () {},
 );
 ```
@@ -94,7 +94,7 @@ AddressSearchField(
   noResultsText: String,
   exceptions: <String>[],
   coordForRef: bool,
-  onDone: (AddressPoint point) {},
+  onDone: (BuildContext dialogContext, AddressPoint point) {},
   onCleaned: () {},
 );
 ```
@@ -108,12 +108,13 @@ AddressSearchField(
 * When the address search is complete, you can get an `AddressPoint` object that provides the following values:
 
 ```dart
-onDone: (AddressPoint point) {
+onDone: (BuildContext dialogContext, AddressPoint point) {
   bool found = point.found;
   String address = point.address;
   String country = point.country;
   double latitude = point.latitude;
   double longitude = point.longitude;
+  Navigator.of(dialogContext).pop(); // Use it JUST in a AddressSearchField widget to close the dialog.
 }
 ```
 

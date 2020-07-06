@@ -1,3 +1,7 @@
+## 1.4.2
+
+* Add explicit dialog context like a parameter in the onDone function
+
 ## 1.4.1
 
 * Fix possible bug from useless conditional
