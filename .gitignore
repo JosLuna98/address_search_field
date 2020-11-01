@@ -8,7 +8,6 @@
 .buildlog/
 .history
 .svn/
-gen_doc.sh
 
 # IntelliJ related
 *.iml

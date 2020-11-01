@@ -1,106 +1,174 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:address_search_field/address_search_field.dart';
-import 'package:toast/toast.dart'; // External library
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 void main() {
   runApp(MaterialApp(
-    title: 'Flutter Demo',
-    theme: ThemeData(
-      primarySwatch: Colors.blue,
-      visualDensity: VisualDensity.adaptivePlatformDensity,
-    ),
-    home: PageOne(),
+    debugShowCheckedModeBanner: false,
+    home: SafeArea(child: MyApp()),
   ));
 }
 
-class PageOne extends StatefulWidget {
+class MyApp extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _PageOneState();
+  _MyAppState createState() => _MyAppState();
 }
 
-class _PageOneState extends State<PageOne> {
-  TextEditingController controller = TextEditingController();
-  String text = "";
+class _MyAppState extends State<MyApp> {
+  final Completer<GoogleMapController> _controller = Completer();
+
+  final TextEditingController oriCtrl =
+      TextEditingController.fromValue(TextEditingValue(text: 'las palmas'));
+
+  final TextEditingController desCtrl =
+      TextEditingController.fromValue(TextEditingValue(text: 'gran aki'));
+
+  final CameraPosition _kGooglePlex = CameraPosition(
+    target: LatLng(37.42796133580664, -122.085749655962),
+    zoom: 14.4746,
+  );
+
+  final Set<Polyline> polylines = Set<Polyline>();
+  final Set<Marker> markers = Set<Marker>();
+
+  final GeoMethods geoMethods = GeoMethods(
+    googleApiKey: 'GOOGLE_API_KEY',
+    language: 'es-419',
+    countryCode: 'ec',
+    country: 'Ecuador',
+    city: 'Esmeraldas',
+  );
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    final Size size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(),
-      body: Center(
-        child: Container(
-          width: size.width * 0.80,
+      appBar: AppBar(
+        title: const Text('Plugin example app'),
+      ),
+      body: Container(
+        child: SingleChildScrollView(
+          physics: NeverScrollableScrollPhysics(),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              AddressSearchField(
-                controller: controller,
-                country: "Ecuador",
-                city: "Esmeraldas",
-                hintText: "Dirección",
-                noResultsText: "No hay resultados...",
-                exceptions: [
-                  "Esmeraldas, Ecuador",
-                  "Esmeraldas Province, Ecuador",
-                  "Ecuador"
-                ],
-                onDone: (BuildContext dialogContext, AddressPoint point) async {
-                  AddressPoint point2;
-                  if (point.latitude != null)
-                    point2 = await AddressPoint.fromPoint(
-                      latitude: point.latitude,
-                      longitude: point.longitude,
-                    );
-                  setState(() {
-                    text = "${point.toString()}\n\n${point2.toString()}";
-                  });
-                  Navigator.of(dialogContext).pop();
-                },
-                onCleaned: () => print("clean"),
+            children: [
+              Container(
+                height: size.height - 230.0,
+                width: size.width,
+                child: GoogleMap(
+                  compassEnabled: true,
+                  myLocationEnabled: true,
+                  myLocationButtonEnabled: true,
+                  rotateGesturesEnabled: true,
+                  initialCameraPosition: _kGooglePlex,
+                  onMapCreated: (GoogleMapController controller) {
+                    _controller.complete(controller);
+                  },
+                  polylines: polylines,
+                  markers: markers,
+                ),
               ),
               Container(
-                margin: EdgeInsets.symmetric(vertical: 30.0),
-                child: Text(text),
+                color: Colors.white,
+                height: 150.0,
+                width: size.width,
+                child: RouteSearchBox(
+                  geoMethods: geoMethods,
+                  originCtrl: oriCtrl,
+                  originCtor: AddressFieldCtor(
+                    addressDialog: AddressDialogCtor(
+                      onDone: (address) async {
+                        print(address);
+                        if (address.hasCoords) {
+                          markers.clear();
+                          polylines.clear();
+                          markers.add(Marker(
+                            markerId: MarkerId('origin'),
+                            position: CoordsConvert(address.coords).toLatLng(),
+                          ));
+                          if (_controller.isCompleted) {
+                            (await _controller.future).animateCamera(
+                                CameraUpdate.newLatLngBounds(
+                                    BoundsConvert(address.bounds).toLatLng(),
+                                    60.0));
+                          }
+                        }
+                        return address != null;
+                      },
+                    ),
+                  ),
+                  destinationCtrl: desCtrl,
+                  destinationCtor: AddressFieldCtor(
+                    addressDialog: AddressDialogCtor(
+                      onDone: (address) async {
+                        print(address);
+                        if (address.hasCoords) {
+                          markers.clear();
+                          polylines.clear();
+                          markers.add(Marker(
+                            markerId: MarkerId('destination'),
+                            position: CoordsConvert(address.coords).toLatLng(),
+                          ));
+                          if (_controller.isCompleted && address.hasCoords) {
+                            (await _controller.future).animateCamera(
+                                CameraUpdate.newLatLngBounds(
+                                    BoundsConvert(address.bounds).toLatLng(),
+                                    60.0));
+                          }
+                        }
+                        return address != null;
+                      },
+                    ),
+                  ),
+                  widgetBuilder:
+                      (context, originField, destinationField, getDirections) {
+                    return Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        originField,
+                        destinationField,
+                        RaisedButton(
+                          onPressed: () async {
+                            Directions result = await getDirections([]);
+                            if (_controller.isCompleted) {
+                              setState(() {
+                                markers.clear();
+                                markers.add(Marker(
+                                  markerId: MarkerId('origin'),
+                                  position: CoordsConvert(result.origin.coords)
+                                      .toLatLng(),
+                                ));
+                                markers.add(Marker(
+                                  markerId: MarkerId('destination'),
+                                  position:
+                                      CoordsConvert(result.destination.coords)
+                                          .toLatLng(),
+                                ));
+                                polylines.clear();
+                                polylines.add(Polyline(
+                                  polylineId: PolylineId("route"),
+                                  points: ListConvert(result.points).toLatLng(),
+                                  color: Colors.green,
+                                  width: 5,
+                                ));
+                              });
+                              (await _controller.future).animateCamera(
+                                  CameraUpdate.newLatLngBounds(
+                                      BoundsConvert(result.bounds).toLatLng(),
+                                      60.0));
+                            }
+                            print(result);
+                          },
+                          child: Text("let's go!"),
+                        )
+                      ],
+                    );
+                  },
+                ),
               ),
-              FlatButton(
-                onPressed: () => Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => PageTwo())),
-                child: Text("Page Two"),
-                color: Colors.blue,
-              )
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class PageTwo extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: AddressSearchBox(
-        country: "Ecuador",
-        city: "Esmeraldas",
-        hintText: "Dirección",
-        noResultsText: "No hay resultados...",
-        exceptions: [
-          "Esmeraldas, Ecuador",
-          "Esmeraldas Province, Ecuador",
-          "Ecuador"
-        ],
-        onDone: (_, AddressPoint point) {
-          FocusScope.of(context).requestFocus(FocusNode());
-          // I use toast dependency to prettier show the result
-          Toast.show(
-            point.toString(),
-            context,
-            duration: Toast.LENGTH_LONG,
-            gravity: Toast.BOTTOM,
-          );
-        },
       ),
     );
   }
