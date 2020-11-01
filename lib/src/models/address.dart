@@ -1,7 +1,7 @@
 import 'package:address_search_field/src/models/bounds.dart';
 import 'package:address_search_field/src/models/coords.dart';
 
-/// A address primary data to work with Google APIs and [google_maps_flutter](https://pub.dev/packages/google_maps_flutter) plugin.
+/// Primary data of an address to perform geolocation processes.
 class Address {
   Coords _coords;
   Bounds _bounds;

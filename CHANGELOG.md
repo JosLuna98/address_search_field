@@ -1,4 +1,4 @@
-## [2.0.0]
+## [2.0.0+1]
 
 * Everything is new, excepting the plugin context. See [README](https://pub.dev/packages/address_search_field#-readme-tab-).
 

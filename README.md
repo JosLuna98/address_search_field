@@ -11,7 +11,7 @@ To use this plugin, add `address_search_field` as a [dependency in your pubspec.
 
 ```yaml
 dependencies:
-  address_search_field: ^2.0.0
+  address_search_field: ^2.0.0+1
 ```
 
 ## Permissions
