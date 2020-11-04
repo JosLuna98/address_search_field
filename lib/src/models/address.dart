@@ -39,12 +39,6 @@ class Address {
   /// Check if bounds exists.
   bool get hasBounds => _bounds != null;
 
-  /// Permits to update coords of the object.
-  void updateCoords(Coords coordinates, Bounds bounds) {
-    _coords = coordinates;
-    _bounds = bounds;
-  }
-
   /// Permits to update object by other object.
   void update(Address newAddress) {
     _coords = newAddress.coords;
