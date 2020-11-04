@@ -1,7 +1,7 @@
 # Address Search Field
 
 An address search field which helps to autocomplete an address by a reference. It can be used to get Directions beetwen two points.
-It uses [HTTP](https://pub.dev/packages/http/versions/0.12.2), [Google Maps for Flutter](https://pub.dev/packages/google_maps_flutter/versions/1.0.5) plugins. (This last plugin is to use compatible objects that can be converted).
+It uses [HTTP](https://pub.dev/packages/http/versions/0.12.2), [Google Maps for Flutter](https://pub.dev/packages/google_maps_flutter/versions/1.0.5) plugins. (This last plugin is to use compatible objects that can be converted). [FlutterToast](https://pub.dev/packages/fluttertoast) plugin is used to improve the frontend.
 
 ![](https://raw.githubusercontent.com/JosLuna98/address_search_field/master/screenshot/untitled.gif)
 
@@ -11,7 +11,7 @@ To use this plugin, add `address_search_field` as a [dependency in your pubspec.
 
 ```yaml
 dependencies:
-  address_search_field: ^2.0.0+1
+  address_search_field: ^2.0.1
 ```
 
 ## Permissions
