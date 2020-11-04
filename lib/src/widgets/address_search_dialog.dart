@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:address_search_field/src/widgets/route_search_box.dart';
 import 'package:address_search_field/src/services/geo_methods.dart';
 import 'package:address_search_field/src/models/address.dart';
@@ -24,6 +25,9 @@ class AddressDialogCtor {
   /// Continue text for [AddressSearchDialog].
   String continueText;
 
+  /// Error text for [AddressSearchDialog].
+  String errorText;
+
   /// `bool` for [AddressSearchDialog].
   bool useButtons;
 
@@ -41,6 +45,7 @@ class AddressDialogCtor {
     this.noResultsText,
     this.cancelText,
     this.continueText,
+    this.errorText,
     this.useButtons = true,
     @required this.onDone,
     this.result,
@@ -70,6 +75,9 @@ class AddressSearchDialog extends StatefulWidget {
   /// Text for [RaisedButton] of the widget to continue.
   final String continueText;
 
+  /// Text for [Fluttertoast] when something goes wrong.
+  final String errorText;
+
   /// Sets if the [AddressSearchDialog] will have buttons at bottom.
   final bool useButtons;
 
@@ -91,6 +99,7 @@ class AddressSearchDialog extends StatefulWidget {
     String noResultsText,
     String cancelText,
     String continueText,
+    String errorText,
     this.useButtons = true,
     @required this.onDone,
     @required this.geoMethods,
@@ -99,7 +108,8 @@ class AddressSearchDialog extends StatefulWidget {
         this.hintText = hintText ?? 'Address or reference',
         this.noResultsText = noResultsText ?? "There're no results",
         this.cancelText = cancelText ?? 'Cancel',
-        this.continueText = continueText ?? 'Continue' {
+        this.continueText = continueText ?? 'Continue',
+        this.errorText = errorText ?? 'Unexpected error' {
     if (!useButtons)
       assert(cancelText == null && continueText == null,
           "cancelText and continueText won't be visible when useButtons is false");
@@ -144,7 +154,7 @@ class _AddressSearchDialogState extends State<AddressSearchDialog> {
   Widget build(BuildContext context) {
     _size = MediaQuery.of(context).size;
     return SimpleDialog(
-      contentPadding: EdgeInsets.all(0.0),
+      contentPadding: EdgeInsets.zero,
       backgroundColor: Colors.transparent,
       children: <Widget>[
         Column(
@@ -317,23 +327,36 @@ class _AddressSearchDialogState extends State<AddressSearchDialog> {
   }
 
   Future<void> _searchAddress() async {
-    setState(() => _isLoading = true);
-    _places.clear();
-    _places.addAll(await widget.geoMethods
-        .autocompletePlace(query: widget.controller.text));
-    setState(() => _isLoading = false);
+    try {
+      setState(() => _isLoading = true);
+      _places.clear();
+      final List<Address> list = await widget.geoMethods
+          .autocompletePlace(query: widget.controller.text);
+      if (list == null) Fluttertoast.showToast(msg: widget.errorText);
+      _places.addAll(list ?? <Address>[]);
+      setState(() => _isLoading = false);
+    } catch (e) {
+      _isLoading = false;
+    }
   }
 
   void _clearSearchBar() {
-    widget.controller.clear();
-    setState(() => _places.clear());
+    try {
+      widget.controller.clear();
+      setState(() => _places.clear());
+    } catch (e) {
+      _places.clear();
+    }
   }
 
   Future<void> _selected(Address address) async {
-    if (address.hasPlaceId) {
+    if (address.hasReference && address.hasPlaceId) {
       Address add = await widget.geoMethods.getPlaceGeometry(
           reference: address.reference, placeId: address.placeId);
-      address.updateCoords(add.coords, add.bounds);
+      if (add != null)
+        address.update(add);
+      else
+        Fluttertoast.showToast(msg: widget.errorText);
     }
     if (await widget.onDone(address)) {
       widget.controller.text = address.reference;

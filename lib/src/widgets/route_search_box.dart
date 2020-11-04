@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:address_search_field/src/widgets/address_search_field.dart';
 import 'package:address_search_field/src/services/geo_methods.dart';
 import 'package:address_search_field/src/models/directions.dart';
@@ -30,6 +31,15 @@ class RouteSearchBox extends StatelessWidget {
     Future<Directions> Function(List<Address> waypoints) getDirections,
   ) widgetBuilder;
 
+  /// Text for [Fluttertoast] when something goes wrong.
+  final String errorText;
+
+  /// Text for [Fluttertoast] when `getDirections` is called without origin coords.
+  final String noOriginText;
+
+  /// Text for [Fluttertoast] when `getDirections` is called without destination coords.
+  final String noDestText;
+
   /// Constructor for [RouteSearchBox].
   RouteSearchBox({
     @required this.geoMethods,
@@ -38,8 +48,14 @@ class RouteSearchBox extends StatelessWidget {
     @required this.destinationCtor,
     TextEditingController destinationCtrl,
     @required this.widgetBuilder,
+    String errorText,
+    String noOriginText,
+    String noDestText,
   })  : this.originCtrl = originCtrl ?? TextEditingController(),
-        this.destinationCtrl = destinationCtrl ?? TextEditingController() {
+        this.destinationCtrl = destinationCtrl ?? TextEditingController(),
+        this.errorText = errorText ?? 'Unexpected error',
+        this.noOriginText = noOriginText ?? 'No origin coords',
+        this.noDestText = noDestText ?? 'No destination coords' {
     originCtor.addressDialog.result = _origin;
     destinationCtor.addressDialog.result = _destination;
   }
@@ -66,11 +82,18 @@ class RouteSearchBox extends StatelessWidget {
   }
 
   Future<Directions> _getDirections(List<Address> waypoints) async {
-    if (_origin.hasCoords && _destination.hasCoords)
-      return await geoMethods.getDirections(
+    if (!_origin.hasCoords) Fluttertoast.showToast(msg: noOriginText);
+    if (!_destination.hasCoords) Fluttertoast.showToast(msg: noDestText);
+    if (_origin.hasCoords && _destination.hasCoords) {
+      Directions direc = await geoMethods.getDirections(
           origin: _origin,
           destination: _destination,
           waypoints: waypoints ?? []);
+      if (direc == null)
+        Fluttertoast.showToast(msg: errorText);
+      else
+        return direc;
+    }
     return null;
   }
 }
