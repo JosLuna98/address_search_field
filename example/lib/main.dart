@@ -130,32 +130,36 @@ class _MyAppState extends State<MyApp> {
                         RaisedButton(
                           onPressed: () async {
                             Directions result = await getDirections([]);
-                            if (_controller.isCompleted) {
-                              setState(() {
-                                markers.clear();
-                                markers.add(Marker(
-                                  markerId: MarkerId('origin'),
-                                  position: CoordsConvert(result.origin.coords)
-                                      .toLatLng(),
-                                ));
-                                markers.add(Marker(
-                                  markerId: MarkerId('destination'),
-                                  position:
-                                      CoordsConvert(result.destination.coords)
-                                          .toLatLng(),
-                                ));
-                                polylines.clear();
-                                polylines.add(Polyline(
-                                  polylineId: PolylineId("route"),
-                                  points: ListConvert(result.points).toLatLng(),
-                                  color: Colors.green,
-                                  width: 5,
-                                ));
-                              });
-                              (await _controller.future).animateCamera(
-                                  CameraUpdate.newLatLngBounds(
-                                      BoundsConvert(result.bounds).toLatLng(),
-                                      60.0));
+                            if (result != null) {
+                              if (_controller.isCompleted) {
+                                setState(() {
+                                  markers.clear();
+                                  markers.add(Marker(
+                                    markerId: MarkerId('origin'),
+                                    position:
+                                        CoordsConvert(result.origin.coords)
+                                            .toLatLng(),
+                                  ));
+                                  markers.add(Marker(
+                                    markerId: MarkerId('destination'),
+                                    position:
+                                        CoordsConvert(result.destination.coords)
+                                            .toLatLng(),
+                                  ));
+                                  polylines.clear();
+                                  polylines.add(Polyline(
+                                    polylineId: PolylineId("route"),
+                                    points:
+                                        ListConvert(result.points).toLatLng(),
+                                    color: Colors.green,
+                                    width: 5,
+                                  ));
+                                });
+                                (await _controller.future).animateCamera(
+                                    CameraUpdate.newLatLngBounds(
+                                        BoundsConvert(result.bounds).toLatLng(),
+                                        60.0));
+                              }
                             }
                             print(result);
                           },

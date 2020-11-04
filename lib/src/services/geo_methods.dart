@@ -47,8 +47,13 @@ class GeoMethods {
     query = query.replaceAll(RegExp(r' '), '%20');
     final String url =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$query,%20$city,%20$country&language=$language&components=country:$countryCode&key=$googleApiKey';
-    http.Response response = await http.get(url);
-    final List<Address> list = List();
+    http.Response response;
+    try {
+      response = await http.get(url);
+    } catch (e) {
+      return null;
+    }
+    final List<Address> list = List<Address>();
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body)['predictions'];
       jsonResponse.forEach((element) => list.add(Address(
@@ -66,7 +71,12 @@ class GeoMethods {
       AssertionError("placeId can't be declared as an empty `String`");
     final String url =
         'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&fields=geometry&key=$googleApiKey';
-    http.Response response = await http.get(url);
+    http.Response response;
+    try {
+      response = await http.get(url);
+    } catch (e) {
+      return null;
+    }
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
       var coords = jsonResponse['result']['geometry']['location'];
@@ -85,7 +95,12 @@ class GeoMethods {
   Future<Address> geoLocatePlace({@required Coords coords}) async {
     final String url =
         'https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.toString()}&result_type=street_address&language=$language&key=$googleApiKey';
-    http.Response response = await http.get(url);
+    http.Response response;
+    try {
+      response = await http.get(url);
+    } catch (e) {
+      return null;
+    }
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
       var bounds = jsonResponse['results'][0]['geometry']['viewport'];
@@ -120,7 +135,12 @@ class GeoMethods {
           ? '${element.coords.toString()}|'
           : '${element.coords.toString()}');
     }
-    http.Response response = await http.get(url);
+    http.Response response;
+    try {
+      response = await http.get(url);
+    } catch (e) {
+      return null;
+    }
     if (response.statusCode == 200) {
       var jsonResponse = jsonDecode(response.body);
       if (jsonResponse['status'] == "NOT_FOUND") throw ("NOT_FOUND");
@@ -143,23 +163,41 @@ class GeoMethods {
   /// `List<Map<String, dynamic>>`
   String _calcDistance(dynamic distances) {
     int value = 0;
+    String suffix = 'm';
     try {
       distances.forEach((element) => value += element['distance']['value']);
-      return '$value';
-    } catch (_) {
-      return '$value';
-    }
+      if (value > 999) {
+        // meters to kilometers
+        value = (value / 1000).round();
+        suffix = 'km';
+      }
+    } catch (e) {}
+    return '$value $suffix';
   }
 
   /// `List<Map<String, dynamic>>`
   String _calcDuration(dynamic durations) {
     int value = 0;
+    String suffix = 'sec';
     try {
       durations.forEach((element) => value += element['duration']['value']);
-      return '$value';
-    } catch (_) {
-      return '$value';
-    }
+      if (value > 60) {
+        // seconds to minutes
+        value = (value / 60).round();
+        suffix = 'min';
+      }
+      if (value > 60) {
+        // minutes to hours
+        value = (value / 60).round();
+        suffix = 'h';
+      }
+      if (value > 24) {
+        // hours to days
+        value = (value / 24).round();
+        suffix = 'd';
+      }
+    } catch (e) {}
+    return '$value $suffix';
   }
 
   /// Decodes an `encoded` [String] to create a [Polyline].
