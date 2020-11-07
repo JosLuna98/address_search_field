@@ -74,9 +74,9 @@ class _MyAppState extends State<MyApp> {
                 width: size.width,
                 child: RouteSearchBox(
                   geoMethods: geoMethods,
-                  originCtrl: oriCtrl,
-                  originCtor: AddressFieldCtor(
-                    addressDialog: AddressDialogCtor(
+                  originBldr: AddressFieldBuilder(
+                    controller: oriCtrl,
+                    addressDialog: AddressDialogBuilder(
                       onDone: (address) async {
                         print(address);
                         if (address.hasCoords) {
@@ -97,9 +97,9 @@ class _MyAppState extends State<MyApp> {
                       },
                     ),
                   ),
-                  destinationCtrl: desCtrl,
-                  destinationCtor: AddressFieldCtor(
-                    addressDialog: AddressDialogCtor(
+                  destinationBldr: AddressFieldBuilder(
+                    controller: desCtrl,
+                    addressDialog: AddressDialogBuilder(
                       onDone: (address) async {
                         print(address);
                         if (address.hasCoords) {

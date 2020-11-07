@@ -5,40 +5,40 @@ import 'package:address_search_field/src/widgets/route_search_box.dart';
 import 'package:address_search_field/src/services/geo_methods.dart';
 import 'package:address_search_field/src/models/address.dart';
 
-/// Helps to create an [AddressSearchDialog].
-class AddressDialogCtor {
-  /// Color for [AddressSearchDialog].
+/// Builder for [AddressDialog].
+class AddressDialogBuilder {
+  /// Variable for [AddressDialog].
   Color color;
 
-  /// Background color for [AddressSearchDialog].
+  /// Variable for [AddressDialog].
   Color backgroundColor;
 
-  /// Hint text for [AddressSearchDialog].
+  /// Variable for [AddressDialog].
   String hintText;
 
-  /// No results text for [AddressSearchDialog].
+  /// Variable for [AddressDialog].
   String noResultsText;
 
-  /// Cancel text for [AddressSearchDialog].
+  /// Variable for [AddressDialog].
   String cancelText;
 
-  /// Continue text for [AddressSearchDialog].
+  /// Variable for [AddressDialog].
   String continueText;
 
-  /// Error text for [AddressSearchDialog].
+  /// Variable for [AddressDialog].
   String errorText;
 
-  /// `bool` for [AddressSearchDialog].
+  /// Variable for [AddressDialog].
   bool useButtons;
 
-  /// `Function` for [AddressSearchDialog].
+  /// Variable for [AddressDialog].
   FutureOr<bool> Function(Address address) onDone;
 
-  /// `Address` for [AddressSearchDialog].
+  /// Variable for [AddressDialog].
   Address result;
 
-  /// Constructor for [AddressDialogCtor].
-  AddressDialogCtor({
+  /// Constructor for [AddressDialogBuilder].
+  AddressDialogBuilder({
     this.color,
     this.backgroundColor,
     this.hintText,
@@ -50,10 +50,30 @@ class AddressDialogCtor {
     @required this.onDone,
     this.result,
   });
+
+  /// Build an [AddressDialog].
+  AddressDialog build({
+    @required GeoMethods geoMethods,
+    TextEditingController controller,
+  }) {
+    return AddressDialog(
+      controller: controller,
+      color: color,
+      backgroundColor: backgroundColor,
+      hintText: hintText,
+      noResultsText: noResultsText,
+      cancelText: cancelText,
+      continueText: continueText,
+      useButtons: (useButtons != null) ? useButtons : true,
+      onDone: onDone,
+      geoMethods: geoMethods,
+      result: result,
+    );
+  }
 }
 
 /// Dialog box to search a place or address in an autocompleted results list.
-class AddressSearchDialog extends StatefulWidget {
+class AddressDialog extends StatefulWidget {
   /// Controller for [TextField] in the widget.
   final TextEditingController controller;
 
@@ -78,7 +98,7 @@ class AddressSearchDialog extends StatefulWidget {
   /// Text for [Fluttertoast] when something goes wrong.
   final String errorText;
 
-  /// Sets if the [AddressSearchDialog] will have buttons at bottom.
+  /// Sets if the [AddressDialog] will have buttons at bottom.
   final bool useButtons;
 
   /// Runs when an address is selected.
@@ -90,8 +110,8 @@ class AddressSearchDialog extends StatefulWidget {
   /// Parameter to work with a [RouteSearchBox].
   final Address result;
 
-  /// Constructor for [AddressSearchDialog].
-  AddressSearchDialog({
+  /// Constructor for [AddressDialog].
+  AddressDialog({
     TextEditingController controller,
     this.color,
     this.backgroundColor,
@@ -115,34 +135,12 @@ class AddressSearchDialog extends StatefulWidget {
           "cancelText and continueText won't be visible when useButtons is false");
   }
 
-  /// Constructor for [AddressSearchDialog] by [AddressDialogCtor].
-  factory AddressSearchDialog.ctor({
-    @required AddressDialogCtor constructor,
-    TextEditingController controller,
-    @required GeoMethods geoMethods,
-  }) {
-    return AddressSearchDialog(
-      controller: controller,
-      color: constructor.color,
-      backgroundColor: constructor.backgroundColor,
-      hintText: constructor.hintText,
-      noResultsText: constructor.noResultsText,
-      cancelText: constructor.cancelText,
-      continueText: constructor.continueText,
-      useButtons:
-          (constructor.useButtons != null) ? constructor.useButtons : true,
-      onDone: constructor.onDone,
-      geoMethods: geoMethods,
-      result: constructor.result,
-    );
-  }
-
   @override
-  _AddressSearchDialogState createState() => _AddressSearchDialogState();
+  _AddressDialogState createState() => _AddressDialogState();
 }
 
-class _AddressSearchDialogState extends State<AddressSearchDialog> {
-  _AddressSearchDialogState()
+class _AddressDialogState extends State<AddressDialog> {
+  _AddressDialogState()
       : this._isLoading = false,
         this._places = List<Address>();
 
@@ -332,7 +330,14 @@ class _AddressSearchDialogState extends State<AddressSearchDialog> {
       _places.clear();
       final List<Address> list = await widget.geoMethods
           .autocompletePlace(query: widget.controller.text);
-      if (list == null) Fluttertoast.showToast(msg: widget.errorText);
+      if (list == null)
+        Fluttertoast.showToast(
+          msg: widget.errorText,
+          toastLength: Toast.LENGTH_LONG,
+          timeInSecForIosWeb: 2,
+          webPosition: 'center',
+          webBgColor: '#BDBDBD',
+        );
       _places.addAll(list ?? <Address>[]);
       setState(() => _isLoading = false);
     } catch (e) {
@@ -356,7 +361,13 @@ class _AddressSearchDialogState extends State<AddressSearchDialog> {
       if (add != null)
         address.update(add);
       else
-        Fluttertoast.showToast(msg: widget.errorText);
+        Fluttertoast.showToast(
+          msg: widget.errorText,
+          toastLength: Toast.LENGTH_LONG,
+          timeInSecForIosWeb: 2,
+          webPosition: 'center',
+          webBgColor: '#BDBDBD',
+        );
     }
     if (await widget.onDone(address)) {
       widget.controller.text = address.reference;

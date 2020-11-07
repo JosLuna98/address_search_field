@@ -1,3 +1,14 @@
+## [2.1.0]
+
+* `AddressSearchField` is called: `AddressField`.
+* `AddressSearchDialog` is called: `AddressDialog`.
+* `AddressFieldCtor` is called: `AddressFieldBuilder`.
+* `AddressDialogCtor` is called: `AddressDialogBuilder`.
+* `RouteSearchBox` doesn't have two `TextEditingController`.
+* `AddressField` is converted from `TextField` to a `TextFormField`.
+* `AddressField` can use all the `TextFormField` parameters.
+* FlutterToast looks better in web.
+
 ## [2.0.1]
 
 * Error handling for `GeoMethods` added.

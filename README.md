@@ -11,7 +11,7 @@ To use this plugin, add `address_search_field` as a [dependency in your pubspec.
 
 ```yaml
 dependencies:
-  address_search_field: ^2.0.1
+  address_search_field: ^2.1.0
 ```
 
 ## Permissions
@@ -48,10 +48,10 @@ GeoMethods(
 * Language support list [here](https://developers.google.com/maps/faq#languagesupport).
 * List of countries [here](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes).
 
-## AddressSearchDialog
+## AddressDialog
 
 ```dart
-AddressSearchDialog(
+AddressDialog(
   controller: TextEditingController(),
   color: Color,
   backgroundColor: Color,
@@ -62,52 +62,48 @@ AddressSearchDialog(
   useButtons: bool,
   onDone: FutureOr<bool> Function(Address addressPoint),
   geoMethods: GeoMethods
-  result: Address
 );
 ```
 
 * This widget is a `Dialog` box to search a place or address in an autocompleted results list.
 * onDone `Function` let you work with the resulted `Address` from the search. When it returns `true` the `Dialog` does `pop()`.
-* The result object helps this widget to work in a `RouteSearchBox`.
+* It has a result object that helps this widget to work in a `RouteSearchBox`.
 
-## AddressSearchField
+## AddressField
 
 ```dart
-AddressSearchField(
+AddressField(
   controller: TextEditingController(),
-  decoration: InputDecoration(),
-  style: TextStyle(),
+  /// ... more variables of `TextFormField`
   barrierDismissible: bool,
-  addressDialog: AddressDialogCtor,
+  addressDialog: AddressDialogBuilder,
   geoMethods: GeoMethods,
 );
 ```
 
-* This widget is a `TextField` that `onTap` shows a `AddressSearchDialog`.
-* It uses an `AddressDialogCtor` object to build an `AddressSearchDialog` sharing variables like controller and geoMethods.
+* This widget is a `TextFormField` that `onTap` shows a `AddressDialog`.
+* It uses an `AddressDialogBuilder` object to build an `AddressDialog` sharing variables like controller and geoMethods.
 
 ## RouteSearchBox
 
 ```dart
 RouteSearchBox(
   geoMethods: GeoMethods,
-  originCtrl: TextEditingController(),
-  originCtor: AddressFieldCtor,
-  destinationCtrl: TextEditingController(),
-  destinationCtor: AddressFieldCtor,
+  originBldr: AddressFieldBuilder,
+  destinationBldr: AddressFieldBuilder,
   widgetBuilder: Widget Function(
     BuildContext context,
-    AddressSearchField originField,
-    AddressSearchField destinationField,
+    AddressField originField,
+    AddressField destinationField,
     Future<Directions> Function(List<Address> waypoints) getDirections,
   ),
 );
 ```
 
-* This widget use a custom `WidgetBuilder` with two `AddressSearchField` to call Google Directions API and get `Directions` beetwen two or more points.
-* It uses an `AddressFieldCtor` object to build an `AddressSearchField` sharing variables like controller and geoMethods.
-* In its constructor it edits the `AddressFieldCtor` to use the `result` variable connecting directly these two widgets.
-* The `widgetBuilder` lets you build a widget using two `AddressSearchField` to get two `Address` objects and be able to call Google Directions API by `getDirections` to finally get a `Directions` object.
+* This widget use a custom `WidgetBuilder` with two `AddressField` to call Google Directions API and get `Directions` beetwen two or more points.
+* It uses an `AddressFieldBuilder` object to build an `AddressField` sharing variables like controller and geoMethods.
+* In its constructor it edits the `AddressFieldBuilder` to use the `result` variable connecting directly these two widgets.
+* The `widgetBuilder` lets you build a widget using two `AddressField` to get two `Address` objects and be able to call Google Directions API by `getDirections` to finally get a `Directions` object.
 
 ##  License
 
