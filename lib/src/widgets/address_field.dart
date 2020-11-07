@@ -251,52 +251,147 @@ class AddressFieldBuilder {
 
 /// [TextFormField] that `onTap` shows a [AddressDialog].
 class AddressField extends StatelessWidget {
+  /// Tapping outside the box dismiss the widget. default true.
   final bool barrierDismissible;
+
+  /// Builder for [AddressDialog].
   final AddressDialogBuilder addressDialog;
+
+  /// [GeoMethods] instance to use Google APIs.
   final GeoMethods geoMethods;
+
+  /// Controls the text being edited.
+  ///
+  /// If null, this widget will create its own [TextEditingController].
   final TextEditingController controller;
+
+  /// Variable for [TextFormField].
   final String initialValue;
+
+  /// Variable for [TextFormField].
   final FocusNode focusNode;
+
+  /// Variable for [TextFormField].
   final InputDecoration decoration;
+
+  /// Variable for [TextFormField].
   final TextInputType keyboardType;
+
+  /// Variable for [TextFormField].
   final TextCapitalization textCapitalization;
+
+  /// Variable for [TextFormField].
   final TextInputAction textInputAction;
+
+  /// Variable for [TextFormField].
   final TextStyle style;
+
+  /// Variable for [TextFormField].
   final StrutStyle strutStyle;
+
+  /// Variable for [TextFormField].
   final TextDirection textDirection;
+
+  /// Variable for [TextFormField].
   final TextAlign textAlign;
+
+  /// Variable for [TextFormField].
   final TextAlignVertical textAlignVertical;
+
+  /// Variable for [TextFormField].
   final bool autofocus;
+
+  /// Variable for [TextFormField].
   final ToolbarOptions toolbarOptions;
+
+  /// Variable for [TextFormField].
   final bool showCursor;
+
+  /// Variable for [TextFormField].
   final String obscuringCharacter;
+
+  /// Variable for [TextFormField].
   final bool obscureText;
+
+  /// Variable for [TextFormField].
   final bool autocorrect;
+
+  /// Variable for [TextFormField].
   final SmartDashesType smartDashesType;
+
+  /// Variable for [TextFormField].
   final SmartQuotesType smartQuotesType;
+
+  /// Variable for [TextFormField].
   final bool enableSuggestions;
+
+  /// Variable for [TextFormField].
   final bool maxLengthEnforced;
+
+  /// Variable for [TextFormField].
   final int maxLines;
+
+  /// Variable for [TextFormField].
   final int minLines;
+
+  /// Variable for [TextFormField].
   final bool expands;
+
+  /// Variable for [TextFormField].
   final int maxLength;
+
+  /// Variable for [TextFormField].
   final ValueChanged<String> onChanged;
+
+  /// Variable for [TextFormField].
   final VoidCallback onEditingComplete;
+
+  /// Variable for [TextFormField].
   final ValueChanged<String> onFieldSubmitted;
+
+  /// Variable for [TextFormField].
   final FormFieldSetter<String> onSaved;
+
+  /// Variable for [TextFormField].
   final FormFieldValidator<String> validator;
+
+  /// Variable for [TextFormField].
   final List<TextInputFormatter> inputFormatters;
+
+  /// Variable for [TextFormField].
   final bool enabled;
+
+  /// Variable for [TextFormField].
   final double cursorWidth;
+
+  /// Variable for [TextFormField].
   final double cursorHeight;
+
+  /// Variable for [TextFormField].
   final Radius cursorRadius;
+
+  /// Variable for [TextFormField].
   final Color cursorColor;
+
+  /// Variable for [TextFormField].
   final Brightness keyboardAppearance;
+
+  /// Variable for [TextFormField].
   final EdgeInsets scrollPadding;
+
+  /// Variable for [TextFormField].
   final bool enableInteractiveSelection;
+
+  /// Variable for [TextFormField].
   final InputCounterWidgetBuilder buildCounter;
+
+  /// Variable for [TextFormField].
   final ScrollPhysics scrollPhysics;
+
+  /// Variable for [TextFormField].
   final Iterable<String> autofillHints;
+
+  /// Variable for [TextFormField].
   final AutovalidateMode autovalidateMode;
 
   /// Constructor for [AddressField].

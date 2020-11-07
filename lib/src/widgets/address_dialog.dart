@@ -74,7 +74,9 @@ class AddressDialogBuilder {
 
 /// Dialog box to search a place or address in an autocompleted results list.
 class AddressDialog extends StatefulWidget {
-  /// Controller for [TextField] in the widget.
+  /// Controls the text being edited.
+  ///
+  /// If null, this widget will create its own [TextEditingController].
   final TextEditingController controller;
 
   /// Color for details in the widget.

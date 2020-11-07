@@ -1,3 +1,8 @@
+## [2.1.0+1]
+
+* Documentation improved.
+* Better implementation of dart extensions in example.
+
 ## [2.1.0]
 
 * `AddressSearchField` is called: `AddressField`.

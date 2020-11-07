@@ -26,7 +26,7 @@ class Bounds {
 /// Helps to use objects with [google_maps_flutter](https://pub.dev/packages/google_maps_flutter) plugin.
 extension BoundsConvert on Bounds {
   /// Returns a [LatLngBounds] object.
-  LatLngBounds toLatLng() => LatLngBounds(
+  LatLngBounds toLatLngBounds() => LatLngBounds(
         southwest: LatLng(
           this.southwest.latitude,
           this.southwest.longitude,

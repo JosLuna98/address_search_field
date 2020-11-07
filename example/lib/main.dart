@@ -84,13 +84,12 @@ class _MyAppState extends State<MyApp> {
                           polylines.clear();
                           markers.add(Marker(
                             markerId: MarkerId('origin'),
-                            position: CoordsConvert(address.coords).toLatLng(),
+                            position: address.coords.toLatLng(),
                           ));
                           if (_controller.isCompleted) {
                             (await _controller.future).animateCamera(
                                 CameraUpdate.newLatLngBounds(
-                                    BoundsConvert(address.bounds).toLatLng(),
-                                    60.0));
+                                    address.bounds.toLatLngBounds(), 60.0));
                           }
                         }
                         return address != null;
@@ -107,13 +106,12 @@ class _MyAppState extends State<MyApp> {
                           polylines.clear();
                           markers.add(Marker(
                             markerId: MarkerId('destination'),
-                            position: CoordsConvert(address.coords).toLatLng(),
+                            position: address.coords.toLatLng(),
                           ));
                           if (_controller.isCompleted && address.hasCoords) {
                             (await _controller.future).animateCamera(
                                 CameraUpdate.newLatLngBounds(
-                                    BoundsConvert(address.bounds).toLatLng(),
-                                    60.0));
+                                    address.bounds.toLatLngBounds(), 60.0));
                           }
                         }
                         return address != null;
@@ -136,29 +134,24 @@ class _MyAppState extends State<MyApp> {
                                   markers.clear();
                                   markers.add(Marker(
                                     markerId: MarkerId('origin'),
-                                    position:
-                                        CoordsConvert(result.origin.coords)
-                                            .toLatLng(),
+                                    position: result.origin.coords.toLatLng(),
                                   ));
                                   markers.add(Marker(
                                     markerId: MarkerId('destination'),
                                     position:
-                                        CoordsConvert(result.destination.coords)
-                                            .toLatLng(),
+                                        result.destination.coords.toLatLng(),
                                   ));
                                   polylines.clear();
                                   polylines.add(Polyline(
                                     polylineId: PolylineId("route"),
-                                    points:
-                                        ListConvert(result.points).toLatLng(),
+                                    points: result.points.toLatLng(),
                                     color: Colors.green,
                                     width: 5,
                                   ));
                                 });
                                 (await _controller.future).animateCamera(
                                     CameraUpdate.newLatLngBounds(
-                                        BoundsConvert(result.bounds).toLatLng(),
-                                        60.0));
+                                        result.bounds.toLatLngBounds(), 60.0));
                               }
                             }
                             print(result);

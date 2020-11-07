@@ -11,10 +11,10 @@ class RouteSearchBox extends StatelessWidget {
   /// [GeoMethods] instance to use Google APIs.
   final GeoMethods geoMethods;
 
-  /// Constructor for `origin` [AddressField].
+  /// Builder for `origin` [AddressField].
   final AddressFieldBuilder originBldr;
 
-  /// Constructor for `destination` [AddressField].
+  /// Builder for `destination` [AddressField].
   final AddressFieldBuilder destinationBldr;
 
   /// Custom [WidgetBuilder] that builds a widget by two [AddressSearchField] to get two [Address] objects and be able to call Google Directions API by `getDirections` to finally get a [Directions] object.
