@@ -1,7 +1,7 @@
 # Address Search Field
 
-An address search field which helps to autocomplete an address by a reference. It can be used to get Directions beetwen two points.
-It uses [HTTP](https://pub.dev/packages/http/versions/0.12.2), [Google Maps for Flutter](https://pub.dev/packages/google_maps_flutter/versions/1.0.5) plugins. (This last plugin is to use compatible objects that can be converted). [FlutterToast](https://pub.dev/packages/fluttertoast) plugin is used to improve the frontend.
+Widget builders to create 'address search widgets' which helps to autocomplete an address using a reference. They can be used to get Directions beetwen two places with optional waypoints. These widgets are made to be showed by `onTap` in a `TextField` with the `showDialog` function.
+It uses [HTTP](https://pub.dev/packages/http/versions/0.12.2), [Google Maps for Flutter](https://pub.dev/packages/google_maps_flutter/versions/1.0.5) plugins. (This last plugin is to use extended objects that can be usable with `GoogleMap` Widget).
 
 ![](https://raw.githubusercontent.com/JosLuna98/address_search_field/master/screenshot/untitled.gif)
 
@@ -11,7 +11,7 @@ To use this plugin, add `address_search_field` as a [dependency in your pubspec.
 
 ```yaml
 dependencies:
-  address_search_field: ^2.1.0+1
+  address_search_field: ^3.0.0
 ```
 
 ## Permissions
@@ -22,6 +22,17 @@ On Android you'll need to add the internet permission to your Android Manifest f
 
 ``` xml
 <uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+```
+
+### iOS
+
+On iOS you'll need to add the `NSLocationWhenInUseUsageDescription` to your Info.plist file (located under ios/Runner) in order to access the device's location. Simply open your Info.plist file and add the following:
+
+``` xml
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Permission to get your location</string>
 ```
 
 ## Usage
@@ -44,15 +55,54 @@ GeoMethods(
 );
 ```
 
-* This object make calls to Google APIs using the parameters set. It can do requests to Google places, geocode and directions APIs.
+* This object makes calls to Google APIs using the parameters set. It can do requests to Google places, geocode and directions APIs.
 * Language support list [here](https://developers.google.com/maps/faq#languagesupport).
 * List of countries [here](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes).
 
-## AddressDialog
+## AddressSearchBuilder
+
+This widget is a builder which provides of parameters and methods to create a widget that can search addresses and permits to work with them using an `Address` object.
 
 ```dart
-AddressDialog(
-  controller: TextEditingController(),
+AddressSearchBuilder(
+  geoMethods: GeoMethods,
+  controller: TextEditingController,
+  builder: (
+    BuildContext context,
+    AsyncSnapshot<List<Address>> snapshot, {
+    TextEditingController controller,
+    Future<void> Function() searchAddress,
+    Future<Address> Function(Address address) getGeometry,
+  }) {
+    // building example
+    return AddressSearchDialog(
+      snapshot: snapshot,
+      controller: controller,
+      searchAddress: searchAddress,
+      getGeometry: getGeometry,
+      onDone: (address) => null,
+    );
+  },
+);
+```
+
+>`AddressSearchDialog` shouldn't be used alone. It needs parameters from `AddressSearchBuilder`. The best way to use this widget is using `AddressSearchBuilder.deft`, which will just use an `AddressDialogBuilder` and it's an easier implementation.
+
+```dart
+AddressSearchBuilder.deft(
+  geoMethods: GeoMethods,
+  controller: TextEditingController,
+  builder: AddressDialogBuilder(),
+  onDone: (Address address) {},
+);
+```
+
+## AddressDialogBuilder
+
+This builder uses parameters to customize an `AddressSearchDialog` which is called from `AddressSearchBuilder`.
+
+```dart
+AddressDialogBuilder(
   color: Color,
   backgroundColor: Color,
   hintText: String,
@@ -60,50 +110,47 @@ AddressDialog(
   cancelText: String,
   continueText: String,
   useButtons: bool,
-  onDone: FutureOr<bool> Function(Address addressPoint),
-  geoMethods: GeoMethods
 );
 ```
-
-* This widget is a `Dialog` box to search a place or address in an autocompleted results list.
-* onDone `Function` let you work with the resulted `Address` from the search. When it returns `true` the `Dialog` does `pop()`.
-* It has a result object that helps this widget to work in a `RouteSearchBox`.
-
-## AddressField
-
-```dart
-AddressField(
-  controller: TextEditingController(),
-  /// ... more variables of `TextFormField`
-  barrierDismissible: bool,
-  addressDialog: AddressDialogBuilder,
-  geoMethods: GeoMethods,
-);
-```
-
-* This widget is a `TextFormField` that `onTap` shows a `AddressDialog`.
-* It uses an `AddressDialogBuilder` object to build an `AddressDialog` sharing variables like controller and geoMethods.
 
 ## RouteSearchBox
 
+This is a special widget with a builder which provides of three `AddressSearchBuilder` to search an origin `Address`, destination `Address` and optionally waypoints in a `List<Address>`. This widget is used to get directions from the points got by the builder's `AddressSearchBuilder`s.
+A completed example of how to use this widget could be found [here](https://pub.dev/packages/address_search_field/example).
+
 ```dart
 RouteSearchBox(
+  originIsMyLocation: bool,
+  onOriginLoading: String,
+  onOriginError: String,
   geoMethods: GeoMethods,
-  originBldr: AddressFieldBuilder,
-  destinationBldr: AddressFieldBuilder,
-  widgetBuilder: Widget Function(
+  originCtrlr: TextEditingController,
+  destinationCtrlr: TextEditingController,
+  waypointCtrlr:TextEditingController,
+  builder: (
     BuildContext context,
-    AddressField originField,
-    AddressField destinationField,
-    Future<Directions> Function(List<Address> waypoints) getDirections,
-  ),
+    AddressSearchBuilder originBuilder,
+    AddressSearchBuilder destinationBuilder,
+    AddressSearchBuilder waypointBuilder, {
+    WaypointsManager waypointsMgr,
+    Future<Directions> Function() getDirections,
+  }) {
+    // building example
+    return TextField(
+      controller: originCtrlr,
+      onTap: () => showDialog(
+        context: context,
+        builder:
+            (context) => 
+                originBuilder.buildDefault(
+          builder: AddressDialogBuilder(),
+          onDone: (address) => null,
+        ),
+      ),
+    );
+  },
 );
 ```
-
-* This widget use a custom `WidgetBuilder` with two `AddressField` to call Google Directions API and get `Directions` beetwen two or more points.
-* It uses an `AddressFieldBuilder` object to build an `AddressField` sharing variables like controller and geoMethods.
-* In its constructor it edits the `AddressFieldBuilder` to use the `result` variable connecting directly these two widgets.
-* The `widgetBuilder` lets you build a widget using two `AddressField` to get two `Address` objects and be able to call Google Directions API by `getDirections` to finally get a `Directions` object.
 
 ##  License
 

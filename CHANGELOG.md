@@ -1,3 +1,7 @@
+## [3.0.0]
+
+* **BREAK CHANGES:** read documentation is needed.
+
 ## [2.1.0+1]
 
 * Documentation improved.
