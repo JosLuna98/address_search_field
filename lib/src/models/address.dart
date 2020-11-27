@@ -1,11 +1,19 @@
+import 'package:flutter/widgets.dart';
 import 'package:address_search_field/src/models/bounds.dart';
 import 'package:address_search_field/src/models/coords.dart';
 
 /// Primary data of an address to perform geolocation processes.
 class Address {
+  /// Coordinates.
   Coords _coords;
+
+  /// Bounds.
   Bounds _bounds;
+
+  /// Reference or streets.
   String _reference;
+
+  /// Place Id from Google Place API.
   String _placeId;
 
   /// Constructor for [Address].
@@ -27,17 +35,20 @@ class Address {
   /// Place Id to work with Google Place API
   String get placeId => _placeId;
 
-  /// Check if reference exists.
+  /// Checks if reference exists.
   bool get hasReference => _reference != null && _reference.isNotEmpty;
 
-  /// Check if Place Id exists.
+  /// Checks if Place Id exists.
   bool get hasPlaceId => _placeId != null && _placeId.isNotEmpty;
 
-  /// Check if coords exists.
+  /// Checks if coords exists.
   bool get hasCoords => _coords != null;
 
-  /// Check if bounds exists.
+  /// Checks if bounds exists.
   bool get hasBounds => _bounds != null;
+
+  /// Checks if all properties exist.
+  bool get isCompleted => hasCoords && hasPlaceId && hasCoords && hasBounds;
 
   /// Permits to update object by other object.
   void update(Address newAddress) {
@@ -50,4 +61,17 @@ class Address {
   @override
   String toString() =>
       "${(hasPlaceId) ? _placeId : null} => $_reference\ncoords: [${_coords.toString()}]${(hasBounds) ? '\n${_bounds.toString()}' : ''}";
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Address &&
+        other._coords == _coords &&
+        other._bounds == _bounds &&
+        other._reference == _reference &&
+        other._placeId == _placeId;
+  }
+
+  @override
+  int get hashCode => hashValues(_coords, _bounds, _reference, _placeId);
 }

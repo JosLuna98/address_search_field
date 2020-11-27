@@ -1,39 +1,37 @@
-import 'package:address_search_field/src/models/coords.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:address_search_field/src/models/coords.dart';
 
 /// Geographical bounding box by coordinates of [LatLng] object.
-class Bounds {
-  /// The northeast coordinates of the rectangle.
-  final Coords northeast;
+class Bounds extends LatLngBounds {
+  /// Constructor for [Bounds].
+  Bounds({@required this.southwest, @required this.northeast})
+      : super(southwest: southwest, northeast: northeast);
 
   /// The southwest coordinates of the rectangle.
   final Coords southwest;
 
-  /// Constructor for [Bounds].
-  Bounds(this.northeast, this.southwest)
-      : assert(northeast != null && southwest != null, "coords can't be null");
+  /// The northeast coordinates of the rectangle.
+  final Coords northeast;
 
   /// Constructor for [Bounds] by JSON [Map] object.
   // Map<String, Map<String, double>>
   factory Bounds.fromJson(dynamic json) => Bounds(
-      Coords.fromJson(json['northeast']), Coords.fromJson(json['southwest']));
+      southwest: Coords.fromJson(json['southwest']),
+      northeast: Coords.fromJson(json['northeast']));
 
   @override
   String toString() =>
-      "bounds:\n\tnortheast: [${northeast.toString()}]\n\tsouthwest: [${southwest.toString()}]";
-}
+      'bounds:\n\tnortheast: [${northeast.toString()}]\n\tsouthwest: [${southwest.toString()}]';
 
-/// Helps to use objects with [google_maps_flutter](https://pub.dev/packages/google_maps_flutter) plugin.
-extension BoundsConvert on Bounds {
-  /// Returns a [LatLngBounds] object.
-  LatLngBounds toLatLngBounds() => LatLngBounds(
-        southwest: LatLng(
-          this.southwest.latitude,
-          this.southwest.longitude,
-        ),
-        northeast: LatLng(
-          this.northeast.latitude,
-          this.northeast.longitude,
-        ),
-      );
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Bounds &&
+        other.southwest == southwest &&
+        other.northeast == northeast;
+  }
+
+  @override
+  int get hashCode => hashValues(southwest, northeast);
 }

@@ -1,4 +1,4 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:address_search_field/src/models/coords.dart';
 import 'package:address_search_field/src/models/bounds.dart';
@@ -41,8 +41,26 @@ class Directions {
   @override
   String toString() {
     String value =
-        "origin: ${origin.toString()}\ndestination: ${destination.toString()}\ndistance: $distance\nduration: $duration\ndirections ${bounds.toString()}\npolyline:";
-    points.forEach((element) => value += "\n\t[${element.toString()}]");
+        'origin: ${origin.toString()}\ndestination: ${destination.toString()}\ndistance: $distance\nduration: $duration\ndirections ${bounds.toString()}\npolyline: [ ';
+    points.forEach((element) => value += ' [${element.toString()}] ');
+    value += ' ]';
     return value;
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Directions &&
+        other.origin == origin &&
+        other.destination == destination &&
+        other.waypoints == waypoints &&
+        other.distance == distance &&
+        other.duration == duration &&
+        other.bounds == bounds &&
+        other.points == points;
+  }
+
+  @override
+  int get hashCode => hashValues(
+      origin, destination, waypoints, distance, duration, bounds, points);
 }
