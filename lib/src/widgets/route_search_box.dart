@@ -1,100 +1,144 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:address_search_field/src/widgets/address_field.dart';
-import 'package:address_search_field/src/services/geo_methods.dart';
-import 'package:address_search_field/src/models/directions.dart';
-import 'package:address_search_field/src/models/address.dart';
+part of 'package:address_search_field/address_search_field.dart';
 
 /// Custom [WidgetBuilder] with two [AddressField] to call Google Directions API and get [Directions] beetwen two or more points.
-class RouteSearchBox extends StatelessWidget {
+class RouteSearchBox extends StatefulWidget {
+  /// Constructor for [RouteSearchBox].
+  RouteSearchBox({
+    this.originIsMyLocation = false,
+    this.onOriginLoading = 'Loading..',
+    this.onOriginError,
+    @required this.geoMethods,
+    TextEditingController originCtrlr,
+    TextEditingController destinationCtrlr,
+    TextEditingController waypointCtrlr,
+    @required this.builder,
+  })  : assert(originIsMyLocation != null),
+        assert(geoMethods != null),
+        assert(builder != null),
+        this.originCtrlr = originCtrlr ?? TextEditingController(),
+        this.destinationCtrlr = destinationCtrlr ?? TextEditingController(),
+        this.waypointCtrlr = waypointCtrlr ?? TextEditingController(),
+        super();
+
+  /// If it's true the user location will be set as the origin [Address].
+  final bool originIsMyLocation;
+
+  /// Text to show when origin location is loading.
+  final String onOriginLoading;
+
+  /// Text to show when origin location fails.
+  final String onOriginError;
+
   /// [GeoMethods] instance to use Google APIs.
   final GeoMethods geoMethods;
 
-  /// Builder for `origin` [AddressField].
-  final AddressFieldBuilder originBldr;
+  /// controller for text used to search an [Address].
+  final TextEditingController originCtrlr;
 
-  /// Builder for `destination` [AddressField].
-  final AddressFieldBuilder destinationBldr;
+  /// controller for text used to search an [Address].
+  final TextEditingController destinationCtrlr;
+
+  /// controller for text used to search an [Address].
+  final TextEditingController waypointCtrlr;
 
   /// Custom [WidgetBuilder] that builds a widget by two [AddressSearchField] to get two [Address] objects and be able to call Google Directions API by `getDirections` to finally get a [Directions] object.
   final Widget Function(
     BuildContext context,
-    AddressField originField,
-    AddressField destinationField,
-    Future<Directions> Function(List<Address> waypoints) getDirections,
-  ) widgetBuilder;
+    AddressSearchBuilder originBuilder,
+    AddressSearchBuilder destinationBuilder,
+    AddressSearchBuilder waypointBuilder, {
+    WaypointsManager waypointsMgr,
+    Future<Directions> Function() getDirections,
+  }) builder;
 
-  /// Text for [Fluttertoast] when something goes wrong.
-  final String errorText;
+  @override
+  _RouteSearchBoxState createState() => _RouteSearchBoxState();
+}
 
-  /// Text for [Fluttertoast] when `getDirections` is called without origin coords.
-  final String noOriginText;
-
-  /// Text for [Fluttertoast] when `getDirections` is called without destination coords.
-  final String noDestText;
-
-  /// Constructor for [RouteSearchBox].
-  RouteSearchBox({
-    @required this.geoMethods,
-    @required this.originBldr,
-    @required this.destinationBldr,
-    @required this.widgetBuilder,
-    String errorText,
-    String noOriginText,
-    String noDestText,
-  })  : this.errorText = errorText ?? 'Unexpected error',
-        this.noOriginText = noOriginText ?? 'No origin coords',
-        this.noDestText = noDestText ?? 'No destination coords' {
-    originBldr.addressDialog.result = _origin;
-    destinationBldr.addressDialog.result = _destination;
-  }
-
-  static final Address _origin = Address();
-  static final Address _destination = Address();
+class _RouteSearchBoxState extends State<RouteSearchBox> {
+  /// Permits to work with the found [Address] by a [RouteSearchBox].
+  final _addrComm = _AddrComm();
 
   @override
   Widget build(BuildContext context) {
-    return widgetBuilder(
-      context,
-      originBldr.build(geoMethods: geoMethods),
-      destinationBldr.build(geoMethods: geoMethods),
-      _getDirections,
-    );
+    if (widget.originIsMyLocation) {
+      return FutureBuilder(
+        future: _setOrigin(),
+        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
+          widget.originCtrlr.text = (snapshot.hasError)
+              ? widget.onOriginError ?? snapshot.error
+              : (snapshot.connectionState != ConnectionState.done)
+                  ? widget.onOriginLoading ?? ''
+                  : snapshot.data;
+          return _widget(context);
+        },
+      );
+    }
+    return _widget(context);
   }
 
-  Future<Directions> _getDirections(List<Address> waypoints) async {
-    if (!_origin.hasCoords)
-      Fluttertoast.showToast(
-        msg: noOriginText,
-        toastLength: Toast.LENGTH_LONG,
-        timeInSecForIosWeb: 2,
-        webPosition: 'center',
-        webBgColor: '#BDBDBD',
+  /// [Widget] to return in [build] function.
+  Widget _widget(BuildContext context) => widget.builder(
+        context,
+        AddressSearchBuilder._fromBox(
+          widget.geoMethods,
+          widget.originCtrlr,
+          _BoxId.origin,
+          _addrComm,
+        ),
+        AddressSearchBuilder._fromBox(
+          widget.geoMethods,
+          widget.destinationCtrlr,
+          _BoxId.destination,
+          _addrComm,
+        ),
+        AddressSearchBuilder._fromBox(
+          widget.geoMethods,
+          widget.waypointCtrlr,
+          _BoxId.waypoints,
+          _addrComm,
+        ),
+        waypointsMgr: _addrComm.readAddrList(_BoxId.waypoints),
+        getDirections: _getDirections,
       );
-    if (!_destination.hasCoords)
-      Fluttertoast.showToast(
-        msg: noDestText,
-        toastLength: Toast.LENGTH_LONG,
-        timeInSecForIosWeb: 2,
-        webPosition: 'center',
-        webBgColor: '#BDBDBD',
-      );
-    if (_origin.hasCoords && _destination.hasCoords) {
-      Directions direc = await geoMethods.getDirections(
-          origin: _origin,
-          destination: _destination,
-          waypoints: waypoints ?? []);
-      if (direc == null)
-        Fluttertoast.showToast(
-          msg: errorText,
-          toastLength: Toast.LENGTH_LONG,
-          timeInSecForIosWeb: 2,
-          webPosition: 'center',
-          webBgColor: '#BDBDBD',
-        );
-      else
-        return direc;
+
+  /// When [widget.originIsMyLocation] is true, it will set current location in origin field.
+  Future<String> _setOrigin() async {
+    if (_addrComm.readAddr(_BoxId.origin).hasReference)
+      return Future.value(_addrComm.readAddr(_BoxId.origin).reference);
+    final Location location = Location();
+    if (!await location.serviceEnabled()) {
+      if (!await location.requestService()) throw 'GPS service is disabled';
+    }
+    if (await location.hasPermission() == PermissionStatus.denied) {
+      if (await location.requestPermission() != PermissionStatus.granted)
+        throw 'No GPS permissions';
+    }
+    final locationData = await location.getLocation();
+    final coords = Coords(locationData.latitude, locationData.longitude);
+    Address address = await widget.geoMethods.geoLocatePlace(coords: coords);
+    if (address == null) {
+      _addrComm.writeAddr(_BoxId.origin, Address(coords: coords));
+      throw 'Location not found';
+    }
+    _addrComm.writeAddr(_BoxId.origin, address);
+    return Future.value(address.reference);
+  }
+
+  /// Gets directions using all the [Address] objects in [_addrComm].
+  Future<Directions> _getDirections() async {
+    if (!_addrComm.readAddr(_BoxId.origin).hasCoords) throw 'No origin coords';
+    if (!_addrComm.readAddr(_BoxId.destination).hasCoords)
+      throw 'No destination coords';
+    if (_addrComm.readAddr(_BoxId.origin).hasCoords &&
+        _addrComm.readAddr(_BoxId.destination).hasCoords) {
+      Directions direc = await widget.geoMethods.getDirections(
+          origin: _addrComm.readAddr(_BoxId.origin),
+          destination: _addrComm.readAddr(_BoxId.destination),
+          waypoints:
+              _addrComm.readAddrList(_BoxId.waypoints).valueNotifier.value);
+      if (direc == null) throw 'Directions not found';
+      return direc;
     }
     return null;
   }
