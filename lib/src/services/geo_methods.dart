@@ -47,47 +47,47 @@ class GeoMethods {
     query = query.replaceAll(RegExp(r' '), '%20');
     final String url =
         'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$query,%20$city,%20$country&language=$language&components=country:$countryCode&key=$googleApiKey';
-    http.Response response;
     try {
-      response = await http.get(url);
+      final http.Response response = await http.get(url);
+      final List<Address> list = List<Address>();
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body)['predictions'];
+        jsonResponse.forEach((element) => list.add(Address(
+            reference: element['description'], placeId: element['place_id'])));
+      } else {
+        throw ('Request failed with status: ${response.statusCode}');
+      }
+      return list;
     } catch (e) {
       return null;
     }
-    final List<Address> list = List<Address>();
-    if (response.statusCode == 200) {
-      var jsonResponse = jsonDecode(response.body)['predictions'];
-      jsonResponse.forEach((element) => list.add(Address(
-          reference: element['description'], placeId: element['place_id'])));
-    } else {
-      throw ("Request failed with status: ${response.statusCode}");
-    }
-    return list;
   }
 
   /// Calls Details of Google Place API sending a `place_id`.
-  Future<Address> getPlaceGeometry(
-      {@required String reference, @required String placeId}) async {
+  Future<Address> getPlaceGeometry({
+    @required String reference,
+    @required String placeId,
+  }) async {
     if (placeId.isEmpty)
       AssertionError("placeId can't be declared as an empty `String`");
     final String url =
         'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&fields=geometry&key=$googleApiKey';
-    http.Response response;
     try {
-      response = await http.get(url);
+      final http.Response response = await http.get(url);
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        var coords = jsonResponse['result']['geometry']['location'];
+        var bounds = jsonResponse['result']['geometry']['viewport'];
+        return Address(
+            coords: Coords.fromJson(coords),
+            bounds: Bounds.fromJson(bounds),
+            reference: reference,
+            placeId: placeId);
+      } else {
+        throw ('Request failed with status: ${response.statusCode}');
+      }
     } catch (e) {
       return null;
-    }
-    if (response.statusCode == 200) {
-      var jsonResponse = jsonDecode(response.body);
-      var coords = jsonResponse['result']['geometry']['location'];
-      var bounds = jsonResponse['result']['geometry']['viewport'];
-      return Address(
-          coords: Coords.fromJson(coords),
-          bounds: Bounds.fromJson(bounds),
-          reference: reference,
-          placeId: placeId);
-    } else {
-      throw ("Request failed with status: ${response.statusCode}");
     }
   }
 
@@ -95,32 +95,32 @@ class GeoMethods {
   Future<Address> geoLocatePlace({@required Coords coords}) async {
     final String url =
         'https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.toString()}&result_type=street_address&language=$language&key=$googleApiKey';
-    http.Response response;
     try {
-      response = await http.get(url);
+      final http.Response response = await http.get(url);
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        var bounds = jsonResponse['results'][0]['geometry']['viewport'];
+        var reference = jsonResponse['results'][0]['formatted_address'];
+        return Address(
+          coords: coords,
+          bounds: Bounds.fromJson(bounds),
+          reference: reference,
+          placeId: jsonResponse['results'][0]['place_id'] ?? '',
+        );
+      } else {
+        throw ('Request failed with status: ${response.statusCode}');
+      }
     } catch (e) {
       return null;
-    }
-    if (response.statusCode == 200) {
-      var jsonResponse = jsonDecode(response.body);
-      var bounds = jsonResponse['results'][0]['geometry']['viewport'];
-      var reference = jsonResponse['results'][0]['formatted_address'];
-      return Address(
-        coords: coords,
-        bounds: Bounds.fromJson(bounds),
-        reference: reference,
-        placeId: jsonResponse['results'][0]['place_id'] ?? '',
-      );
-    } else {
-      throw ("Request failed with status: ${response.statusCode}");
     }
   }
 
   /// Calls Google Directions API sending `origin`, `destination` and `waypoints` [Coords].
-  Future<Directions> getDirections(
-      {@required Address origin,
-      @required Address destination,
-      @required List<Address> waypoints}) async {
+  Future<Directions> getDirections({
+    @required Address origin,
+    @required Address destination,
+    @required List<Address> waypoints,
+  }) async {
     if (!origin.hasCoords)
       AssertionError('origin has to contain latitude and longitude values');
     if (!destination.hasCoords)
@@ -135,28 +135,27 @@ class GeoMethods {
           ? '${element.coords.toString()}|'
           : '${element.coords.toString()}');
     }
-    http.Response response;
     try {
-      response = await http.get(url);
+      final http.Response response = await http.get(url);
+      if (response.statusCode == 200) {
+        var jsonResponse = jsonDecode(response.body);
+        if (jsonResponse['status'] == "NOT_FOUND") throw ("NOT_FOUND");
+        var routes = jsonResponse['routes'][0];
+        return Directions(
+          origin: origin,
+          destination: destination,
+          waypoints: waypoints,
+          distance: _calcDistance(routes['legs']),
+          duration: _calcDuration(routes['legs']),
+          bounds: Bounds.fromJson(routes['bounds']),
+          points: decodeEncodedPolyline(
+              encoded: routes['overview_polyline']['points']),
+        );
+      } else {
+        throw ('Request failed with status: ${response.statusCode}');
+      }
     } catch (e) {
       return null;
-    }
-    if (response.statusCode == 200) {
-      var jsonResponse = jsonDecode(response.body);
-      if (jsonResponse['status'] == "NOT_FOUND") throw ("NOT_FOUND");
-      var routes = jsonResponse['routes'][0];
-      return Directions(
-        origin: origin,
-        destination: destination,
-        waypoints: waypoints,
-        distance: _calcDistance(routes['legs']),
-        duration: _calcDuration(routes['legs']),
-        bounds: Bounds.fromJson(routes['bounds']),
-        points: decodeEncodedPolyline(
-            encoded: routes['overview_polyline']['points']),
-      );
-    } else {
-      throw ("Request failed with status: ${response.statusCode}");
     }
   }
 
@@ -203,8 +202,9 @@ class GeoMethods {
   /// Decodes an `encoded` [String] to create a [Polyline].
   static List<Coords> decodeEncodedPolyline({@required String encoded}) {
     if (encoded.isEmpty) AssertionError("encoded can't be empty");
-    List<Coords> points = [];
-    int index = 0, len = encoded.length;
+    final List<Coords> points = List<Coords>();
+    final int len = encoded.length;
+    int index = 0;
     int lat = 0, lng = 0;
 
     int decode(int positon) {
