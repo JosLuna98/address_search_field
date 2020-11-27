@@ -10,6 +10,10 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 /// A web implementation of the AddressSearchField plugin.
 class AddressSearchFieldWeb {
+  /// Constructor.
+  const AddressSearchFieldWeb();
+
+  /// Register method.
   static void registerWith(Registrar registrar) {
     final MethodChannel channel = MethodChannel(
       'address_search_field',
