@@ -46,7 +46,8 @@ class _AddrComm extends ChangeNotifier {
   /// Gets an [WaypointsManager] by verifying the [_BoxId].
   WaypointsManager readAddrList(_BoxId id) {
     assert(id == _BoxId.waypoints);
-    return WaypointsManager._(_waypoints, _onReorderAddrList);
+    return WaypointsManager._(
+        _waypoints, _onReorderAddrList, _onDeleteAddrListElement);
   }
 
   /// Reorders the [Address] in the `waypoints` [List].
@@ -55,12 +56,18 @@ class _AddrComm extends ChangeNotifier {
     _waypoints.value.insert(newIndex, addr);
     _waypoints.notifyListeners();
   }
+
+  /// Removes an element in the `waypoints` [List].
+  void _onDeleteAddrListElement(int index) {
+    _waypoints.value.remove(index);
+    _waypoints.notifyListeners();
+  }
 }
 
 /// Permits read and reorder a [List] of [Address].
 class WaypointsManager {
   /// Constructor for [WaypointsManager].
-  WaypointsManager._(this.valueNotifier, this.onReorder);
+  WaypointsManager._(this.valueNotifier, this.onReorder, this.onDelete);
 
   /// A [ValueNotifier] to create a [Widget] updable.
   final ValueNotifier<List<Address>> valueNotifier;
@@ -68,4 +75,7 @@ class WaypointsManager {
   /// [Function] to reorder a [List] of [Address].
   /// It is to can use a [ReorderableList](https://pub.dev/packages/flutter_reorderable_list).
   final void Function(int oldIndex, int newIndex) onReorder;
+
+  /// [Function] to remove an element from the [List] of [Address].
+  final void Function(int index) onDelete;
 }

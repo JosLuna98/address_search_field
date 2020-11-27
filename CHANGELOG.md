@@ -1,3 +1,7 @@
+## [3.0.1]
+
+* Function in WaypointsManager added to remove elements in the list of waypoints.
+
 ## [3.0.0]
 
 * **BREAK CHANGES:** read documentation is needed.

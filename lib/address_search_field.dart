@@ -3,8 +3,6 @@
 library address_search_field;
 
 import 'dart:async';
-import 'package:address_search_field/address_search_field.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
 import 'package:address_search_field/src/services/geo_methods.dart';
