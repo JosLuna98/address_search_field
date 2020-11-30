@@ -1,3 +1,7 @@
+## [3.0.2]
+
+* fix issue in `AddressSearchBuilder.deft` constructor.
+
 ## [3.0.1]
 
 * Function in WaypointsManager added to remove elements in the list of waypoints.
