@@ -45,8 +45,8 @@ class AddressSearchBuilder extends StatefulWidget {
                 builder.continueText,
                 builder.useButtons,
                 onDone,
-                _addrComm,
-                _boxId),
+                null,
+                null),
         null,
         null);
   }
