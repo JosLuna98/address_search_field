@@ -5,11 +5,13 @@ library address_search_field;
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:location/location.dart';
+import 'package:address_search_field/src/utils/route_error.dart';
 import 'package:address_search_field/src/services/geo_methods.dart';
 import 'package:address_search_field/src/models/coords.dart';
 import 'package:address_search_field/src/models/address.dart';
 import 'package:address_search_field/src/models/directions.dart';
 
+export 'package:address_search_field/src/utils/route_error.dart';
 export 'package:address_search_field/src/services/geo_methods.dart';
 export 'package:address_search_field/src/models/directions.dart';
 export 'package:address_search_field/src/models/address.dart';
