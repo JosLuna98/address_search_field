@@ -1,6 +1,6 @@
 part of 'package:address_search_field/address_search_field.dart';
 
-/// `enum` which identifies [Address] in [_AddrComm]
+/// `enum` which identifies [Address] in [_AddrComm].
 enum _BoxId {
   /// Identify [Address] object.
   origin,

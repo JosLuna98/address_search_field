@@ -56,9 +56,7 @@ class AddressSearchDialog extends StatelessWidget {
     this.continueText = 'Continue',
     this.useButtons = true,
     @required this.onDone,
-  })  : this._addrComm = null,
-        this._boxId = null,
-        assert(snapshot != null),
+  })  : assert(snapshot != null),
         assert(controller != null),
         assert(searchAddress != null),
         assert(getGeometry != null),
@@ -68,6 +66,8 @@ class AddressSearchDialog extends StatelessWidget {
         assert(cancelText != null),
         assert(continueText != null),
         assert(useButtons != null),
+        this._addrComm = null,
+        this._boxId = null,
         super();
 
   /// Constructor for [AddressSearchDialog] to be called by [AddressSearchBuilder].
@@ -309,8 +309,8 @@ class AddressSearchDialog extends StatelessWidget {
       );
 
   /// Closes itself.
-  void _dismiss(context) {
-    Navigator.of(context).pop();
+  void _dismiss(BuildContext context) {
+    Navigator.pop(context);
     FocusScope.of(context).unfocus();
   }
 
