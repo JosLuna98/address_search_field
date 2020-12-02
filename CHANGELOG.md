@@ -1,3 +1,8 @@
+## [3.0.3]
+
+* `RouteError` enum created to identify errors easly.
+* `relocate` function added to `RouteSearchBox` builder to reload origin address.
+
 ## [3.0.2]
 
 * fix issue in `AddressSearchBuilder.deft` constructor.
