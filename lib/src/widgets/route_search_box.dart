@@ -34,13 +34,13 @@ class RouteSearchBox extends StatefulWidget {
   /// [GeoMethods] instance to use Google APIs.
   final GeoMethods geoMethods;
 
-  /// controller for text used to search an [Address].
+  /// Controller for text used to search an [Address].
   final TextEditingController originCtrl;
 
-  /// controller for text used to search an [Address].
+  /// Controller for text used to search an [Address].
   final TextEditingController destinationCtrl;
 
-  /// controller for text used to search an [Address].
+  /// Controller for text used to search an [Address].
   final TextEditingController waypointCtrl;
 
   /// Custom [WidgetBuilder] that builds a widget by two [AddressSearchField] to get two [Address] objects and be able to call Google Directions API by `getDirections` to finally get a [Directions] object.

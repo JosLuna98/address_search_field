@@ -11,7 +11,7 @@ To use this plugin, add `address_search_field` as a [dependency in your pubspec.
 
 ```yaml
 dependencies:
-  address_search_field: ^3.0.3
+  address_search_field: ^3.0.3+1
 ```
 
 ## Permissions
@@ -130,10 +130,11 @@ RouteSearchBox(
   builder: (
     BuildContext context,
     AddressSearchBuilder originBuilder,
-    AddressSearchBuilder destinationBuilder,
-    AddressSearchBuilder waypointBuilder, {
-    WaypointsManager waypointsMgr,
+    AddressSearchBuilder destinationBuilder, {
     Future<Directions> Function() getDirections,
+    void Function() relocate,
+    AddressSearchBuilder waypointBuilder,
+    WaypointsManager waypointsMgr,
   }) {
     // building example
     return TextField(

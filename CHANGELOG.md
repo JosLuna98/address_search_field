@@ -1,4 +1,4 @@
-## [3.0.3]
+## [3.0.3+1]
 
 * `RouteError` enum created to identify errors easly.
 * `relocate` function added to `RouteSearchBox` builder to reload origin address.
