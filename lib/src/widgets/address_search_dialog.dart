@@ -67,7 +67,7 @@ class AddressSearchDialog extends StatelessWidget {
         assert(continueText != null),
         assert(useButtons != null),
         this._addrComm = null,
-        this._boxId = null,
+        this._addressId = null,
         super();
 
   /// Constructor for [AddressSearchDialog] to be called by [AddressSearchBuilder].
@@ -85,7 +85,7 @@ class AddressSearchDialog extends StatelessWidget {
     this.useButtons,
     this.onDone,
     this._addrComm,
-    this._boxId,
+    this._addressId,
   ) : super();
 
   /// Representation of the most recent interaction with an asynchronous computation.
@@ -125,10 +125,13 @@ class AddressSearchDialog extends StatelessWidget {
   final FutureOr<void> Function(Address address) onDone;
 
   /// Identifies the [Address] to work in the [Widget] built.
-  final _BoxId _boxId;
+  final AddressId _addressId;
 
   /// Permits to work with the found [Address] by a [RouteSearchBox].
   final _AddrComm _addrComm;
+
+  /// Verify if the [AddressDialog] will have buttons at bottom.
+  bool get _hasButtons => useButtons && _addressId != AddressId._waypoints;
 
   @override
   Widget build(BuildContext context) {
@@ -144,10 +147,10 @@ class AddressSearchDialog extends StatelessWidget {
               _searchBar(context, size),
               Divider(color: Colors.grey, height: 0.2),
               _resultsList(context, size),
-              (useButtons)
+              (_hasButtons)
                   ? Divider(color: Colors.grey, height: 0.2)
                   : Container(),
-              (useButtons) ? _dialogButtons(context, size) : Container(),
+              (_hasButtons) ? _dialogButtons(context, size) : Container(),
             ],
           ),
         );
@@ -236,7 +239,7 @@ class AddressSearchDialog extends StatelessWidget {
         width: size.width * 0.80,
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: (useButtons)
+          borderRadius: (_hasButtons)
               ? BorderRadius.all(Radius.zero)
               : BorderRadius.only(
                   bottomLeft: Radius.circular(10.0),
@@ -318,8 +321,8 @@ class AddressSearchDialog extends StatelessWidget {
   Future<void> _selected(BuildContext context, Address address) async {
     if (controller.text != address.reference)
       controller.text = address.reference;
-    if (_boxId != null && _addrComm != null)
-      _addrComm.writeAddr(_boxId, address);
+    if (_addressId != null && _addrComm != null)
+      _addrComm.writeAddr(_addressId, address);
     await onDone(address);
     _dismiss(context);
   }
