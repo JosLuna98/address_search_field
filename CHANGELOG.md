@@ -1,3 +1,20 @@
+## [3.0.4]
+
+* New `AddressId` enum to identify address which will be updated by `relocate` function of `RouteSearchBox`.
+
+#### WaypointsManager
+---
+* `onDelete` function becomes in `remove`
+* `clear` function added.
+
+#### GeoMethods
+---
+* Error prevented in `getDirections` function.
+
+#### RouteSearchBox
+---
+* `relocate` function permits to change origin and destination `Address` using an `AddressId` and `Coords` now.
+
 ## [3.0.3+1]
 
 * `RouteError` enum created to identify errors easly.

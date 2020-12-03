@@ -121,7 +121,8 @@ class _MyAppState extends State<MyApp> {
                         ),
                         ElevatedButton(
                           child: Text('Relocate'),
-                          onPressed: relocate,
+                          onPressed: () async =>
+                              relocate(AddressId.origin, await _getPosition()),
                         ),
                         ElevatedButton(
                           child: Text('Search'),
