@@ -139,9 +139,14 @@ class GeoMethods {
     if (waypoints.isNotEmpty) {
       url += '&waypoints=';
       final end = waypoints.length - 1;
-      waypoints.asMap().forEach((index, element) => url += (index != end)
-          ? '${element.coords.toString()}|'
-          : '${element.coords.toString()}');
+      waypoints.asMap().forEach((index, element) {
+        if (element.hasCoords)
+          url += (index != end)
+              ? '${element.coords.toString()}|'
+              : '${element.coords.toString()}';
+        else
+          print("waypoint $index doesn't have coords");
+      });
     }
     try {
       final response = await http.get(url);
