@@ -17,4 +17,7 @@ enum RouteError {
 
   /// Route directions not found.
   directions_not_found,
+
+  /// Unexpected error.
+  unexpected_error,
 }
