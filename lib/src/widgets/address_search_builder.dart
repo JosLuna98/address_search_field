@@ -10,7 +10,7 @@ class AddressSearchBuilder extends StatefulWidget {
   })  : assert(geoMethods != null),
         assert(controller != null),
         assert(builder != null),
-        this._boxId = null,
+        this._addressId = null,
         this._addrComm = null,
         super();
 
@@ -55,7 +55,7 @@ class AddressSearchBuilder extends StatefulWidget {
   const AddressSearchBuilder._fromBox(
     this.geoMethods,
     this.controller,
-    this._boxId,
+    this._addressId,
     this._addrComm,
   )   : this.builder = null,
         super();
@@ -65,7 +65,7 @@ class AddressSearchBuilder extends StatefulWidget {
     this.geoMethods,
     this.controller,
     this.builder,
-    this._boxId,
+    this._addressId,
     this._addrComm,
   ) : super();
 
@@ -85,7 +85,7 @@ class AddressSearchBuilder extends StatefulWidget {
   }) builder;
 
   /// Identifies the [Address] to work in the [Widget] built.
-  final _BoxId _boxId;
+  final AddressId _addressId;
 
   /// Permits to work with the found [Address] by a [RouteSearchBox].
   final _AddrComm _addrComm;
@@ -104,7 +104,7 @@ class AddressSearchBuilder extends StatefulWidget {
         'this method just can be called when this widget is a child of [RouteSearchBox]');
     assert(widgetBuilder != null, 'this method has to build a widget');
     return AddressSearchBuilder._(this.geoMethods, this.controller,
-        widgetBuilder, this._boxId, this._addrComm);
+        widgetBuilder, this._addressId, this._addrComm);
   }
 
   /// Builder for an [AddressSearchDialog].
@@ -137,8 +137,8 @@ class AddressSearchBuilder extends StatefulWidget {
                 builder.useButtons,
                 onDone,
                 this._addrComm,
-                this._boxId),
-        this._boxId,
+                this._addressId),
+        this._addressId,
         this._addrComm);
   }
 
@@ -178,8 +178,8 @@ class _AddressSearchBuilderState extends State<AddressSearchBuilder> {
       reference: address.reference,
       placeId: address.placeId,
     );
-    if (widget._boxId == null || widget._addrComm == null) return addr;
-    widget._addrComm.writeAddr(widget._boxId, addr ?? address);
+    if (widget._addressId == null || widget._addrComm == null) return addr;
+    widget._addrComm.writeAddr(widget._addressId, addr ?? address);
     return addr;
   }
 }
