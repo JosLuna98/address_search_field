@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
-Coords _initialPositon;
+LatLng _initialPositon;
 
-Future<Coords> _getPosition() async {
+Future<LatLng> _getPosition() async {
   final Location location = Location();
   if (!await location.serviceEnabled()) {
     if (!await location.requestService()) throw 'GPS service is disabled';
@@ -16,7 +16,7 @@ Future<Coords> _getPosition() async {
       throw 'No GPS permissions';
   }
   final data = await location.getLocation();
-  return Coords(data.latitude, data.longitude);
+  return LatLng(data.latitude, data.longitude);
 }
 
 void main() async {
@@ -84,7 +84,7 @@ class _MyAppState extends State<MyApp> {
             builder: (context, originBuilder, destinationBuilder,
                 {waypointBuilder, getDirections, relocate, waypointsMgr}) {
               if (origCtrl.text.isEmpty)
-                relocate(AddressId.origin, _initialPositon);
+                relocate(AddressId.origin, _initialPositon.toCoords());
               return Container(
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
                 color: Colors.green[50],

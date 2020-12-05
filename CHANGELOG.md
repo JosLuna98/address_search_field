@@ -1,3 +1,7 @@
+## [3.0.6]
+
+* Extensions for `LatLng` and `LatLngBounds` to convert them into `Coords` and `Bounds` addded.
+
 ## [3.0.5]
 
 * New `AddressLocator` widget to set an initial address reference in a `TextEditingController`.

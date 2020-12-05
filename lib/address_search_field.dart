@@ -4,18 +4,19 @@ library address_search_field;
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:address_search_field/src/utils/route_error.dart';
 import 'package:address_search_field/src/services/geo_methods.dart';
 import 'package:address_search_field/src/models/coords.dart';
 import 'package:address_search_field/src/models/address.dart';
 import 'package:address_search_field/src/models/directions.dart';
+import 'package:address_search_field/src/utils/route_error.dart';
 
-export 'package:address_search_field/src/utils/route_error.dart';
 export 'package:address_search_field/src/services/geo_methods.dart';
 export 'package:address_search_field/src/models/directions.dart';
 export 'package:address_search_field/src/models/address.dart';
 export 'package:address_search_field/src/models/bounds.dart';
 export 'package:address_search_field/src/models/coords.dart';
+export 'package:address_search_field/src/utils/route_error.dart';
+export 'package:address_search_field/src/utils/extensions.dart';
 
 part 'package:address_search_field/src/widgets/route_search_box.dart';
 part 'package:address_search_field/src/widgets/address_search_builder.dart';
