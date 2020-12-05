@@ -1,10 +1,23 @@
 part of 'package:address_search_field/address_search_field.dart';
 
+/// Callback method.
+typedef Widget RouteBuilderCallback(
+  BuildContext context,
+  AddressSearchBuilder originBuilder,
+  AddressSearchBuilder destinationBuilder, {
+  AddressSearchBuilder waypointBuilder,
+  WaypointsManager waypointsMgr,
+  RelocateCallback relocate,
+  Future<Directions> Function() getDirections,
+});
+
+/// Callback method.
+typedef void RelocateCallback(AddressId addressId, Coords coords);
+
 /// Custom [WidgetBuilder] with two [AddressField] to call Google Directions API and get [Directions] beetwen two or more points.
 class RouteSearchBox extends StatefulWidget {
   /// Constructor for [RouteSearchBox].
   RouteSearchBox({
-    this.originIsMyLocation = false,
     this.onAddressLoading = 'Loading..',
     this.onAddressError = 'Unidentified place',
     @required this.geoMethods,
@@ -12,8 +25,7 @@ class RouteSearchBox extends StatefulWidget {
     TextEditingController destinationCtrl,
     TextEditingController waypointCtrl,
     @required this.builder,
-  })  : assert(originIsMyLocation != null),
-        assert(onAddressLoading != null),
+  })  : assert(onAddressLoading != null),
         assert(onAddressError != null),
         assert(geoMethods != null),
         assert(builder != null),
@@ -21,9 +33,6 @@ class RouteSearchBox extends StatefulWidget {
         this.destinationCtrl = destinationCtrl ?? TextEditingController(),
         this.waypointCtrl = waypointCtrl ?? TextEditingController(),
         super();
-
-  /// If it's true the user location will be set as the origin [Address].
-  final bool originIsMyLocation;
 
   /// Text to show when origin location is loading.
   final String onAddressLoading;
@@ -44,15 +53,7 @@ class RouteSearchBox extends StatefulWidget {
   final TextEditingController waypointCtrl;
 
   /// Custom [WidgetBuilder] that builds a widget by two [AddressSearchField] to get two [Address] objects and be able to call Google Directions API by `getDirections` to finally get a [Directions] object.
-  final Widget Function(
-    BuildContext context,
-    AddressSearchBuilder originBuilder,
-    AddressSearchBuilder destinationBuilder, {
-    AddressSearchBuilder waypointBuilder,
-    WaypointsManager waypointsMgr,
-    void Function(AddressId addressId, Coords coords) relocate,
-    Future<Directions> Function() getDirections,
-  }) builder;
+  final RouteBuilderCallback builder;
 
   @override
   _RouteSearchBoxState createState() => _RouteSearchBoxState();
@@ -64,68 +65,30 @@ class _RouteSearchBoxState extends State<RouteSearchBox> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.originIsMyLocation)
-      return FutureBuilder(
-        future: _setOrigin(),
-        builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
-          widget.originCtrl.text = (snapshot.hasError)
-              ? widget.onAddressError
-              : (snapshot.connectionState != ConnectionState.done)
-                  ? widget.onAddressLoading
-                  : snapshot.data;
-          return _widget(context);
-        },
-      );
-    return _widget(context);
-  }
-
-  /// [Widget] to return in [build] function.
-  Widget _widget(BuildContext context) => widget.builder(
-        context,
-        AddressSearchBuilder._fromBox(
-          widget.geoMethods,
-          widget.originCtrl,
-          AddressId.origin,
-          _addrComm,
-        ),
-        AddressSearchBuilder._fromBox(
-          widget.geoMethods,
-          widget.destinationCtrl,
-          AddressId.destination,
-          _addrComm,
-        ),
-        waypointBuilder: AddressSearchBuilder._fromBox(
-          widget.geoMethods,
-          widget.waypointCtrl,
-          AddressId._waypoints,
-          _addrComm,
-        ),
-        waypointsMgr: _addrComm.readAddrList(AddressId._waypoints),
-        relocate: _relocate,
-        getDirections: _getDirections,
-      );
-
-  /// When [widget.originIsMyLocation] is true, it will set current location in origin field.
-  Future<String> _setOrigin() async {
-    if (_addrComm.readAddr(AddressId.origin).hasReference)
-      return _addrComm.readAddr(AddressId.origin).reference;
-    final location = Location();
-    if (!await location.serviceEnabled()) {
-      if (!await location.requestService()) throw RouteError.gps_disabled;
-    }
-    if (await location.hasPermission() == PermissionStatus.denied) {
-      if (await location.requestPermission() != PermissionStatus.granted)
-        throw RouteError.no_gps_permission;
-    }
-    final locationData = await location.getLocation();
-    final coords = Coords(locationData.latitude, locationData.longitude);
-    final address = await widget.geoMethods.geoLocatePlace(coords: coords);
-    if (address == null) {
-      _addrComm.writeAddr(AddressId.origin, Address(coords: coords));
-      throw RouteError.location_not_found;
-    }
-    _addrComm.writeAddr(AddressId.origin, address);
-    return address.reference;
+    return widget.builder(
+      context,
+      AddressSearchBuilder._fromBox(
+        widget.geoMethods,
+        widget.originCtrl,
+        AddressId.origin,
+        _addrComm,
+      ),
+      AddressSearchBuilder._fromBox(
+        widget.geoMethods,
+        widget.destinationCtrl,
+        AddressId.destination,
+        _addrComm,
+      ),
+      waypointBuilder: AddressSearchBuilder._fromBox(
+        widget.geoMethods,
+        widget.waypointCtrl,
+        AddressId._waypoints,
+        _addrComm,
+      ),
+      waypointsMgr: _addrComm.readAddrList(AddressId._waypoints),
+      relocate: _relocate,
+      getDirections: _getDirections,
+    );
   }
 
   /// Sets a new [Address].
