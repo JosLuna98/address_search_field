@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
-var _initialPositon;
+Coords _initialPositon;
 
 Future<Coords> _getPosition() async {
   final Location location = Location();
@@ -16,7 +16,7 @@ Future<Coords> _getPosition() async {
       throw 'No GPS permissions';
   }
   final data = await location.getLocation();
-  return Future.value(Coords(data.latitude, data.longitude));
+  return Coords(data.latitude, data.longitude);
 }
 
 void main() async {
@@ -36,15 +36,15 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   GoogleMapController _controller;
 
-  final TextEditingController origCtrl = TextEditingController();
+  final origCtrl = TextEditingController();
 
-  final TextEditingController destCtrl = TextEditingController();
+  final destCtrl = TextEditingController();
 
-  final Set<Polyline> polylines = Set<Polyline>();
+  final polylines = Set<Polyline>();
 
-  final Set<Marker> markers = Set<Marker>();
+  final markers = Set<Marker>();
 
-  final GeoMethods geoMethods = GeoMethods(
+  final geoMethods = GeoMethods(
     googleApiKey: 'GOOGLE_API_KEY',
     language: 'es-419',
     countryCode: 'ec',
@@ -61,13 +61,30 @@ class _MyAppState extends State<MyApp> {
       ),
       body: Column(
         children: [
+          Expanded(
+            child: GoogleMap(
+              compassEnabled: true,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
+              rotateGesturesEnabled: true,
+              initialCameraPosition: CameraPosition(
+                target: _initialPositon,
+                zoom: 14.5,
+              ),
+              onMapCreated: (GoogleMapController controller) =>
+                  _controller = controller,
+              polylines: polylines,
+              markers: markers,
+            ),
+          ),
           RouteSearchBox(
             geoMethods: geoMethods,
-            originIsMyLocation: true,
             originCtrl: origCtrl,
             destinationCtrl: destCtrl,
             builder: (context, originBuilder, destinationBuilder,
                 {waypointBuilder, getDirections, relocate, waypointsMgr}) {
+              if (origCtrl.text.isEmpty)
+                relocate(AddressId.origin, _initialPositon);
               return Container(
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
                 color: Colors.green[50],
@@ -78,19 +95,9 @@ class _MyAppState extends State<MyApp> {
                       controller: origCtrl,
                       onTap: () => showDialog(
                         context: context,
-                        builder:
-                            (context) => // You can build your own widget to search addresses.
-                                originBuilder.build(
-                          (context, snapshot,
-                                  {controller, getGeometry, searchAddress}) =>
-                              // It's just an example, you should use `buildDefault` to use this widget.
-                              AddressSearchDialog(
-                            snapshot: snapshot,
-                            controller: controller,
-                            searchAddress: searchAddress,
-                            getGeometry: getGeometry,
-                            onDone: (address) => null,
-                          ),
+                        builder: (context) => originBuilder.buildDefault(
+                          builder: AddressDialogBuilder(),
+                          onDone: (address) => null,
                         ),
                       ),
                     ),
@@ -98,9 +105,7 @@ class _MyAppState extends State<MyApp> {
                       controller: destCtrl,
                       onTap: () => showDialog(
                         context: context,
-                        builder:
-                            (context) => // You can build the default widget in the plugin to search addresses.
-                                destinationBuilder.buildDefault(
+                        builder: (context) => destinationBuilder.buildDefault(
                           builder: AddressDialogBuilder(),
                           onDone: (address) => null,
                         ),
@@ -112,12 +117,13 @@ class _MyAppState extends State<MyApp> {
                         ElevatedButton(
                           child: Text('Points'),
                           onPressed: () => Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                fullscreenDialog: true,
-                                builder: (context) =>
-                                    Waypoints(waypointsMgr, waypointBuilder),
-                              )),
+                            context,
+                            MaterialPageRoute(
+                              fullscreenDialog: true,
+                              builder: (_) =>
+                                  Waypoints(waypointsMgr, waypointBuilder),
+                            ),
+                          ),
                         ),
                         ElevatedButton(
                           child: Text('Relocate'),
@@ -164,22 +170,6 @@ class _MyAppState extends State<MyApp> {
                 ),
               );
             },
-          ),
-          Expanded(
-            child: GoogleMap(
-              compassEnabled: true,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
-              rotateGesturesEnabled: true,
-              initialCameraPosition: CameraPosition(
-                target: _initialPositon,
-                zoom: 14.5,
-              ),
-              onMapCreated: (GoogleMapController controller) =>
-                  _controller = controller,
-              polylines: polylines,
-              markers: markers,
-            ),
           ),
         ],
       ),

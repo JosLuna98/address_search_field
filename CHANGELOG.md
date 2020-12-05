@@ -1,3 +1,8 @@
+## [3.0.5]
+
+* New `AddressLocator` widget to set an initial address reference in a `TextEditingController`.
+* `originIsMyLocation` param removed in `RouteSearchBox`.
+
 ## [3.0.4]
 
 * New `AddressId` enum to identify address which will be updated by `relocate` function of `RouteSearchBox`.
