@@ -1,7 +1,7 @@
 # Address Search Field
 Widget builders to create 'address search widgets' which helps to autocomplete an address using a reference. They can be used to get Directions beetwen two places with optional waypoints. These widgets are made to be showed by `onTap` in a `TextField` with the `showDialog` function.
 It uses [HTTP](https://pub.dev/packages/http/versions/0.12.2), [Google Maps for Flutter](https://pub.dev/packages/google_maps_flutter/versions/1.0.5) plugins. (This last plugin is to use extended objects that can be usable with `GoogleMap` Widget).
-![](https://raw.githubusercontent.com/JosLuna98/address_search_field/master/screenshot/untitled.gif)
+![](https://raw.githubusercontent.com/JosLuna98/address_search_field/master/screenshot/address_search_field.gif)
 ## Getting Started
 ---
 To use this plugin, add `address_search_field` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
