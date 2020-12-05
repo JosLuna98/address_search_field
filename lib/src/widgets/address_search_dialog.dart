@@ -1,8 +1,11 @@
 part of 'package:address_search_field/address_search_field.dart';
 
+/// Callback method.
+typedef void OnDoneCallback(Address address);
+
 /// Permits build an [AddressSearchDialog] by default from an [AddressSearchBuilder].
 class AddressDialogBuilder {
-  /// Constructor for [AddressSearchDialog] to be called by [AddressSearchBuilder].
+  /// Constructor for [AddressSearchDialog].
   AddressDialogBuilder({
     this.color,
     this.backgroundColor = Colors.white,
@@ -95,10 +98,10 @@ class AddressSearchDialog extends StatelessWidget {
   final TextEditingController controller;
 
   /// Loads a list of found addresses by the text in [widget.controller].
-  final Future<void> Function() searchAddress;
+  final SearchAddressCallback searchAddress;
 
   /// Tries to get a completed [Address] object by a reference or place id.
-  final Future<Address> Function(Address address) getGeometry;
+  final GetGeometryCallback getGeometry;
 
   /// Color for details in the widget.
   final Color color;
@@ -122,7 +125,7 @@ class AddressSearchDialog extends StatelessWidget {
   final bool useButtons;
 
   /// Variable for [AddressDialog].
-  final FutureOr<void> Function(Address address) onDone;
+  final OnDoneCallback onDone;
 
   /// Identifies the [Address] to work in the [Widget] built.
   final AddressId _addressId;
@@ -137,21 +140,32 @@ class AddressSearchDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
-        final Size size =
+        final size =
             Size(constraints.constrainWidth(), constraints.constrainHeight());
         return Scaffold(
           backgroundColor: Colors.transparent,
-          body: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              _searchBar(context, size),
-              Divider(color: Colors.grey, height: 0.2),
-              _resultsList(context, size),
-              (_hasButtons)
-                  ? Divider(color: Colors.grey, height: 0.2)
-                  : Container(),
-              (_hasButtons) ? _dialogButtons(context, size) : Container(),
-            ],
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _searchBar(context, size),
+                SizedBox(
+                  width: size.width * 0.8,
+                  child: Divider(
+                    color: Colors.grey,
+                    height: 0.2,
+                  ),
+                ),
+                _resultsList(context, size),
+                (_hasButtons)
+                    ? SizedBox(
+                        width: size.width * 0.8,
+                        child: Divider(color: Colors.grey, height: 0.2),
+                      )
+                    : Container(),
+                (_hasButtons) ? _dialogButtons(context, size) : Container(),
+              ],
+            ),
           ),
         );
       },
@@ -161,7 +175,7 @@ class AddressSearchDialog extends StatelessWidget {
   /// Bar to write a reference and search an [Address].
   Widget _searchBar(BuildContext context, Size size) => Container(
         height: 55.0,
-        width: (size.width * 0.8),
+        width: size.width * 0.8,
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.only(
@@ -188,7 +202,7 @@ class AddressSearchDialog extends StatelessWidget {
                 autocorrect: false,
                 textCapitalization: TextCapitalization.words,
                 cursorColor: color ?? Theme.of(context).primaryColor,
-                onEditingComplete: () async => await searchAddress(),
+                onEditingComplete: searchAddress,
                 decoration: InputDecoration(
                   suffix: GestureDetector(
                     child: Padding(
@@ -227,7 +241,7 @@ class AddressSearchDialog extends StatelessWidget {
                   // size: (size.width * 0.8) * 0.0625,
                 ),
               ),
-              onTap: () async => await searchAddress(),
+              onTap: searchAddress,
             )
           ],
         ),
@@ -236,7 +250,7 @@ class AddressSearchDialog extends StatelessWidget {
   /// Resulted list of [Address] from searching.
   Widget _resultsList(BuildContext context, Size size) => Container(
         height: size.height * 0.35,
-        width: size.width * 0.80,
+        width: size.width * 0.8,
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: (_hasButtons)
@@ -258,7 +272,7 @@ class AddressSearchDialog extends StatelessWidget {
                           ListTile(
                         title: Text(snapshot.data[index].reference),
                         onTap: () async => (onDone != null)
-                            ? await _selected(context,
+                            ? _selected(context,
                                 await getGeometry(snapshot.data[index]))
                             : null,
                       ),
@@ -271,7 +285,7 @@ class AddressSearchDialog extends StatelessWidget {
   /// Buttons to close or continue.
   Widget _dialogButtons(BuildContext context, Size size) => Container(
         height: 45,
-        width: size.width * 0.80,
+        width: size.width * 0.8,
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.only(
@@ -301,9 +315,8 @@ class AddressSearchDialog extends StatelessWidget {
                   style:
                       TextStyle(color: color ?? Theme.of(context).primaryColor),
                 ),
-                onTap: () async => (onDone != null)
-                    ? await _selected(
-                        context, Address(reference: controller.text))
+                onTap: () => (onDone != null)
+                    ? _selected(context, Address(reference: controller.text))
                     : null,
               ),
             ),
@@ -318,12 +331,12 @@ class AddressSearchDialog extends StatelessWidget {
   }
 
   /// Selects an [Address] to work.
-  Future<void> _selected(BuildContext context, Address address) async {
+  void _selected(BuildContext context, Address address) async {
     if (controller.text != address.reference)
       controller.text = address.reference;
     if (_addressId != null && _addrComm != null)
       _addrComm.writeAddr(_addressId, address);
-    await onDone(address);
+    onDone(address);
     _dismiss(context);
   }
 }

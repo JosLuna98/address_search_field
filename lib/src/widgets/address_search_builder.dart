@@ -1,5 +1,20 @@
 part of 'package:address_search_field/address_search_field.dart';
 
+/// Callback method.
+typedef void SearchAddressCallback();
+
+/// Callback method.
+typedef Future<Address> GetGeometryCallback(Address address);
+
+/// Callback method.
+typedef Widget AddressBuilderCallback(
+  BuildContext context,
+  AsyncSnapshot<List<Address>> snapshot, {
+  TextEditingController controller,
+  SearchAddressCallback searchAddress,
+  GetGeometryCallback getGeometry,
+});
+
 /// Custom [StatefulBuilder] to create a [Widget] like [AddressSearchDialog].
 class AddressSearchBuilder extends StatefulWidget {
   /// Constructor for [AddressSearchBuilder].
@@ -19,36 +34,39 @@ class AddressSearchBuilder extends StatefulWidget {
     @required GeoMethods geoMethods,
     @required TextEditingController controller,
     @required AddressDialogBuilder builder,
-    @required FutureOr<void> Function(Address address) onDone,
+    @required OnDoneCallback onDone,
   }) {
     assert(geoMethods != null);
     assert(controller != null);
     assert(builder != null);
     assert(onDone != null);
     return AddressSearchBuilder._(
-        geoMethods,
-        controller,
-        (BuildContext context, AsyncSnapshot<List<Address>> snapshot,
-                {TextEditingController controller,
-                Future<void> Function() searchAddress,
-                Future<Address> Function(Address address) getGeometry}) =>
-            AddressSearchDialog._fromBuilder(
-                snapshot,
-                controller,
-                searchAddress,
-                getGeometry,
-                builder.color,
-                builder.backgroundColor,
-                builder.hintText,
-                builder.noResultsText,
-                builder.cancelText,
-                builder.continueText,
-                builder.useButtons,
-                onDone,
-                null,
-                null),
-        null,
-        null);
+      geoMethods,
+      controller,
+      (BuildContext context, AsyncSnapshot<List<Address>> snapshot,
+          {TextEditingController controller,
+          void Function() searchAddress,
+          Future<Address> Function(Address address) getGeometry}) {
+        return AddressSearchDialog._fromBuilder(
+          snapshot,
+          controller,
+          searchAddress,
+          getGeometry,
+          builder.color,
+          builder.backgroundColor,
+          builder.hintText,
+          builder.noResultsText,
+          builder.cancelText,
+          builder.continueText,
+          builder.useButtons,
+          onDone,
+          null,
+          null,
+        );
+      },
+      null,
+      null,
+    );
   }
 
   /// Constructor for [AddressSearchBuilder] to be called by [RouteSearchBox].
@@ -76,13 +94,7 @@ class AddressSearchBuilder extends StatefulWidget {
   final TextEditingController controller;
 
   /// Called to obtain the child widget.
-  final Widget Function(
-    BuildContext context,
-    AsyncSnapshot<List<Address>> snapshot, {
-    TextEditingController controller,
-    Future<void> Function() searchAddress,
-    Future<Address> Function(Address address) getGeometry,
-  }) builder;
+  final AddressBuilderCallback builder;
 
   /// Identifies the [Address] to work in the [Widget] built.
   final AddressId _addressId;
@@ -91,55 +103,54 @@ class AddressSearchBuilder extends StatefulWidget {
   final _AddrComm _addrComm;
 
   /// Builder for a custom [Widget].
-  Widget build(
-      Widget Function(
-    BuildContext context,
-    AsyncSnapshot<List<Address>> snapshot, {
-    TextEditingController controller,
-    Future<void> Function() searchAddress,
-    Future<Address> Function(Address address) getGeometry,
-  })
-          widgetBuilder) {
+  Widget build(AddressBuilderCallback builder) {
     assert(this.builder == null,
         'this method just can be called when this widget is a child of [RouteSearchBox]');
-    assert(widgetBuilder != null, 'this method has to build a widget');
-    return AddressSearchBuilder._(this.geoMethods, this.controller,
-        widgetBuilder, this._addressId, this._addrComm);
+    assert(builder != null, 'this method has to build a widget');
+    return AddressSearchBuilder._(
+      this.geoMethods,
+      this.controller,
+      builder,
+      this._addressId,
+      this._addrComm,
+    );
   }
 
   /// Builder for an [AddressSearchDialog].
   Widget buildDefault({
     @required AddressDialogBuilder builder,
-    @required FutureOr<void> Function(Address address) onDone,
+    @required OnDoneCallback onDone,
   }) {
     assert(this.builder == null,
         'this method just can be called when this widget is a child of [RouteSearchBox]');
     assert(builder != null);
     assert(onDone != null);
     return AddressSearchBuilder._(
-        this.geoMethods,
-        this.controller,
-        (BuildContext context, AsyncSnapshot<List<Address>> snapshot,
-                {TextEditingController controller,
-                Future<void> Function() searchAddress,
-                Future<Address> Function(Address address) getGeometry}) =>
-            AddressSearchDialog._fromBuilder(
-                snapshot,
-                controller,
-                searchAddress,
-                getGeometry,
-                builder.color,
-                builder.backgroundColor,
-                builder.hintText,
-                builder.noResultsText,
-                builder.cancelText,
-                builder.continueText,
-                builder.useButtons,
-                onDone,
-                this._addrComm,
-                this._addressId),
+      this.geoMethods,
+      this.controller,
+      (BuildContext context, AsyncSnapshot<List<Address>> snapshot,
+              {TextEditingController controller,
+              void Function() searchAddress,
+              Future<Address> Function(Address address) getGeometry}) =>
+          AddressSearchDialog._fromBuilder(
+        snapshot,
+        controller,
+        searchAddress,
+        getGeometry,
+        builder.color,
+        builder.backgroundColor,
+        builder.hintText,
+        builder.noResultsText,
+        builder.cancelText,
+        builder.continueText,
+        builder.useButtons,
+        onDone,
+        this._addrComm,
         this._addressId,
-        this._addrComm);
+      ),
+      this._addressId,
+      this._addrComm,
+    );
   }
 
   @override
@@ -147,6 +158,7 @@ class AddressSearchBuilder extends StatefulWidget {
 }
 
 class _AddressSearchBuilderState extends State<AddressSearchBuilder> {
+  /// Representation of the most recent interaction with [_searchAddress].
   AsyncSnapshot<List<Address>> _snapshot =
       AsyncSnapshot<List<Address>>.nothing();
 
@@ -160,7 +172,7 @@ class _AddressSearchBuilderState extends State<AddressSearchBuilder> {
       );
 
   /// Loads a list of found addresses by the text in [widget.controller].
-  Future<void> _searchAddress() async {
+  void _searchAddress() async {
     if (mounted)
       setState(() => _snapshot = AsyncSnapshot<List<Address>>.waiting());
     final List<Address> data = await widget.geoMethods
