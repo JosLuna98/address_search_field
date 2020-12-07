@@ -14,7 +14,9 @@ class _AddrComm extends ChangeNotifier {
   /// Writes an [Address] by a [AddressId].
   void writeAddr(AddressId id, Address addr, {bool update = false}) {
     assert(update != null);
-    assert(update && id == AddressId._waypoints,
+    assert(
+        id != AddressId._waypoints ||
+            (id == AddressId._waypoints && update == false),
         'use a WaypointsManager to update _waypoints');
     if (id == AddressId.origin)
       _origin = update ? _origin.copyWith(addr) : addr;
