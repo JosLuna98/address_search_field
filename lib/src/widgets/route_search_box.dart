@@ -112,7 +112,7 @@ class _RouteSearchBoxState extends State<RouteSearchBox> {
         widget.destinationCtrl.text =
             found ? address.reference : widget.onAddressError;
     } else
-      _addrComm.writeAddr(addrId, Address(coords: coords));
+      _addrComm.writeAddr(addrId, Address(coords: coords), update: true);
   }
 
   /// Gets directions using all the [Address] objects in [_addrComm].

@@ -12,9 +12,14 @@ class _AddrComm extends ChangeNotifier {
   final _waypoints = ValueNotifier<List<Address>>(List<Address>());
 
   /// Writes an [Address] by a [AddressId].
-  void writeAddr(AddressId id, Address addr) {
-    if (id == AddressId.origin) _origin = _origin.copyWith(addr);
-    if (id == AddressId.destination) _destination = _destination.copyWith(addr);
+  void writeAddr(AddressId id, Address addr, {bool update = false}) {
+    assert(update != null);
+    assert(update && id == AddressId._waypoints,
+        'use a WaypointsManager to update _waypoints');
+    if (id == AddressId.origin)
+      _origin = update ? _origin.copyWith(addr) : addr;
+    if (id == AddressId.destination)
+      _destination = update ? _destination.copyWith(addr) : addr;
     if (id == AddressId._waypoints && !_waypoints.value.contains(addr)) {
       _waypoints.value.add(addr);
       _waypoints.notifyListeners();
