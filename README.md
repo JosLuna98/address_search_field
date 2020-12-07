@@ -6,7 +6,7 @@ It uses [HTTP](https://pub.dev/packages/http/versions/0.12.2), [Google Maps for 
 To use this plugin, add `address_search_field` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
 ```yaml
 dependencies:
-  address_search_field: ^3.0.7
+  address_search_field: ^3.0.7+1
 ```
 ## Permissions
 ### Android

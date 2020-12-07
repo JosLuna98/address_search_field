@@ -1,4 +1,4 @@
-## [3.0.7]
+## [3.0.7+1]
 * New extensions to convert `List<Address>` to `List<Coords>` and `List<Address>` to `List<Coords>`.
 #### RouteSearchBox
 * `relocate` function has a new param called `changeReference` to update `Coords` in an internal `Address` now.
