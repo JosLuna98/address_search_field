@@ -6,7 +6,7 @@ It uses [HTTP](https://pub.dev/packages/http/versions/0.12.2), [Google Maps for 
 To use this plugin, add `address_search_field` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
 ```yaml
 dependencies:
-  address_search_field: ^3.0.6
+  address_search_field: ^3.0.7
 ```
 ## Permissions
 ### Android
@@ -41,8 +41,26 @@ GeoMethods(
 * This object makes calls to Google APIs using the parameters set. It can do requests to Google places, geocode and directions APIs.
 * Language support list [here](https://developers.google.com/maps/faq#languagesupport).
 * List of countries [here](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes).
+
+Example:
+```dart
+final geoMethods = GeoMethods(
+  googleApiKey: 'GOOGLE_API_KEY',
+  language: 'en',
+  countryCode: 'usa',
+  country: 'United States',
+  city: 'New York',
+);
+    
+geoMethods.autocompletePlace(query: 'place streets or reference');
+geoMethods.geoLocatePlace(coords: Coords(0.10, 0.10));
+geoMethods.getPlaceGeometry(reference: 'place streets', placeId: 'ajFDN3662fNsa4hhs42FAjeb5n');
+geoMethods.getDirections(origin: Address(coords: Coords(0.10, 0.10)), destination: Address(coords: Coords(0.10, 0.10)));
+```
 ## AddressSearchBuilder
-This widget is a builder which provides of parameters and methods to create a widget that can search addresses and permits to work with them using an `Address` object. Example:
+This widget is a builder which provides of parameters and methods to create a widget that can search addresses and permits to work with them using an `Address` object.
+
+Example:
 ```dart
 GeoMethods geoMethods;
 TextEditingController controller;
@@ -67,7 +85,9 @@ AddressSearchBuilder(
   },
 );
 ```
->`AddressSearchDialog` shouldn't be used alone. It needs parameters from `AddressSearchBuilder`. The best way to use this widget is using `AddressSearchBuilder.deft`, which will just use an `AddressDialogBuilder` and it's an easier implementation. Example:
+>`AddressSearchDialog` shouldn't be used alone. It needs parameters from `AddressSearchBuilder`. The best way to use this widget is using `AddressSearchBuilder.deft`, which will just use an `AddressDialogBuilder` and it's an easier implementation.
+
+Example:
 ```dart
 GeoMethods geoMethods;
 TextEditingController controller;
@@ -80,7 +100,9 @@ AddressSearchBuilder.deft(
 );
 ```
 ## AddressDialogBuilder
-This builder uses parameters to customize an `AddressSearchDialog` which is called from `AddressSearchBuilder`. Example:
+This builder uses parameters to customize an `AddressSearchDialog` which is called from `AddressSearchBuilder`.
+
+Example:
 ```dart
 AddressDialogBuilder(
   color: Color,
@@ -93,7 +115,9 @@ AddressDialogBuilder(
 );
 ```
 ## AddressLocator
-This widget is a simple way to set an initial address reference in a `TextEditingController` when the `AddressSearchBuilder` is not created by a `RouteSearchBox`. `locator` param provides a `relocate` function to do it and get an `Address`. Example:
+This widget is a simple way to set an initial address reference in a `TextEditingController` when the `AddressSearchBuilder` is not created by a `RouteSearchBox`. `locator` param provides a `relocate` function to do it and get an `Address`.
+
+Example:
 ```dart
 GeoMethods geoMethods;
 TextEditingController controller;
@@ -118,7 +142,9 @@ AddressLocator(
 ```
 ## RouteSearchBox
 This is a special widget with a builder which provides of three `AddressSearchBuilder` to search an origin `Address`, destination `Address` and optionally waypoints in a `List<Address>`. This widget is used to get directions from the points got by the builder's `AddressSearchBuilder`s.
-A completed example of how to use this widget could be found [here](https://pub.dev/packages/address_search_field/example). Example:
+A completed example of how to use this widget could be found [here](https://pub.dev/packages/address_search_field/example).
+
+Example:
 ```dart
 GeoMethods geoMethods;
 TextEditingController originCtrl;
