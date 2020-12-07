@@ -172,7 +172,7 @@ class GeoMethods {
     }
   }
 
-  /// `List<Map<String, dynamic>>`
+  /// Param is `List<Map<String, dynamic>>`
   String _calcDistance(dynamic distances) {
     int value = 0;
     String suffix = 'm';
@@ -188,7 +188,7 @@ class GeoMethods {
     return '$value $suffix';
   }
 
-  /// `List<Map<String, dynamic>>`
+  /// Param is `List<Map<String, dynamic>>`
   String _calcDuration(dynamic durations) {
     int value = 0;
     String suffix = 'sec';
