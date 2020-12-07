@@ -92,22 +92,27 @@ class _RouteSearchBoxState extends State<RouteSearchBox> {
   }
 
   /// Sets a new [Address].
-  void _relocate(AddressId addrId, Coords coords) async {
+  void _relocate(AddressId addrId, Coords coords,
+      {bool changeReference = true}) async {
     assert(addrId != null);
     assert(coords != null);
-    if (addrId == AddressId.origin)
-      widget.originCtrl.text = widget.onAddressLoading;
-    else
-      widget.destinationCtrl.text = widget.onAddressLoading;
-    final address = await widget.geoMethods.geoLocatePlace(coords: coords);
-    final found = address?.isCompleted ?? false;
-    _addrComm.writeAddr(addrId, found ? address : Address(coords: coords));
-    if (addrId == AddressId.origin)
-      widget.originCtrl.text =
-          found ? address.reference : widget.onAddressError;
-    else
-      widget.destinationCtrl.text =
-          found ? address.reference : widget.onAddressError;
+    assert(changeReference != null);
+    if (changeReference) {
+      if (addrId == AddressId.origin)
+        widget.originCtrl.text = widget.onAddressLoading;
+      else
+        widget.destinationCtrl.text = widget.onAddressLoading;
+      final address = await widget.geoMethods.geoLocatePlace(coords: coords);
+      final found = address?.isCompleted ?? false;
+      _addrComm.writeAddr(addrId, found ? address : Address(coords: coords));
+      if (addrId == AddressId.origin)
+        widget.originCtrl.text =
+            found ? address.reference : widget.onAddressError;
+      else
+        widget.destinationCtrl.text =
+            found ? address.reference : widget.onAddressError;
+    } else
+      _addrComm.writeAddr(addrId, Address(coords: coords));
   }
 
   /// Gets directions using all the [Address] objects in [_addrComm].
