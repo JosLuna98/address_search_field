@@ -13,3 +13,23 @@ extension LatLngBoundsConvert on LatLngBounds {
   Bounds toBounds() =>
       Bounds(southwest: this.southwest, northeast: this.northeast);
 }
+
+/// extensions for [List<Address>].
+extension AddressListConvert on List<Address> {
+  /// Converts [List<Address>] to [List<Coords>].
+  List<Coords> toCoordsList() {
+    final coords = List<Coords>();
+    this.forEach((element) => coords.add(element.coords));
+    return coords;
+  }
+}
+
+/// extensions for [List<Coords>].
+extension CoordsListConvert on List<Coords> {
+  /// Converts [List<Coords>] to [List<Address>].
+  List<Address> toAddressList() {
+    final addresses = List<Address>();
+    this.forEach((element) => addresses.add(Address(coords: element)));
+    return addresses;
+  }
+}
