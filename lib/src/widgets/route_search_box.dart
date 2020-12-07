@@ -12,7 +12,8 @@ typedef Widget RouteBuilderCallback(
 });
 
 /// Callback method.
-typedef void RelocateCallback(AddressId addressId, Coords coords);
+typedef void RelocateCallback(AddressId addressId, Coords coords,
+    {bool changeReference});
 
 /// Custom [WidgetBuilder] with two [AddressField] to call Google Directions API and get [Directions] beetwen two or more points.
 class RouteSearchBox extends StatefulWidget {
