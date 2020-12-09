@@ -1,7 +1,7 @@
 part of 'package:address_search_field/address_search_field.dart';
 
 /// Callback method.
-typedef Future<void> OnDoneCallback(Address address);
+typedef FutureOr<void> OnDoneCallback(Address address);
 
 /// Permits build an [AddressSearchDialog] by default from an [AddressSearchBuilder].
 class AddressDialogBuilder {
