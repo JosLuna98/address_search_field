@@ -12,7 +12,7 @@ typedef Widget RouteBuilderCallback(
 });
 
 /// Callback method.
-typedef void RelocateCallback(AddressId addressId, Coords coords,
+typedef Future<void> RelocateCallback(AddressId addressId, Coords coords,
     {bool changeReference});
 
 /// Custom [WidgetBuilder] with two [AddressField] to call Google Directions API and get [Directions] beetwen two or more points.
@@ -93,7 +93,7 @@ class _RouteSearchBoxState extends State<RouteSearchBox> {
   }
 
   /// Sets a new [Address].
-  void _relocate(AddressId addrId, Coords coords,
+  Future<void> _relocate(AddressId addrId, Coords coords,
       {bool changeReference = true}) async {
     assert(addrId != null);
     assert(coords != null);

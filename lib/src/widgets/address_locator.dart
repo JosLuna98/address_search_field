@@ -1,7 +1,8 @@
 part of 'package:address_search_field/address_search_field.dart';
 
 /// Callback method.
-typedef void LocatorCallback(Future<Address> Function(Coords coords) relocate);
+typedef Future<void> LocatorCallback(
+    Future<Address> Function(Coords coords) relocate);
 
 /// Sets an initital address reference in the [TextEditingController].
 class AddressLocator extends StatelessWidget {

@@ -1,7 +1,7 @@
 part of 'package:address_search_field/address_search_field.dart';
 
 /// Callback method.
-typedef void SearchAddressCallback();
+typedef Future<void> SearchAddressCallback();
 
 /// Callback method.
 typedef Future<Address> GetGeometryCallback(Address address);
@@ -172,7 +172,7 @@ class _AddressSearchBuilderState extends State<AddressSearchBuilder> {
       );
 
   /// Loads a list of found addresses by the text in [widget.controller].
-  void _searchAddress() async {
+  Future<void> _searchAddress() async {
     if (mounted)
       setState(() => _snapshot = AsyncSnapshot<List<Address>>.waiting());
     final List<Address> data = await widget.geoMethods

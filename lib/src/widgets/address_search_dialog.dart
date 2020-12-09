@@ -1,7 +1,7 @@
 part of 'package:address_search_field/address_search_field.dart';
 
 /// Callback method.
-typedef void OnDoneCallback(Address address);
+typedef Future<void> OnDoneCallback(Address address);
 
 /// Permits build an [AddressSearchDialog] by default from an [AddressSearchBuilder].
 class AddressDialogBuilder {
@@ -269,7 +269,7 @@ class AddressSearchDialog extends StatelessWidget {
                           ListTile(
                         title: Text(snapshot.data[index].reference),
                         onTap: () async => (onDone != null)
-                            ? _selected(context,
+                            ? await _selected(context,
                                 await getGeometry(snapshot.data[index]))
                             : null,
                       ),
@@ -312,8 +312,9 @@ class AddressSearchDialog extends StatelessWidget {
                   style:
                       TextStyle(color: color ?? Theme.of(context).primaryColor),
                 ),
-                onTap: () => (onDone != null)
-                    ? _selected(context, Address(reference: controller.text))
+                onTap: () async => (onDone != null)
+                    ? await _selected(
+                        context, Address(reference: controller.text))
                     : null,
               ),
             ),
@@ -328,12 +329,12 @@ class AddressSearchDialog extends StatelessWidget {
   }
 
   /// Selects an [Address] to work.
-  void _selected(BuildContext context, Address address) async {
+  Future<void> _selected(BuildContext context, Address address) async {
     if (controller.text != address.reference)
       controller.text = address.reference;
     if (_addressId != null && _addrComm != null)
       _addrComm.writeAddr(_addressId, address);
-    onDone(address);
+    await onDone(address);
     _dismiss(context);
   }
 }
