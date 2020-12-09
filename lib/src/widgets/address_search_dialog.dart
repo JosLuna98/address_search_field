@@ -133,9 +133,6 @@ class AddressSearchDialog extends StatelessWidget {
   /// Permits to work with the found [Address] by a [RouteSearchBox].
   final _AddrComm _addrComm;
 
-  /// Verify if the [AddressDialog] will have buttons at bottom.
-  bool get _hasButtons => useButtons && _addressId != AddressId._waypoints;
-
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
@@ -157,13 +154,13 @@ class AddressSearchDialog extends StatelessWidget {
                   ),
                 ),
                 _resultsList(context, size),
-                (_hasButtons)
+                (useButtons)
                     ? SizedBox(
                         width: size.width * 0.8,
                         child: Divider(color: Colors.grey, height: 0.2),
                       )
                     : Container(),
-                (_hasButtons) ? _dialogButtons(context, size) : Container(),
+                (useButtons) ? _dialogButtons(context, size) : Container(),
               ],
             ),
           ),
@@ -253,7 +250,7 @@ class AddressSearchDialog extends StatelessWidget {
         width: size.width * 0.8,
         decoration: BoxDecoration(
           color: backgroundColor,
-          borderRadius: (_hasButtons)
+          borderRadius: (useButtons)
               ? BorderRadius.all(Radius.zero)
               : BorderRadius.only(
                   bottomLeft: Radius.circular(10.0),
