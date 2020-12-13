@@ -1,4 +1,7 @@
-## [3.0.7+5]
+## [3.0.8]
+* New `typedef`s for functions.
+* All tests passed.
+## [3.0.7]
 * New extensions to convert `List<Address>` to `List<Coords>` and `List<Address>` to `List<Coords>`.
 #### RouteSearchBox
 * `relocate` function has a new param called `changeReference` to update `Coords` in an internal `Address` now.
