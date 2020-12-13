@@ -1,6 +1,9 @@
 part of 'package:address_search_field/address_search_field.dart';
 
 /// Callback method.
+typedef Future<Directions> GetDirectionsCallback();
+
+/// Callback method.
 typedef Widget RouteBuilderCallback(
   BuildContext context,
   AddressSearchBuilder originBuilder,
@@ -8,7 +11,7 @@ typedef Widget RouteBuilderCallback(
   AddressSearchBuilder waypointBuilder,
   WaypointsManager waypointsMgr,
   RelocateCallback relocate,
-  Future<Directions> Function() getDirections,
+  GetDirectionsCallback getDirections,
 });
 
 /// Callback method.
