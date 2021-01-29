@@ -1,3 +1,5 @@
+## [3.0.9]
+* `city` parameter is not longer required in `GeoMethods`.
 ## [3.0.8]
 * New `typedef`s for functions.
 * All tests passed.

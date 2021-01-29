@@ -36,7 +36,7 @@ class GeoMethods {
     @required this.language,
     @required this.countryCode,
     @required this.country,
-    @required this.city,
+    this.city = '',
     this.mode = 'driving',
   })  : assert(googleApiKey != null),
         assert(language != null),
