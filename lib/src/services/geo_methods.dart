@@ -46,6 +46,8 @@ class GeoMethods {
   })  : assert(googleApiKey != null),
         assert(language != null),
         assert(countryCode != null),
+        assert(countryCode.length == 2,
+            'country must be passed as a two character, ISO 3166-1 Alpha-2 compatible country code'),
         assert(countryCodes != null),
         assert(countryCodes.length <= 5, 'just can filter up to 5 countries'),
         assert(countryCodes.every((c) => c.length == 2),
