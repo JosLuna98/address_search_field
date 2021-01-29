@@ -47,9 +47,15 @@ class _MyAppState extends State<MyApp> {
   final geoMethods = GeoMethods(
     googleApiKey: 'GOOGLE_API_KEY',
     language: 'es-419',
-    countryCode: 'ec',
-    country: 'Ecuador',
-    city: 'Esmeraldas',
+    // country: 'ec', /// commented for use case
+    countryCodes: [
+      /// to autocomplete addresses from multicountry
+      'ec', //ecuador
+      'co', //colombia
+      'ar', //argentina
+      'es', //españa
+      'br', //brazil
+    ],
   );
 
   @override
@@ -78,7 +84,8 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
           RouteSearchBox(
-            geoMethods: geoMethods,
+            /// we need to specify a countryCode to get routes because countryCode parameter was commented
+            geoMethods: geoMethods.copyWith(countryCodeParam: 'ec'),
             originCtrl: origCtrl,
             destinationCtrl: destCtrl,
             builder: (context, originBuilder, destinationBuilder,

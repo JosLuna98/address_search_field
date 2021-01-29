@@ -9,7 +9,7 @@ class _AddrComm extends ChangeNotifier {
   Address _destination = Address();
 
   /// [List] of [Address] to identify waypoints.
-  final _waypoints = ValueNotifier<List<Address>>(List<Address>());
+  final _waypoints = ValueNotifier<List<Address>>(<Address>[]);
 
   /// Writes an [Address] by a [AddressId].
   void writeAddr(AddressId id, Address addr, {bool update = false}) {

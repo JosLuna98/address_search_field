@@ -17,9 +17,13 @@ class GeoMethods {
   /// Language support list [here](https://developers.google.com/maps/faq#languagesupport).
   final String language;
 
-  /// Country code to search in a specific region.
+  /// Country code to search routes in a specific region.
   /// List of countries [here](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes).
   final String countryCode;
+
+  /// Country code to search and autocomplete addresses filtering up to 5 countries .
+  /// List of countries [here](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes).
+  final List<String> countryCodes;
 
   /// Country to filter address results.
   final String country;
@@ -34,24 +38,56 @@ class GeoMethods {
   GeoMethods({
     @required this.googleApiKey,
     @required this.language,
-    @required this.countryCode,
-    @required this.country,
+    this.countryCode = '',
+    this.countryCodes = const <String>[],
+    this.country = '',
     this.city = '',
     this.mode = 'driving',
   })  : assert(googleApiKey != null),
         assert(language != null),
         assert(countryCode != null),
+        assert(countryCodes != null),
+        assert(countryCodes.length <= 5, 'just can filter up to 5 countries'),
+        assert(countryCodes.every((c) => c.length == 2),
+            'countries must be passed as a two character, ISO 3166-1 Alpha-2 compatible country code'),
         assert(country != null),
         assert(city != null),
         assert(mode != null);
+
+  /// Permits to use an [GeoMethods] copy with updated data.
+  GeoMethods copyWith({
+    String apiKeyParam,
+    String languageParam,
+    String countryCodeParam,
+    List<String> countryCodesParam,
+    String countryParam,
+    String cityParam,
+    String modeParam,
+  }) =>
+      GeoMethods(
+        googleApiKey: apiKeyParam ?? googleApiKey,
+        language: languageParam ?? language,
+        countryCode: countryCodeParam ?? countryCode,
+        countryCodes: countryCodesParam ?? countryCodes,
+        country: countryParam ?? country,
+        city: cityParam ?? city,
+        mode: modeParam ?? mode,
+      );
 
   /// Calls AutoComplete of Google Place API sending a `query`.
   /// Each [Address] just have `reference` and `place_id`.
   Future<List<Address>> autocompletePlace({@required String query}) async {
     if (query.isEmpty) return <Address>[];
     query = query.replaceAll(RegExp(r' '), '%20');
-    final url =
-        'https://maps.googleapis.com/maps/api/place/autocomplete/json?input=$query,%20$city,%20$country&language=$language&components=country:$countryCode&key=$googleApiKey';
+    String url =
+        'https://maps.googleapis.com/maps/api/place/autocomplete/json?key=$googleApiKey&language=$language&input=$query';
+    if (city.isNotEmpty) url += ',%20$city';
+    if (country.isNotEmpty) url += ',%20$country';
+    if (countryCodes.isNotEmpty) {
+      final countries = countryCodes.map((c) => 'country:$c').join('|');
+      url += '&components=$countries';
+    } else if (countryCode.isNotEmpty)
+      url += '&components=country:$countryCode';
     try {
       final response = await http.get(url);
       final list = List<Address>();
@@ -74,8 +110,8 @@ class GeoMethods {
     @required String reference,
     @required String placeId,
   }) async {
-    if (placeId.isEmpty)
-      AssertionError("placeId can't be declared as an empty `String`");
+    assert(
+        placeId.isNotEmpty, "placeId can't be declared as an empty `String`");
     final url =
         'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&fields=geometry&key=$googleApiKey';
     try {
@@ -129,19 +165,19 @@ class GeoMethods {
     @required Address destination,
     List<Address> waypoints,
   }) async {
-    if (!origin.hasCoords)
-      AssertionError('origin has to contain coordinates values');
-    if (!destination.hasCoords)
-      AssertionError('destination has to contain coordinates values');
+    assert(countryCode.isNotEmpty,
+        'countryCode parameter is required to get Directions');
+    assert(origin.hasCoords, 'origin has to contain coordinates values');
+    assert(
+        destination.hasCoords, 'destination has to contain coordinates values');
     if (waypoints == null) waypoints = <Address>[];
     String url =
         'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.coords.toString()}&destination=${destination.coords.toString()}&language=$language&units=metric&region=$countryCode&mode=$mode&key=$googleApiKey';
     if (waypoints.isNotEmpty) {
       url += '&waypoints=';
-      final end = waypoints.length - 1;
       waypoints.asMap().forEach((index, element) {
         if (element.hasCoords)
-          url += (index != end)
+          url += (index != waypoints.length - 1)
               ? '${element.coords.toString()}|'
               : '${element.coords.toString()}';
         else
@@ -216,7 +252,7 @@ class GeoMethods {
 
   /// Decodes an `encoded` [String] to create a [Polyline].
   static List<Coords> decodeEncodedPolyline({@required String encoded}) {
-    if (encoded.isEmpty) AssertionError("encoded can't be empty");
+    assert(encoded.isNotEmpty, "encoded can't be empty");
     final points = List<Coords>();
     final len = encoded.length;
     int index = 0;

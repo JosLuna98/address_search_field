@@ -1,3 +1,9 @@
+## [3.0.10]
+* `country` parameter is not longer required in `GeoMethods`.
+* `countryCode` parameter is not longer required in `GeoMethods`.
+* New parameter `countryCodes` added in `GeoMethods` to autocomplete an address filtering up to 5 countries.
+* New method `copyWith` added in `GeoMethods` to use a modified copy from an object of this type.
+* `countryCode` parameter is required in the `GeoMethods` object to run `getDirections` method.
 ## [3.0.9]
 * `city` parameter is not longer required in `GeoMethods`.
 ## [3.0.8]
