@@ -29,13 +29,13 @@ class Directions {
 
   /// Constructor for [Directions].
   Directions({
-    @required this.origin,
-    @required this.destination,
-    @required this.waypoints,
-    @required this.distance,
-    @required this.duration,
-    @required this.bounds,
-    @required this.points,
+    required this.origin,
+    required this.destination,
+    required this.waypoints,
+    required this.distance,
+    required this.duration,
+    required this.bounds,
+    required this.points,
   });
 
   @override

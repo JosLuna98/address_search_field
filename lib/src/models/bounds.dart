@@ -5,7 +5,7 @@ import 'package:address_search_field/src/models/coords.dart';
 /// Geographical bounding box by coordinates of [LatLng] object.
 class Bounds extends LatLngBounds {
   /// Constructor for [Bounds].
-  Bounds({@required this.southwest, @required this.northeast})
+  Bounds({required this.southwest, required this.northeast})
       : super(southwest: southwest, northeast: northeast);
 
   /// The southwest coordinates of the rectangle.

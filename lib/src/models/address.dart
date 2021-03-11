@@ -5,29 +5,29 @@ import 'package:address_search_field/src/models/coords.dart';
 /// Primary data of an address to perform geolocation processes.
 class Address {
   /// Coordinates.
-  final Coords coords;
+  final Coords? coords;
 
   /// Bounds.
-  final Bounds bounds;
+  final Bounds? bounds;
 
   /// Reference or streets.
-  final String reference;
+  final String? reference;
 
   /// Place Id from Google Place API.
-  final String placeId;
+  final String? placeId;
 
   /// Constructor for [Address].
-  Address({Coords coords, Bounds bounds, String reference, String placeId})
+  Address({Coords? coords, Bounds? bounds, String? reference, String? placeId})
       : this.coords = coords,
         this.bounds = bounds,
         this.reference = reference,
         this.placeId = placeId;
 
   /// Checks if reference exists.
-  bool get hasReference => reference != null && reference.isNotEmpty;
+  bool get hasReference => reference != null && reference!.isNotEmpty;
 
   /// Checks if Place Id exists.
-  bool get hasPlaceId => placeId != null && placeId.isNotEmpty;
+  bool get hasPlaceId => placeId != null && placeId!.isNotEmpty;
 
   /// Checks if coords exists.
   bool get hasCoords => coords != null;
@@ -40,7 +40,6 @@ class Address {
 
   /// Permits to get an [Address] copy and update its data with other [Address].
   Address copyWith(Address newAddress) {
-    assert(newAddress != null);
     return Address(
       coords: newAddress.coords ?? this.coords,
       bounds: newAddress.bounds ?? this.bounds,

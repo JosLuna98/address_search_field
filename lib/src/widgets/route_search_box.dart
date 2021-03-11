@@ -8,15 +8,15 @@ typedef Widget RouteBuilderCallback(
   BuildContext context,
   AddressSearchBuilder originBuilder,
   AddressSearchBuilder destinationBuilder, {
-  AddressSearchBuilder waypointBuilder,
-  WaypointsManager waypointsMgr,
-  RelocateCallback relocate,
-  GetDirectionsCallback getDirections,
+  AddressSearchBuilder? waypointBuilder,
+  WaypointsManager? waypointsMgr,
+  RelocateCallback? relocate,
+  GetDirectionsCallback? getDirections,
 });
 
 /// Callback method.
 typedef Future<void> RelocateCallback(AddressId addressId, Coords coords,
-    {bool changeReference});
+    {bool? changeReference});
 
 /// Custom [WidgetBuilder] with two [AddressField] to call Google Directions API and get [Directions] beetwen two or more points.
 class RouteSearchBox extends StatefulWidget {
@@ -24,16 +24,12 @@ class RouteSearchBox extends StatefulWidget {
   RouteSearchBox({
     this.onAddressLoading = 'Loading..',
     this.onAddressError = 'Unidentified place',
-    @required this.geoMethods,
-    TextEditingController originCtrl,
-    TextEditingController destinationCtrl,
-    TextEditingController waypointCtrl,
-    @required this.builder,
-  })  : assert(onAddressLoading != null),
-        assert(onAddressError != null),
-        assert(geoMethods != null),
-        assert(builder != null),
-        this.originCtrl = originCtrl ?? TextEditingController(),
+    required this.geoMethods,
+    TextEditingController? originCtrl,
+    TextEditingController? destinationCtrl,
+    TextEditingController? waypointCtrl,
+    required this.builder,
+  })   : this.originCtrl = originCtrl ?? TextEditingController(),
         this.destinationCtrl = destinationCtrl ?? TextEditingController(),
         this.waypointCtrl = waypointCtrl ?? TextEditingController(),
         super();
@@ -97,11 +93,9 @@ class _RouteSearchBoxState extends State<RouteSearchBox> {
 
   /// Sets a new [Address].
   Future<void> _relocate(AddressId addrId, Coords coords,
-      {bool changeReference = true}) async {
-    assert(addrId != null);
-    assert(coords != null);
+      {bool? changeReference = true}) async {
     assert(changeReference != null);
-    if (changeReference) {
+    if (changeReference!) {
       if (addrId == AddressId.origin)
         widget.originCtrl.text = widget.onAddressLoading;
       else
@@ -111,23 +105,23 @@ class _RouteSearchBoxState extends State<RouteSearchBox> {
       _addrComm.writeAddr(addrId, found ? address : Address(coords: coords));
       if (addrId == AddressId.origin)
         widget.originCtrl.text =
-            found ? address.reference : widget.onAddressError;
+            found ? address!.reference! : widget.onAddressError;
       else
         widget.destinationCtrl.text =
-            found ? address.reference : widget.onAddressError;
+            found ? address!.reference! : widget.onAddressError;
     } else
       _addrComm.writeAddr(addrId, Address(coords: coords), update: true);
   }
 
   /// Gets directions using all the [Address] objects in [_addrComm].
   Future<Directions> _getDirections() async {
-    if (!_addrComm.readAddr(AddressId.origin).hasCoords)
+    if (!_addrComm.readAddr(AddressId.origin)!.hasCoords)
       throw RouteError.no_origin_coords;
-    if (!_addrComm.readAddr(AddressId.destination).hasCoords)
+    if (!_addrComm.readAddr(AddressId.destination)!.hasCoords)
       throw RouteError.no_dest_coords;
     final direc = await widget.geoMethods.getDirections(
-        origin: _addrComm.readAddr(AddressId.origin),
-        destination: _addrComm.readAddr(AddressId.destination),
+        origin: _addrComm.readAddr(AddressId.origin)!,
+        destination: _addrComm.readAddr(AddressId.destination)!,
         waypoints:
             _addrComm.readAddrList(AddressId._waypoints).valueNotifier.value);
     if (direc == null) throw RouteError.directions_not_found;

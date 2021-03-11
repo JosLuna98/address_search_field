@@ -10,15 +10,15 @@ extension LatLngConvert on LatLng {
 /// extensions for [LatLngBounds].
 extension LatLngBoundsConvert on LatLngBounds {
   /// Converts [LatLngBounds] to [Bounds].
-  Bounds toBounds() =>
-      Bounds(southwest: this.southwest, northeast: this.northeast);
+  Bounds toBounds() => Bounds(
+      southwest: this.southwest as Coords, northeast: this.northeast as Coords);
 }
 
 /// extensions for [List<Address>].
 extension AddressListConvert on List<Address> {
   /// Converts [List<Address>] to [List<Coords>].
-  List<Coords> toCoordsList() {
-    final coords = List<Coords>();
+  List<Coords?> toCoordsList() {
+    final coords = <Coords?>[];
     this.forEach((element) => coords.add(element.coords));
     return coords;
   }
@@ -28,7 +28,7 @@ extension AddressListConvert on List<Address> {
 extension CoordsListConvert on List<Coords> {
   /// Converts [List<Coords>] to [List<Address>].
   List<Address> toAddressList() {
-    final addresses = List<Address>();
+    final addresses = <Address>[];
     this.forEach((element) => addresses.add(Address(coords: element)));
     return addresses;
   }

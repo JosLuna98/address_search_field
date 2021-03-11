@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:address_search_field/src/models/directions.dart';
@@ -36,35 +35,28 @@ class GeoMethods {
 
   /// Contructor for [GeoMethods].
   GeoMethods({
-    @required this.googleApiKey,
-    @required this.language,
+    required this.googleApiKey,
+    required this.language,
     this.countryCode = '',
     this.countryCodes = const <String>[],
     this.country = '',
     this.city = '',
     this.mode = 'driving',
-  })  : assert(googleApiKey != null),
-        assert(language != null),
-        assert(countryCode != null),
-        assert(countryCode.length == 2,
-            'country must be passed as a two character, ISO 3166-1 Alpha-2 compatible country code'),
-        assert(countryCodes != null),
+  })  : assert(countryCode == '' || countryCode.length == 2,
+            'country must be passed as two character, ISO 3166-1 Alpha-2 compatible country code'),
         assert(countryCodes.length <= 5, 'just can filter up to 5 countries'),
         assert(countryCodes.every((c) => c.length == 2),
-            'countries must be passed as a two character, ISO 3166-1 Alpha-2 compatible country code'),
-        assert(country != null),
-        assert(city != null),
-        assert(mode != null);
+            'countries must be passed as two character, ISO 3166-1 Alpha-2 compatible country code');
 
   /// Permits to use an [GeoMethods] copy with updated data.
   GeoMethods copyWith({
-    String apiKeyParam,
-    String languageParam,
-    String countryCodeParam,
-    List<String> countryCodesParam,
-    String countryParam,
-    String cityParam,
-    String modeParam,
+    String? apiKeyParam,
+    String? languageParam,
+    String? countryCodeParam,
+    List<String>? countryCodesParam,
+    String? countryParam,
+    String? cityParam,
+    String? modeParam,
   }) =>
       GeoMethods(
         googleApiKey: apiKeyParam ?? googleApiKey,
@@ -78,21 +70,26 @@ class GeoMethods {
 
   /// Calls AutoComplete of Google Place API sending a `query`.
   /// Each [Address] just have `reference` and `place_id`.
-  Future<List<Address>> autocompletePlace({@required String query}) async {
+  Future<List<Address>?> autocompletePlace({required String query}) async {
     if (query.isEmpty) return <Address>[];
-    query = query.replaceAll(RegExp(r' '), '%20');
-    String url =
-        'https://maps.googleapis.com/maps/api/place/autocomplete/json?key=$googleApiKey&language=$language&input=$query';
-    if (city.isNotEmpty) url += ',%20$city';
-    if (country.isNotEmpty) url += ',%20$country';
-    if (countryCodes.isNotEmpty) {
-      final countries = countryCodes.map((c) => 'country:$c').join('|');
-      url += '&components=$countries';
-    } else if (countryCode.isNotEmpty)
-      url += '&components=country:$countryCode';
+    final uri = Uri.https(
+      'maps.googleapis.com',
+      '/maps/api/place/autocomplete/json',
+      {
+        'key': googleApiKey,
+        'language': language,
+        'input': query +
+            (city.isNotEmpty ? ', $city' : '') +
+            (country.isNotEmpty ? ', $country' : ''),
+        if (countryCodes.isNotEmpty)
+          'components': countryCodes.map((c) => 'country:$c').join('|')
+        else if (countryCode.isNotEmpty)
+          'components': 'country:$countryCode',
+      },
+    );
     try {
-      final response = await http.get(url);
-      final list = List<Address>();
+      final response = await http.get(uri);
+      final list = <Address>[];
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body)['predictions'];
         jsonResponse.forEach((element) => list.add(Address(
@@ -108,16 +105,23 @@ class GeoMethods {
   }
 
   /// Calls Details of Google Place API sending a `place_id`.
-  Future<Address> getPlaceGeometry({
-    @required String reference,
-    @required String placeId,
+  Future<Address?> getPlaceGeometry({
+    required String? reference,
+    required String placeId,
   }) async {
     assert(
         placeId.isNotEmpty, "placeId can't be declared as an empty `String`");
-    final url =
-        'https://maps.googleapis.com/maps/api/place/details/json?place_id=$placeId&fields=geometry&key=$googleApiKey';
+    final uri = Uri.https(
+      'maps.googleapis.com',
+      '/maps/api/place/details/json',
+      {
+        'place_id': placeId,
+        'fields': 'geometry',
+        'key': googleApiKey,
+      },
+    );
     try {
-      final response = await http.get(url);
+      final response = await http.get(uri);
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         final coords = jsonResponse['result']['geometry']['location'];
@@ -137,11 +141,19 @@ class GeoMethods {
   }
 
   /// Calls Google Geocode API sending `latitude` and `longitude` of [Coords].
-  Future<Address> geoLocatePlace({@required Coords coords}) async {
-    final url =
-        'https://maps.googleapis.com/maps/api/geocode/json?latlng=${coords.toString()}&result_type=street_address&language=$language&key=$googleApiKey';
+  Future<Address?> geoLocatePlace({required Coords coords}) async {
+    final uri = Uri.https(
+      'maps.googleapis.com',
+      '/maps/api/geocode/json',
+      {
+        'latlng': coords.toString(),
+        'result_type': 'street_address',
+        'language': language,
+        'key': googleApiKey,
+      },
+    );
     try {
-      final response = await http.get(url);
+      final response = await http.get(uri);
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         final bounds = jsonResponse['results'][0]['geometry']['viewport'];
@@ -162,39 +174,46 @@ class GeoMethods {
   }
 
   /// Calls Google Directions API sending `origin`, `destination` and `waypoints` [Coords].
-  Future<Directions> getDirections({
-    @required Address origin,
-    @required Address destination,
-    List<Address> waypoints,
+  Future<Directions?> getDirections({
+    required Address origin,
+    required Address destination,
+    List<Address?> waypoints = const <Address>[],
   }) async {
     assert(countryCode.isNotEmpty,
         'countryCode parameter is required to get Directions');
     assert(origin.hasCoords, 'origin has to contain coordinates values');
     assert(
         destination.hasCoords, 'destination has to contain coordinates values');
-    if (waypoints == null) waypoints = <Address>[];
-    String url =
-        'https://maps.googleapis.com/maps/api/directions/json?origin=${origin.coords.toString()}&destination=${destination.coords.toString()}&language=$language&units=metric&region=$countryCode&mode=$mode&key=$googleApiKey';
+    String wps = '';
     if (waypoints.isNotEmpty) {
-      url += '&waypoints=';
       waypoints.asMap().forEach((index, element) {
-        if (element.hasCoords)
-          url += (index != waypoints.length - 1)
+        if (element!.hasCoords)
+          wps += (index != waypoints.length - 1)
               ? '${element.coords.toString()}|'
               : '${element.coords.toString()}';
         else
           print("waypoint $index doesn't have coords");
       });
     }
+    final uri = Uri.https('maps.googleapis.com', '/maps/api/directions/json', {
+      'origin': origin.coords.toString(),
+      'destination': destination.coords.toString(),
+      'language': language,
+      'units': 'metric',
+      'region': countryCode,
+      'mode': mode,
+      'key': googleApiKey,
+      if (wps.isNotEmpty) 'waypoints': wps,
+    });
     try {
-      final response = await http.get(url);
+      final response = await http.get(uri);
       if (response.statusCode == 200) {
         final jsonResponse = jsonDecode(response.body);
         final routes = jsonResponse['routes'][0];
         return Directions(
           origin: origin,
           destination: destination,
-          waypoints: waypoints,
+          waypoints: waypoints as List<Address>,
           distance: _calcDistance(routes['legs']),
           duration: _calcDuration(routes['legs']),
           bounds: Bounds.fromJson(routes['bounds']),
@@ -215,8 +234,8 @@ class GeoMethods {
     int value = 0;
     String suffix = 'm';
     try {
-      distances
-          .forEach((element) => value += element['distance']['value'] as int);
+      distances.forEach(
+          (element) => value += (element['distance']['value'] as int?)!);
       if (value > 999) {
         // meters to kilometers
         value = (value / 1000).round();
@@ -231,8 +250,8 @@ class GeoMethods {
     int value = 0;
     String suffix = 'sec';
     try {
-      durations
-          .forEach((element) => value += element['duration']['value'] as int);
+      durations.forEach(
+          (element) => value += (element['duration']['value'] as int?)!);
       if (value > 60) {
         // seconds to minutes
         value = (value / 60).round();
@@ -253,9 +272,9 @@ class GeoMethods {
   }
 
   /// Decodes an `encoded` [String] to create a [Polyline].
-  static List<Coords> decodeEncodedPolyline({@required String encoded}) {
+  static List<Coords> decodeEncodedPolyline({required String encoded}) {
     assert(encoded.isNotEmpty, "encoded can't be empty");
-    final points = List<Coords>();
+    final points = <Coords>[];
     final len = encoded.length;
     int index = 0;
     int lat = 0, lng = 0;

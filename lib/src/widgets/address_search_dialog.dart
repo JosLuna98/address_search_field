@@ -3,9 +3,9 @@ part of 'package:address_search_field/address_search_field.dart';
 /// Callback method.
 typedef FutureOr<void> OnDoneCallback(Address address);
 
-/// Permits build an [AddressSearchDialog] by default from an [AddressSearchBuilder].
+/// Permits build an [_AddressSearchDialog] by default from an [AddressSearchBuilder].
 class AddressDialogBuilder {
-  /// Constructor for [AddressSearchDialog].
+  /// Constructor for [_AddressSearchDialog].
   AddressDialogBuilder({
     this.color,
     this.backgroundColor = Colors.white,
@@ -14,15 +14,10 @@ class AddressDialogBuilder {
     this.cancelText = 'Cancel',
     this.continueText = 'Continue',
     this.useButtons = true,
-  })  : assert(backgroundColor != null),
-        assert(hintText != null),
-        assert(noResultsText != null),
-        assert(cancelText != null),
-        assert(continueText != null),
-        assert(useButtons != null);
+  });
 
   /// Color for details in the widget.
-  final Color color;
+  final Color? color;
 
   /// Bakcground color for widget.
   final Color backgroundColor;
@@ -33,10 +28,10 @@ class AddressDialogBuilder {
   /// Message to show when the [ListView] of the widget is empty.
   final String noResultsText;
 
-  /// Text for [RaisedButton] of the widget to cancel.
+  /// Text for [ElevatedButton] of the widget to cancel.
   final String cancelText;
 
-  /// Text for [RaisedButton] of the widget to continue.
+  /// Text for [ElevatedButton] of the widget to continue.
   final String continueText;
 
   /// Sets if the [AddressDialog] will have buttons at bottom.
@@ -44,13 +39,13 @@ class AddressDialogBuilder {
 }
 
 /// Default [Dialog] to search [Address].
-class AddressSearchDialog extends StatelessWidget {
+class _AddressSearchDialog extends StatelessWidget {
   /// Constructor for [AddressSearchDialog].
-  const AddressSearchDialog({
-    @required this.snapshot,
-    @required this.controller,
-    @required this.searchAddress,
-    @required this.getGeometry,
+  const _AddressSearchDialog({
+    required this.snapshot,
+    required TextEditingController this.controller,
+    required this.searchAddress,
+    required this.getGeometry,
     this.color,
     this.backgroundColor = Colors.white,
     this.hintText = 'Address or reference',
@@ -58,23 +53,15 @@ class AddressSearchDialog extends StatelessWidget {
     this.cancelText = 'Cancel',
     this.continueText = 'Continue',
     this.useButtons = true,
-    @required this.onDone,
-  })  : assert(snapshot != null),
-        assert(controller != null),
-        assert(searchAddress != null),
+    required this.onDone,
+  })   : assert(searchAddress != null),
         assert(getGeometry != null),
-        assert(backgroundColor != null),
-        assert(hintText != null),
-        assert(noResultsText != null),
-        assert(cancelText != null),
-        assert(continueText != null),
-        assert(useButtons != null),
         this._addrComm = null,
         this._addressId = null,
         super();
 
   /// Constructor for [AddressSearchDialog] to be called by [AddressSearchBuilder].
-  const AddressSearchDialog._fromBuilder(
+  const _AddressSearchDialog._fromBuilder(
     this.snapshot,
     this.controller,
     this.searchAddress,
@@ -95,16 +82,16 @@ class AddressSearchDialog extends StatelessWidget {
   final AsyncSnapshot<List<Address>> snapshot;
 
   /// controller for text used to search an [Address].
-  final TextEditingController controller;
+  final TextEditingController? controller;
 
   /// Loads a list of found addresses by the text in [widget.controller].
-  final SearchAddressCallback searchAddress;
+  final SearchAddressCallback? searchAddress;
 
   /// Tries to get a completed [Address] object by a reference or place id.
-  final GetGeometryCallback getGeometry;
+  final GetGeometryCallback? getGeometry;
 
   /// Color for details in the widget.
-  final Color color;
+  final Color? color;
 
   /// Bakcground color for widget.
   final Color backgroundColor;
@@ -115,10 +102,10 @@ class AddressSearchDialog extends StatelessWidget {
   /// Message to show when the [ListView] of the widget is empty.
   final String noResultsText;
 
-  /// Text for [RaisedButton] of the widget to cancel.
+  /// Text for [ElevatedButton] of the widget to cancel.
   final String cancelText;
 
-  /// Text for [RaisedButton] of the widget to continue.
+  /// Text for [ElevatedButton] of the widget to continue.
   final String continueText;
 
   /// Sets if the [AddressDialog] will have buttons at bottom.
@@ -128,10 +115,10 @@ class AddressSearchDialog extends StatelessWidget {
   final OnDoneCallback onDone;
 
   /// Identifies the [Address] to work in the [Widget] built.
-  final AddressId _addressId;
+  final AddressId? _addressId;
 
   /// Permits to work with the found [Address] by a [RouteSearchBox].
-  final _AddrComm _addrComm;
+  final _AddrComm? _addrComm;
 
   @override
   Widget build(BuildContext context) {
@@ -210,7 +197,7 @@ class AddressSearchDialog extends StatelessWidget {
                         size: 13.0,
                       ),
                     ),
-                    onTap: controller.clear,
+                    onTap: controller!.clear,
                   ),
                   hintText: hintText,
                   enabledBorder: UnderlineInputBorder(
@@ -262,16 +249,16 @@ class AddressSearchDialog extends StatelessWidget {
               ? CircularProgressIndicator()
               : (snapshot.hasData)
                   ? ListView.separated(
-                      itemCount: snapshot.data.length,
+                      itemCount: snapshot.data!.length,
                       separatorBuilder: (BuildContext context, int index) =>
                           Divider(),
                       itemBuilder: (BuildContext context, int index) =>
                           ListTile(
-                        title: Text(snapshot.data[index].reference),
-                        onTap: () async => (onDone != null)
-                            ? await _selected(context,
-                                await getGeometry(snapshot.data[index]))
-                            : null,
+                        title: Text(snapshot.data![index].reference!),
+                        onTap: () async => await _selected(
+                            context,
+                            await (getGeometry!(snapshot.data![index])
+                                as FutureOr<Address>)),
                       ),
                     )
                   : Text(noResultsText,
@@ -312,10 +299,8 @@ class AddressSearchDialog extends StatelessWidget {
                   style:
                       TextStyle(color: color ?? Theme.of(context).primaryColor),
                 ),
-                onTap: () async => (onDone != null)
-                    ? await _selected(
-                        context, Address(reference: controller.text))
-                    : null,
+                onTap: () async => await _selected(
+                    context, Address(reference: controller!.text)),
               ),
             ),
           ],
@@ -330,10 +315,10 @@ class AddressSearchDialog extends StatelessWidget {
 
   /// Selects an [Address] to work.
   Future<void> _selected(BuildContext context, Address address) async {
-    if (controller.text != address.reference)
-      controller.text = address.reference;
+    if (controller!.text != address.reference)
+      controller!.text = address.reference!;
     if (_addressId != null && _addrComm != null)
-      _addrComm.writeAddr(_addressId, address);
+      _addrComm!.writeAddr(_addressId, address);
     await onDone(address);
     _dismiss(context);
   }

@@ -45,17 +45,10 @@ class _MyAppState extends State<MyApp> {
   final markers = Set<Marker>();
 
   final geoMethods = GeoMethods(
+    /// [Get API key](https://developers.google.com/maps/documentation/embed/get-api-key)
     googleApiKey: 'GOOGLE_API_KEY',
     language: 'es-419',
-    // country: 'ec', /// commented for use case
-    countryCodes: [
-      /// to autocomplete addresses from multicountry
-      'ec', //ecuador
-      'co', //colombia
-      'ar', //argentina
-      'es', //españa
-      'br', //brazil
-    ],
+    countryCode: 'ec',
   );
 
   @override
@@ -84,8 +77,7 @@ class _MyAppState extends State<MyApp> {
             ),
           ),
           RouteSearchBox(
-            /// we need to specify a countryCode to get routes because countryCode parameter was commented
-            geoMethods: geoMethods.copyWith(countryCodeParam: 'ec'),
+            geoMethods: geoMethods,
             originCtrl: origCtrl,
             destinationCtrl: destCtrl,
             builder: (context, originBuilder, destinationBuilder,

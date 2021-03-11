@@ -19,7 +19,7 @@ class WaypointsManager {
       this.valueNotifier, this.onReorder, this.update, this.remove, this.clear);
 
   /// A [ValueNotifier] to create a [Widget] updable.
-  final ValueNotifier<List<Address>> valueNotifier;
+  final ValueNotifier<List<Address?>> valueNotifier;
 
   /// [Function] to reorder a [List] of [Address].
   /// It is to can use a [ReorderableList](https://pub.dev/packages/flutter_reorderable_list).

@@ -18,6 +18,7 @@ class AddressSearchFieldWeb {
     final MethodChannel channel = MethodChannel(
       'address_search_field',
       const StandardMethodCodec(),
+      // ignore: deprecated_member_use
       registrar.messenger,
     );
 
@@ -32,6 +33,7 @@ class AddressSearchFieldWeb {
     switch (call.method) {
       case 'getPlatformVersion':
         return getPlatformVersion();
+        // ignore: dead_code
         break;
       default:
         throw PlatformException(

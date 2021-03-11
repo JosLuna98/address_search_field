@@ -6,7 +6,7 @@ It uses [HTTP](https://pub.dev/packages/http/versions/0.12.2), [Google Maps for 
 To use this plugin, add `address_search_field` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
 ```yaml
 dependencies:
-  address_search_field: ^3.0.10
+  address_search_field: ^3.1.0
 ```
 ## Permissions
 ### Android
@@ -38,7 +38,7 @@ GeoMethods(
   mode: String,
 );
 ```
-* This object makes calls to Google APIs using the parameters set. It can do requests to Google places, geocode and directions APIs.
+* This object makes calls to Google APIs using the parameters set. It can do requests to Google places, geocode and directions APIs [Get API key](https://developers.google.com/maps/documentation/embed/get-api-key).
 * Language support list [here](https://developers.google.com/maps/faq#languagesupport).
 * List of countries [here](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes).
 
@@ -47,18 +47,33 @@ Example:
 final geoMethods = GeoMethods(
   googleApiKey: 'GOOGLE_API_KEY',
   language: 'en',
-  countryCode: 'usa',
+  countryCode: 'us',
+  countryCodes: ['us', 'es', 'co'],
   country: 'United States',
   city: 'New York',
 );
     
-geoMethods.autocompletePlace(query: 'place streets or reference');
+geoMethods.autocompletePlace(query: 'place streets or reference'); // It will search in unite states, espain and colombia. It just can filter up to 5 countries.
 geoMethods.geoLocatePlace(coords: Coords(0.10, 0.10));
 geoMethods.getPlaceGeometry(reference: 'place streets', placeId: 'ajFDN3662fNsa4hhs42FAjeb5n');
-geoMethods.getDirections(origin: Address(coords: Coords(0.10, 0.10)), destination: Address(coords: Coords(0.10, 0.10)));
+geoMethods.getDirections(origin: Address(coords: Coords(0.10, 0.10)), destination: Address(coords: Coords(0.10, 0.10))); // It needs a specific region, it will search in unite states.
 ```
 ## AddressSearchBuilder
 This widget is a builder which provides of parameters and methods to create a widget that can search addresses and permits to work with them using an `Address` object.
+
+Example:
+```dart
+GeoMethods geoMethods;
+TextEditingController controller;
+
+AddressSearchBuilder.deft(
+  geoMethods: geoMethods,
+  controller: controller,
+  builder: AddressDialogBuilder(),
+  onDone: (Address address) => null,
+);
+```
+>`AddressSearchDialog.deft` creates the widget showed on post's top. If you don't add `.deft` at end you can create your own widget to work with the addresses information.
 
 Example:
 ```dart
@@ -75,7 +90,7 @@ AddressSearchBuilder(
     Future<void> Function() searchAddress,
     Future<Address> Function(Address address) getGeometry,
   }) {
-    return AddressSearchDialog(
+    return MyCustomWidget(
       snapshot: snapshot,
       controller: controller,
       searchAddress: searchAddress,
@@ -83,20 +98,6 @@ AddressSearchBuilder(
       onDone: (Address address) => null,
     );
   },
-);
-```
->`AddressSearchDialog` shouldn't be used alone. It needs parameters from `AddressSearchBuilder`. The best way to use this widget is using `AddressSearchBuilder.deft`, which will just use an `AddressDialogBuilder` and it's an easier implementation.
-
-Example:
-```dart
-GeoMethods geoMethods;
-TextEditingController controller;
-
-AddressSearchBuilder.deft(
-  geoMethods: geoMethods,
-  controller: controller,
-  builder: AddressDialogBuilder(),
-  onDone: (Address address) => null,
 );
 ```
 ## AddressDialogBuilder
@@ -127,9 +128,10 @@ Address initialAddress;
 AddressLocator(
   geoMethods: geoMethods,
   controller: controller,
-  locator: (relocate) async => controller.text.isEmpty
-      ? initialAddress.update(await relocate(initialCoords))
-      : null,
+  locator: (relocate) async {
+    if(controller.text.isEmpty) 
+      initialAddress.update(await relocate(initialCoords)) // by initial coordinates you can get an address reference to be predefined in the widget and save all the address data in a variable.
+  },
   child: TextField(
     onTap: () => AddressSearchBuilder.deft(
       geoMethods: geoMethods,
@@ -141,7 +143,7 @@ AddressLocator(
 );
 ```
 ## RouteSearchBox
-This is a special widget with a builder which provides of three `AddressSearchBuilder` to search an origin `Address`, destination `Address` and optionally waypoints in a `List<Address>`. This widget is used to get directions from the points got by the builder's `AddressSearchBuilder`s.
+This is a special widget with a builder which provides of three `AddressSearchBuilder` to search an origin `Address`, destination `Address` and optionally waypoints in a `List<Address>`. This widget is used to get directions from the points got by the builder's `AddressSearchBuilder`s. `relocate` function permits to set an initial position as origin or destination from an initial coordinates parameter.
 A completed example of how to use this widget could be found [here](https://pub.dev/packages/address_search_field/example).
 
 Example:
@@ -164,7 +166,7 @@ RouteSearchBox(
     AddressSearchBuilder waypointBuilder,
     WaypointsManager waypointsMgr,
   }) {
-    if(controller.text.isEmpty) relocate(AddressId.origin, initialCoords);
+    if(originCtrl.text.isEmpty) relocate(AddressId.origin, initialCoords);
     return Column(
       children: [
         TextField(
@@ -198,3 +200,8 @@ RouteSearchBox(
 ```
 ##  License
 MIT License
+
+## Contact
+You can contact me if you have problems or ideas. Hablo español e inglés.
+
+josluna1098@gmail.com

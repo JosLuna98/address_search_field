@@ -1,3 +1,8 @@
+## [3.1.0]
+* `AddressSearchDialog` widget is private now.
+* `google_maps_flutter` and `http` plugins implementation updated.
+* Null-safety.
+* Documentation updated.
 ## [3.0.10]
 * `country` parameter is not longer required in `GeoMethods`.
 * `countryCode` parameter is not longer required in `GeoMethods`.
