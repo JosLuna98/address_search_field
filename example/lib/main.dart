@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:location/location.dart';
 
-LatLng _initialPositon;
+late LatLng _initialPositon;
 
 Future<LatLng> _getPosition() async {
   final Location location = Location();
@@ -15,8 +15,8 @@ Future<LatLng> _getPosition() async {
     if (await location.requestPermission() != PermissionStatus.granted)
       throw 'No GPS permissions';
   }
-  final data = await location.getLocation();
-  return LatLng(data.latitude, data.longitude);
+  final LocationData data = await location.getLocation();
+  return LatLng(data.latitude!, data.longitude!);
 }
 
 void main() async {
@@ -34,7 +34,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  GoogleMapController _controller;
+  late final GoogleMapController _controller;
 
   final origCtrl = TextEditingController();
 
@@ -81,7 +81,7 @@ class _MyAppState extends State<MyApp> {
             originCtrl: origCtrl,
             destinationCtrl: destCtrl,
             builder: (context, originBuilder, destinationBuilder,
-                {waypointBuilder, getDirections, relocate, waypointsMgr}) {
+                waypointBuilder, waypointsMgr, relocate, getDirections) {
               if (origCtrl.text.isEmpty)
                 relocate(AddressId.origin, _initialPositon.toCoords());
               return Container(
@@ -126,8 +126,8 @@ class _MyAppState extends State<MyApp> {
                         ),
                         ElevatedButton(
                           child: Text('Relocate'),
-                          onPressed: () async =>
-                              relocate(AddressId.origin, await _getPosition()),
+                          onPressed: () async => relocate(AddressId.origin,
+                              (await _getPosition()).toCoords()),
                         ),
                         ElevatedButton(
                           child: Text('Search'),
@@ -139,19 +139,19 @@ class _MyAppState extends State<MyApp> {
                               markers.addAll([
                                 Marker(
                                     markerId: MarkerId('origin'),
-                                    position: result.origin.coords),
+                                    position: result.origin.coords!),
                                 Marker(
                                     markerId: MarkerId('dest'),
-                                    position: result.destination.coords)
+                                    position: result.destination.coords!)
                               ]);
                               result.waypoints.asMap().forEach((key, value) =>
                                   markers.add(Marker(
                                       markerId: MarkerId('point$key'),
-                                      position: value.coords)));
+                                      position: value.coords!)));
                               polylines.add(Polyline(
                                 polylineId: PolylineId('result'),
                                 points: result.points,
-                                color: Colors.blue[400],
+                                color: Colors.blue,
                                 width: 5,
                               ));
                               setState(() {});
@@ -205,7 +205,7 @@ class Waypoints extends StatelessWidget {
           itemCount: value.length,
           separatorBuilder: (BuildContext context, int index) => Divider(),
           itemBuilder: (BuildContext context, int index) =>
-              ListTile(title: Text(value[index].reference)),
+              ListTile(title: Text(value[index].reference!)),
         ),
       ),
     );

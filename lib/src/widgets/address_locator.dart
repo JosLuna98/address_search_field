@@ -1,8 +1,8 @@
 part of 'package:address_search_field/address_search_field.dart';
 
 /// Callback method.
-typedef Future<void> LocatorCallback(
-    Future<Address?> Function(Coords coords) relocate);
+typedef LocatorCallback = Future<void> Function(
+    Future<Address> Function(Coords coords) relocate);
 
 /// Sets an initital address reference in the [TextEditingController].
 class AddressLocator extends StatelessWidget {
@@ -41,11 +41,11 @@ class AddressLocator extends StatelessWidget {
   }
 
   /// Gets an address reference by [Coords].
-  Future<Address?> _relocate(Coords coords) async {
+  Future<Address> _relocate(Coords coords) async {
     controller.text = onAddressLoading;
-    final address = await geoMethods.geoLocatePlace(coords: coords);
-    final found = address?.isCompleted ?? false;
+    final Address? address = await geoMethods.geoLocatePlace(coords: coords);
+    final bool found = address?.isCompleted ?? false;
     controller.text = found ? address!.reference! : onAddressError;
-    return found ? address : Address(coords: coords);
+    return found ? address! : Address(coords: coords);
   }
 }

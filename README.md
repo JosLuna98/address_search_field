@@ -6,7 +6,7 @@ It uses [HTTP](https://pub.dev/packages/http/versions/0.12.2), [Google Maps for 
 To use this plugin, add `address_search_field` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
 ```yaml
 dependencies:
-  address_search_field: ^3.1.0-nullsafety.0
+  address_search_field: ^4.0.0
 ```
 ## Permissions
 ### Android
@@ -85,11 +85,11 @@ AddressSearchBuilder(
   controller: controller,
   builder: (
     BuildContext context,
-    AsyncSnapshot<List<Address>> snapshot, {
+    AsyncSnapshot<List<Address>> snapshot,
     TextEditingController controller,
     Future<void> Function() searchAddress,
     Future<Address> Function(Address address) getGeometry,
-  }) {
+  ) {
     return MyCustomWidget(
       snapshot: snapshot,
       controller: controller,
@@ -160,12 +160,12 @@ RouteSearchBox(
   builder: (
     BuildContext context,
     AddressSearchBuilder originBuilder,
-    AddressSearchBuilder destinationBuilder, {
+    AddressSearchBuilder destinationBuilder,
     Future<Directions> Function() getDirections,
     void Function(AddressId addrId, Coords coords) relocate,
     AddressSearchBuilder waypointBuilder,
     WaypointsManager waypointsMgr,
-  }) {
+  ) {
     if(originCtrl.text.isEmpty) relocate(AddressId.origin, initialCoords);
     return Column(
       children: [

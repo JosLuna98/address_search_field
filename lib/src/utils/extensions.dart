@@ -17,9 +17,11 @@ extension LatLngBoundsConvert on LatLngBounds {
 /// extensions for [List<Address>].
 extension AddressListConvert on List<Address> {
   /// Converts [List<Address>] to [List<Coords>].
-  List<Coords?> toCoordsList() {
-    final coords = <Coords?>[];
-    this.forEach((element) => coords.add(element.coords));
+  List<Coords> toCoordsList() {
+    final coords = <Coords>[];
+    this.forEach((element) {
+      if (element.hasCoords) coords.add(element.coords!);
+    });
     return coords;
   }
 }

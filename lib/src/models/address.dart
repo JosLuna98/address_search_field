@@ -24,10 +24,12 @@ class Address {
         this.placeId = placeId;
 
   /// Checks if reference exists.
-  bool get hasReference => reference != null && reference!.isNotEmpty;
+  bool get hasReference =>
+      (reference != null) ? (reference!.isNotEmpty ? true : false) : false;
 
   /// Checks if Place Id exists.
-  bool get hasPlaceId => placeId != null && placeId!.isNotEmpty;
+  bool get hasPlaceId =>
+      (placeId != null) ? (placeId!.isNotEmpty ? true : false) : false;
 
   /// Checks if coords exists.
   bool get hasCoords => coords != null;

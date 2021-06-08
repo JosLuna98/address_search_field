@@ -1,16 +1,16 @@
 part of 'package:address_search_field/address_search_field.dart';
 
 /// Callback method.
-typedef void OnReorderCallback(int oldIndex, int newIndex);
+typedef OnReorderCallback = void Function(int oldIndex, int newIndex);
 
 /// Callback method.
-typedef void UpdateCallback(int index, Address newAddress);
+typedef UpdateCallback = void Function(int index, Address newAddress);
 
 /// Callback method.
-typedef void RemoveCallback(int index);
+typedef RemoveCallback = void Function(int index);
 
 /// Callback method.
-typedef void ClearCallback();
+typedef ClearCallback = void Function();
 
 /// Permits read and reorder a [List] of [Address].
 class WaypointsManager {
@@ -19,7 +19,7 @@ class WaypointsManager {
       this.valueNotifier, this.onReorder, this.update, this.remove, this.clear);
 
   /// A [ValueNotifier] to create a [Widget] updable.
-  final ValueNotifier<List<Address?>> valueNotifier;
+  final ValueNotifier<List<Address>> valueNotifier;
 
   /// [Function] to reorder a [List] of [Address].
   /// It is to can use a [ReorderableList](https://pub.dev/packages/flutter_reorderable_list).

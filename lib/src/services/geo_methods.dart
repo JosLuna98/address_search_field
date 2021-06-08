@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:address_search_field/src/models/directions.dart';
 import 'package:address_search_field/src/models/address.dart';
@@ -99,7 +100,7 @@ class GeoMethods {
       }
       return list;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -135,7 +136,7 @@ class GeoMethods {
         throw 'Request failed with status: ${response.statusCode}';
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -168,7 +169,7 @@ class GeoMethods {
         throw 'Request failed with status: ${response.statusCode}';
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -224,7 +225,7 @@ class GeoMethods {
         throw 'Request failed with status: ${response.statusCode}';
       }
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return null;
     }
   }

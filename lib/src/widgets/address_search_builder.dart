@@ -1,19 +1,19 @@
 part of 'package:address_search_field/address_search_field.dart';
 
 /// Callback method.
-typedef Future<void> SearchAddressCallback();
+typedef SearchAddressCallback = Future<void> Function();
 
 /// Callback method.
-typedef Future<Address?> GetGeometryCallback(Address address);
+typedef GetGeometryCallback = Future<Address> Function(Address address);
 
 /// Callback method.
-typedef Widget AddressBuilderCallback(
+typedef AddressBuilderCallback = Widget Function(
   BuildContext context,
-  AsyncSnapshot<List<Address>> snapshot, {
-  TextEditingController? controller,
-  SearchAddressCallback? searchAddress,
-  GetGeometryCallback? getGeometry,
-});
+  AsyncSnapshot<List<Address>> snapshot,
+  TextEditingController controller,
+  SearchAddressCallback searchAddress,
+  GetGeometryCallback getGeometry,
+);
 
 /// Custom [StatefulBuilder] to create a [Widget] like [AddressSearchDialog].
 class AddressSearchBuilder extends StatefulWidget {
@@ -22,10 +22,9 @@ class AddressSearchBuilder extends StatefulWidget {
     required this.geoMethods,
     required this.controller,
     required this.builder,
-  })   : assert(builder != null),
+  })  : assert(builder != null),
         this._addressId = null,
-        this._addrComm = null,
-        super();
+        this._addrComm = null;
 
   /// Constructor for [AddressSearchBuilder] to show an [AddressSearchDialog].
   factory AddressSearchBuilder.deft({
@@ -37,14 +36,15 @@ class AddressSearchBuilder extends StatefulWidget {
     return AddressSearchBuilder._(
       geoMethods,
       controller,
-      (BuildContext context, AsyncSnapshot<List<Address>> snapshot,
-          {TextEditingController? controller,
-          void Function()? searchAddress,
-          Future<Address> Function(Address address)? getGeometry}) {
+      (BuildContext context,
+          AsyncSnapshot<List<Address>> snapshot,
+          TextEditingController controller,
+          Future<void> Function() searchAddress,
+          Future<Address> Function(Address address) getGeometry) {
         return _AddressSearchDialog._fromBuilder(
           snapshot,
           controller,
-          searchAddress as Future<void> Function()?,
+          searchAddress,
           getGeometry,
           builder.color,
           builder.backgroundColor,
@@ -57,7 +57,7 @@ class AddressSearchBuilder extends StatefulWidget {
           null,
           null,
         );
-      } as AddressBuilderCallback?,
+      },
       null,
       null,
     );
@@ -69,8 +69,7 @@ class AddressSearchBuilder extends StatefulWidget {
     this.controller,
     this._addressId,
     this._addrComm,
-  )   : this.builder = null,
-        super();
+  ) : this.builder = null;
 
   /// Constructor for [AddressSearchBuilder] to be called by [builder].
   const AddressSearchBuilder._(
@@ -79,7 +78,7 @@ class AddressSearchBuilder extends StatefulWidget {
     this.builder,
     this._addressId,
     this._addrComm,
-  ) : super();
+  );
 
   /// [GeoMethods] instance to use Google APIs.
   final GeoMethods geoMethods;
@@ -119,14 +118,17 @@ class AddressSearchBuilder extends StatefulWidget {
     return AddressSearchBuilder._(
       this.geoMethods,
       this.controller,
-      (BuildContext context, AsyncSnapshot<List<Address>> snapshot,
-          {TextEditingController? controller,
-          void Function()? searchAddress,
-          Future<Address> Function(Address address)? getGeometry}) {
+      // ignore: unnecessary_cast
+      (BuildContext context,
+          AsyncSnapshot<List<Address>> snapshot,
+          TextEditingController controller,
+          Future<void> Function() searchAddress,
+          Future<Address> Function(Address address) getGeometry) {
+        // ignore: unnecessary_cast
         return _AddressSearchDialog._fromBuilder(
           snapshot,
           controller,
-          searchAddress as Future<void> Function()?,
+          searchAddress,
           getGeometry,
           builder.color,
           builder.backgroundColor,
@@ -138,7 +140,7 @@ class AddressSearchBuilder extends StatefulWidget {
           onDone,
           this._addrComm,
           this._addressId,
-        );
+        ) as Widget;
       } as AddressBuilderCallback?,
       this._addressId,
       this._addrComm,
@@ -158,9 +160,9 @@ class _AddressSearchBuilderState extends State<AddressSearchBuilder> {
   Widget build(BuildContext context) => widget.builder!(
         context,
         _snapshot,
-        controller: widget.controller,
-        searchAddress: _searchAddress,
-        getGeometry: _getGeometry,
+        widget.controller,
+        _searchAddress,
+        _getGeometry,
       );
 
   /// Loads a list of found addresses by the text in [widget.controller].
@@ -177,13 +179,14 @@ class _AddressSearchBuilderState extends State<AddressSearchBuilder> {
   }
 
   /// Tries to get a completed [Address] object by a reference or place id.
-  Future<Address?> _getGeometry(Address address) async {
-    final addr = await widget.geoMethods.getPlaceGeometry(
+  Future<Address> _getGeometry(Address address) async {
+    final Address? addr = await widget.geoMethods.getPlaceGeometry(
       reference: address.reference,
       placeId: address.placeId!,
     );
-    if (widget._addressId == null || widget._addrComm == null) return addr;
-    widget._addrComm!.writeAddr(widget._addressId, addr ?? address);
-    return addr;
+    if (widget._addrComm == null || widget._addressId == null)
+      return addr ?? address;
+    widget._addrComm!.writeAddr(widget._addressId!, addr ?? address);
+    return addr ?? address;
   }
 }

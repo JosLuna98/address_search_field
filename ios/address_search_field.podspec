@@ -4,14 +4,14 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'address_search_field'
-  s.version          = '0.0.1'
-  s.summary          = 'A new flutter plugin project.'
+  s.version          = '4.0.0'
+  s.summary          = 'An address search field which helps to autocomplete an address by a reference. It can be used to get Directions beetwen two points.'
   s.description      = <<-DESC
-A new flutter plugin project.
+  An address search field which helps to autocomplete an address by a reference. It can be used to get Directions beetwen two points.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/JosLuna98/address_search_field.git'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'JosLuna98' => 'josluna1098@gmail.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'

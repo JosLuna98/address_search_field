@@ -1,3 +1,5 @@
+## [4.0.0]
+* Fix null safety migration.
 ## [3.1.0-nullsafety.0]
 * `AddressSearchDialog` widget is private now.
 * `google_maps_flutter` and `http` plugins implementation updated.

@@ -1,9 +1,9 @@
 part of 'package:address_search_field/address_search_field.dart';
 
 /// Callback method.
-typedef FutureOr<void> OnDoneCallback(Address address);
+typedef OnDoneCallback = FutureOr<void> Function(Address address);
 
-/// Permits build an [_AddressSearchDialog] by default from an [AddressSearchBuilder].
+/// Permits to build an [_AddressSearchDialog] by default from an [AddressSearchBuilder].
 class AddressDialogBuilder {
   /// Constructor for [_AddressSearchDialog].
   AddressDialogBuilder({
@@ -43,7 +43,7 @@ class _AddressSearchDialog extends StatelessWidget {
   /// Constructor for [AddressSearchDialog].
   const _AddressSearchDialog({
     required this.snapshot,
-    required TextEditingController this.controller,
+    required this.controller,
     required this.searchAddress,
     required this.getGeometry,
     this.color,
@@ -54,11 +54,8 @@ class _AddressSearchDialog extends StatelessWidget {
     this.continueText = 'Continue',
     this.useButtons = true,
     required this.onDone,
-  })   : assert(searchAddress != null),
-        assert(getGeometry != null),
-        this._addrComm = null,
-        this._addressId = null,
-        super();
+  })  : this._addrComm = null,
+        this._addressId = null;
 
   /// Constructor for [AddressSearchDialog] to be called by [AddressSearchBuilder].
   const _AddressSearchDialog._fromBuilder(
@@ -76,19 +73,19 @@ class _AddressSearchDialog extends StatelessWidget {
     this.onDone,
     this._addrComm,
     this._addressId,
-  ) : super();
+  );
 
   /// Representation of the most recent interaction with an asynchronous computation.
   final AsyncSnapshot<List<Address>> snapshot;
 
   /// controller for text used to search an [Address].
-  final TextEditingController? controller;
+  final TextEditingController controller;
 
   /// Loads a list of found addresses by the text in [widget.controller].
-  final SearchAddressCallback? searchAddress;
+  final SearchAddressCallback searchAddress;
 
   /// Tries to get a completed [Address] object by a reference or place id.
-  final GetGeometryCallback? getGeometry;
+  final GetGeometryCallback getGeometry;
 
   /// Color for details in the widget.
   final Color? color;
@@ -197,7 +194,7 @@ class _AddressSearchDialog extends StatelessWidget {
                         size: 13.0,
                       ),
                     ),
-                    onTap: controller!.clear,
+                    onTap: controller.clear,
                   ),
                   hintText: hintText,
                   enabledBorder: UnderlineInputBorder(
@@ -256,9 +253,9 @@ class _AddressSearchDialog extends StatelessWidget {
                           ListTile(
                         title: Text(snapshot.data![index].reference!),
                         onTap: () async => await _selected(
-                            context,
-                            await (getGeometry!(snapshot.data![index])
-                                as FutureOr<Address>)),
+                          context,
+                          await (getGeometry(snapshot.data![index])),
+                        ),
                       ),
                     )
                   : Text(noResultsText,
@@ -300,7 +297,9 @@ class _AddressSearchDialog extends StatelessWidget {
                       TextStyle(color: color ?? Theme.of(context).primaryColor),
                 ),
                 onTap: () async => await _selected(
-                    context, Address(reference: controller!.text)),
+                  context,
+                  Address(reference: controller.text),
+                ),
               ),
             ),
           ],
@@ -315,10 +314,10 @@ class _AddressSearchDialog extends StatelessWidget {
 
   /// Selects an [Address] to work.
   Future<void> _selected(BuildContext context, Address address) async {
-    if (controller!.text != address.reference)
-      controller!.text = address.reference!;
-    if (_addressId != null && _addrComm != null)
-      _addrComm!.writeAddr(_addressId, address);
+    if (controller.text != address.reference)
+      controller.text = address.reference!;
+    if (_addrComm != null && _addressId != null)
+      _addrComm!.writeAddr(_addressId!, address);
     await onDone(address);
     _dismiss(context);
   }

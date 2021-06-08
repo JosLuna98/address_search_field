@@ -3,24 +3,24 @@ part of 'package:address_search_field/address_search_field.dart';
 /// Address Comunicator.
 class _AddrComm extends ChangeNotifier {
   /// [Address] to identify an origin.
-  Address? _origin = Address();
+  Address _origin = Address();
 
   /// [Address] to identify a destination.
-  Address? _destination = Address();
+  Address _destination = Address();
 
   /// [List] of [Address] to identify waypoints.
-  final _waypoints = ValueNotifier<List<Address?>>(<Address?>[]);
+  final _waypoints = ValueNotifier<List<Address>>(<Address>[]);
 
   /// Writes an [Address] by a [AddressId].
-  void writeAddr(AddressId? id, Address? addr, {bool update = false}) {
+  void writeAddr(AddressId id, Address addr, {bool update = false}) {
     assert(
         id != AddressId._waypoints ||
             (id == AddressId._waypoints && update == false),
         'use a WaypointsManager to update _waypoints');
     if (id == AddressId.origin)
-      _origin = update ? _origin!.copyWith(addr!) : addr;
+      _origin = update ? _origin.copyWith(addr) : addr;
     if (id == AddressId.destination)
-      _destination = update ? _destination!.copyWith(addr!) : addr;
+      _destination = update ? _destination.copyWith(addr) : addr;
     if (id == AddressId._waypoints && !_waypoints.value.contains(addr)) {
       _waypoints.value.add(addr);
       _waypoints.notifyListeners();
@@ -28,7 +28,7 @@ class _AddrComm extends ChangeNotifier {
   }
 
   /// Reads an [Address] by a [AddressId].
-  Address? readAddr(AddressId id) {
+  Address readAddr(AddressId id) {
     assert(id != AddressId._waypoints);
     if (id == AddressId.origin) return _origin;
     return _destination;
@@ -52,7 +52,7 @@ class _AddrComm extends ChangeNotifier {
 
   /// Updates an element in the `waypoints` [List].
   void _updateAddrListElement(int index, Address newAddress) {
-    _waypoints.value[index] = _waypoints.value[index]!.copyWith(newAddress);
+    _waypoints.value[index] = _waypoints.value[index].copyWith(newAddress);
     _waypoints.notifyListeners();
   }
 
