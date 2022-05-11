@@ -24,10 +24,12 @@ class Address {
     required this.placeId,
   });
 
+  /// Constructor for [Address] just setting `reference` and `placeId`.
   Address.fromReference({required this.reference, this.placeId})
       : coords = null,
         bounds = null;
 
+  /// Constructor for [Address] just setting `coords`.
   Address.fromCoords({required this.coords})
       : bounds = null,
         reference = null,
@@ -49,16 +51,6 @@ class Address {
 
   /// Checks if all properties exist.
   bool get isCompleted => hasCoords && hasPlaceId && hasCoords && hasBounds;
-
-  // /// Permits to get an [Address] copy and update its data with other [Address].
-  // Address copyWith(Address newAddress) {
-  //   return Address(
-  //     coords: newAddress.coords ?? coords,
-  //     bounds: newAddress.bounds ?? bounds,
-  //     reference: newAddress.reference ?? reference,
-  //     placeId: newAddress.placeId ?? placeId,
-  //   );
-  // }
 
   /// Permits to get an [Address] copy and update its data with other [Address].
   Address copyWith({

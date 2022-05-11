@@ -1,5 +1,4 @@
-
-/// `enum` which identifies [Address] in [_AddrComm] class.
+/// Identifies [Address] in a [RouteBox] widget.
 enum AddressId {
   /// Identify [Address] object.
   origin,

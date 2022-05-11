@@ -35,10 +35,10 @@ class GeoMethods {
   /// City to filter address results.
   final String city;
 
-  /// By default, directions are calculated as `driving` directions. It can also be `walking`, `bicycling`, `transit`. See [documentation](https://developers.google.com/maps/documentation/directions/overview#TravelModes).
+  /// By default, directions are calculated as `driving` directions. It can also be `walking`, `bicycling`, `transit`. See [documentation](https://developers.google.com/maps/documentation/javascript/directions#TravelModes).
   final DirectionsMode mode;
 
-  // /// By default, directions are calculated as `driving` directions. It can also be `walking`, `bicycling`, `transit`. See [documentation](https://developers.google.com/maps/documentation/directions/overview#TravelModes).
+  /// By default, directions are calculated using the `metric` system. It can also be `imperial`. See [https://developers.google.com/maps/documentation/javascript/directions#UnitSystems).
   final DirectionsUnits units;
 
   /// Contructor for [GeoMethods].
@@ -104,10 +104,11 @@ class GeoMethods {
       );
       try {
         final response = await _httpClient(uri);
-        response['predictions'].forEach((element) => list.add(
-            Address.fromReference(
-                reference: element['description'],
-                placeId: element['place_id'])));
+        response['predictions']
+            .forEach((element) => list.add(Address.fromReference(
+                  reference: element['description'],
+                  placeId: element['place_id'],
+                )));
       } catch (e) {
         debugPrint(e.toString());
       }

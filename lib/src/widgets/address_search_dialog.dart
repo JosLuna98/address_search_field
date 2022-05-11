@@ -10,6 +10,7 @@ import 'package:address_search_field/src/services/geo_methods.dart';
 /// Callback method.
 typedef OnDoneCallback = FutureOr<void> Function(Address address);
 
+/// Callback method.
 typedef BuilderCallback = Widget Function(
   BuildContext context,
   AsyncSnapshot<List<Address>> snapshot,
@@ -18,7 +19,9 @@ typedef BuilderCallback = Widget Function(
   void Function() dismiss,
 );
 
+/// Styles for [AddressSearchDialog].
 class AddressDialogStyle {
+  /// Constructor for [AddressDialogStyle].
   const AddressDialogStyle({
     this.color = Colors.blue,
     this.backgroundColor = Colors.white,
@@ -31,11 +34,13 @@ class AddressDialogStyle {
   /// Background color for widget.
   final Color backgroundColor;
 
-  /// Sets if the [AddressDialog] will have buttons at bottom.
+  /// Sets if the [AddressSearchDialog] will have buttons at bottom.
   final bool useButtons;
 }
 
+/// Texts for [AddressSearchDialog].
 class AddressDialogTexts {
+  /// constructor for [AddressDialogTexts].
   const AddressDialogTexts({
     this.hintText = 'Address or reference',
     this.noResultsText = "There're no results",
@@ -56,7 +61,9 @@ class AddressDialogTexts {
   final String cancelText;
 }
 
+/// [Dialog] to search [Address].
 class AddressSearchDialog extends ConsumerStatefulWidget {
+  /// Default constructor.
   AddressSearchDialog({
     required this.geoMethods,
     TextEditingController? controller,
@@ -70,6 +77,7 @@ class AddressSearchDialog extends ConsumerStatefulWidget {
         addressId = null,
         super(key: key);
 
+  /// Constructor used to work in a [RouteBox].
   AddressSearchDialog.withProvider({
     required this.provider,
     required this.addressId,
@@ -82,6 +90,7 @@ class AddressSearchDialog extends ConsumerStatefulWidget {
         geoMethods = null,
         super(key: key);
 
+  /// Constructor used to create a custom [Dialog].
   AddressSearchDialog.custom({
     required this.geoMethods,
     required this.builder,
@@ -94,6 +103,7 @@ class AddressSearchDialog extends ConsumerStatefulWidget {
         addressId = null,
         super(key: key);
 
+  /// Constructor used to create a custom [Dialog] and work in a [RouteBox].
   AddressSearchDialog.customWithProvider({
     required this.builder,
     required this.provider,
@@ -109,20 +119,25 @@ class AddressSearchDialog extends ConsumerStatefulWidget {
   /// [GeoMethods] instance to use Google APIs.
   final GeoMethods? geoMethods;
 
+  /// Called to create the child widget.
   final BuilderCallback? builder;
 
+  /// Used to connect widgets and manage state.
   final ChangeNotifierProvider<RouteNotifier>? provider;
 
+  /// Identifies the [Address] to work in the [AddressSearchDialog] with `provider`.
   final AddressId? addressId;
 
-  /// controller for text used to search an [Address].
+  /// Controller for text used to search an [Address].
   final TextEditingController _controller;
 
+  /// Styles to modelate this [Dialog].
   final AddressDialogStyle style;
 
+  /// Texts to show in this [Dialog].
   final AddressDialogTexts texts;
 
-  /// Variable for [AddressDialog].
+  /// Callback for [AddressSearchDialog] to use [Address] found.
   final OnDoneCallback? onDone;
 
   @override
@@ -320,6 +335,7 @@ class _DefaultDialog extends StatelessWidget {
   }
 }
 
+/// Callback method.
 typedef SearchAddressCallback = Future<void> Function();
 
 class _SearchBar extends StatelessWidget {

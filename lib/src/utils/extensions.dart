@@ -38,8 +38,9 @@ extension CoordsListConvert on List<Coords> {
   }
 }
 
+/// extensions for [List<Address>].
 extension WaypointRangeException on List<Address> {
-  /// 
+  /// Returns [String?] catching [RangeError].
   String? getReference(int index) {
     try {
       return this[index].reference;

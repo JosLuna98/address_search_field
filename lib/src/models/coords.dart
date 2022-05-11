@@ -15,9 +15,7 @@ class Coords extends LatLng {
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
-    return o is Coords &&
-        o.latitude == latitude &&
-        o.longitude == longitude;
+    return o is Coords && o.latitude == latitude && o.longitude == longitude;
   }
 
   @override

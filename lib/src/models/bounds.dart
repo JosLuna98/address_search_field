@@ -21,9 +21,7 @@ class Bounds extends LatLngBounds {
   @override
   bool operator ==(Object o) {
     if (identical(this, o)) return true;
-    return o is Bounds &&
-        o.southwest == southwest &&
-        o.northeast == northeast;
+    return o is Bounds && o.southwest == southwest && o.northeast == northeast;
   }
 
   @override

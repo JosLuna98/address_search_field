@@ -1,4 +1,4 @@
-/// `enum` which identifies throwed errors in routes.
+/// Identifies throwed errors in routes.
 enum RouteError {
   /// Gps service is disabled.
   gpsDisabled,

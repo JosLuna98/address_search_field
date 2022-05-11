@@ -6,30 +6,40 @@ import 'package:address_search_field/src/models/address.dart';
 import 'package:address_search_field/src/services/geo_methods.dart';
 import 'package:flutter/widgets.dart';
 
+/// Sets [Address] objects in the `provider`.
 class LocationSetter {
+  /// Constructor for [LocationSetter].
   LocationSetter({
     required this.coords,
     required this.addressId,
   });
 
+  /// Coordinates to get and set an [Address].
   final Coords coords;
 
+  /// Identifies the [Address] to work in the `provider`.
   final AddressId addressId;
 }
 
+/// Notifier to work with two or more points in [RouteBox].
 class RouteNotifier extends ChangeNotifier {
   late final GeoMethods _geoMethods;
 
+  /// [GeoMethods] instance to use Google APIs.
   GeoMethods get geoMethods => _geoMethods;
 
   late final TextEditingController _originController;
 
+  /// Controller for text used to search an [Address].
   TextEditingController get originController => _originController;
 
   late final TextEditingController _destinationController;
 
+  /// Controller for text used to search an [Address].
   TextEditingController get destinationController => _destinationController;
 
+  /// Initialize the [RouteNotifier].
+  /// It's needed to can use the other `provider` methods.
   void initRouteNotifier(
     GeoMethods geoMethods,
     TextEditingController originController,
@@ -59,22 +69,26 @@ class RouteNotifier extends ChangeNotifier {
   /// Points beetwen origin and destination of a route.
   List<Address> get waypoints => _waypoints;
 
+  /// Sets waypoints as a new [List] of [Address].
   void setWaypoints(Iterable<Address> addressList) {
     _waypoints.clear();
     _waypoints.addAll(addressList);
     notifyListeners();
   }
 
+  /// Adds an [Address] to the [List] of waypoints.
   void addWaypoint(Address address) {
     _waypoints.add(address);
     notifyListeners();
   }
 
+  /// Adds an [Iterable<Address>] to the [List] of waypoints.
   void addWaypoints(Iterable<Address> addressList) {
     _waypoints.addAll(addressList);
     notifyListeners();
   }
 
+  /// Updates an [Address] waypoint.
   void updateWaypoint(int index, Address address) {
     _waypoints[index] = _waypoints[index].copyWith(
       coordsParam: address.coords,
@@ -85,24 +99,22 @@ class RouteNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Reorder an [Address] waypoint.
   void reorderWaypoint(int oldIndex, int newIndex) {
-    try {
-      _waypoints.insert(
-        newIndex,
-        _waypoints.removeAt(oldIndex),
-      );
-      notifyListeners();
-    } catch (e) {
-      debugPrint(e.toString());
-      return;
-    }
+    _waypoints.insert(
+      newIndex,
+      _waypoints.removeAt(oldIndex),
+    );
+    notifyListeners();
   }
 
+  /// Remove an [Address] waypoint.
   void removeWaypointAt(int index) {
     _waypoints.removeAt(index);
     notifyListeners();
   }
 
+  /// Clear the [List] of waypoints.
   void clearWaypoints() {
     _waypoints.clear();
     notifyListeners();
@@ -110,8 +122,10 @@ class RouteNotifier extends ChangeNotifier {
 
   Directions? _route;
 
+  /// Latest route directions found.
   Directions? get routeFound => _route;
 
+  /// Sets a new [Address] where [AddressId] declares.
   Future<void> setLocation(AddressId addressId, Address address) async {
     if (addressId == AddressId.origin) {
       _origin = address;
@@ -125,6 +139,7 @@ class RouteNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Finds a new [Address] by [Coords] and sets it where [AddressId] declares.
   Future<Address> relocate(AddressId addressId, Coords coords) async {
     final address = await geoMethods.geoLocatePlace(coords: coords);
     final newAddress =
@@ -133,6 +148,7 @@ class RouteNotifier extends ChangeNotifier {
     return newAddress;
   }
 
+  /// Gets route directions if the origin and destination are set.
   Future<Directions> findRoute() async {
     if (_origin != null && _destination != null) {
       final route = await _geoMethods.getDirections(
@@ -154,6 +170,3 @@ class RouteNotifier extends ChangeNotifier {
     throw RouteError.unexpectedError;
   }
 }
-
-// final RouteNotifier firstRoute = RouteNotifier();
-// final routeProvider = ChangeNotifierProvider<RouteNotifier>((ref) => firstRoute);

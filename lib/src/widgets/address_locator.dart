@@ -7,9 +7,12 @@ import 'package:address_search_field/src/models/address.dart';
 import 'package:address_search_field/src/models/coords.dart';
 import 'package:address_search_field/src/services/geo_methods.dart';
 
+/// Callback method.
 typedef SetAddressCallback = void Function(Address origin);
 
+/// Use [Coords] to get an [Address].
 class AddressLocator extends ConsumerStatefulWidget {
+  /// Constructor for [AddressLocator].
   AddressLocator({
     required this.coords,
     required this.geoMethods,
@@ -22,6 +25,7 @@ class AddressLocator extends ConsumerStatefulWidget {
   })  : controller = controller ?? TextEditingController(),
         super(key: key);
 
+  /// Coordinates to get an [Address].
   final Coords coords;
 
   /// [GeoMethods] instance to use Google APIs.
@@ -39,7 +43,7 @@ class AddressLocator extends ConsumerStatefulWidget {
   /// Text to show when origin location fails.
   final String onAddressError;
 
-  /// Variable for [AddressDialog].
+  /// Callback for [AddressSearchDialog] to use [Address] found.
   final OnDoneCallback? onDone;
 
   @override
