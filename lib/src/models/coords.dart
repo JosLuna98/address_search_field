@@ -4,13 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 ///  Latitude and longitude coordinates as degrees.
 class Coords extends LatLng {
   /// Constructor for [Coords].
-  const Coords(this.latitude, this.longitude) : super(latitude, longitude);
-
-  /// The latitude in degrees.
-  final double latitude;
-
-  /// The longitude in degrees.
-  final double longitude;
+  const Coords(double latitude, double longitude) : super(latitude, longitude);
 
   /// Constructor for [Coords] by JSON [Map] object.
   factory Coords.fromJson(dynamic json) => Coords(json['lat'], json['lng']);
@@ -19,11 +13,11 @@ class Coords extends LatLng {
   String toString() => '$latitude,$longitude';
 
   @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is Coords &&
-        other.latitude == latitude &&
-        other.longitude == longitude;
+  bool operator ==(Object o) {
+    if (identical(this, o)) return true;
+    return o is Coords &&
+        o.latitude == latitude &&
+        o.longitude == longitude;
   }
 
   @override

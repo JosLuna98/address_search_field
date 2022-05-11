@@ -1,4 +1,4 @@
-package josluna98.address_search_field
+package dev.jostech.address_search_field
 
 import androidx.annotation.NonNull
 

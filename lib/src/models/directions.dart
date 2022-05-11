@@ -1,8 +1,7 @@
+import 'package:address_search_field/src/models/address.dart';
 import 'package:flutter/widgets.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:address_search_field/src/models/coords.dart';
 import 'package:address_search_field/src/models/bounds.dart';
-import 'package:address_search_field/src/models/address.dart';
 
 /// Result of request to Google Directions API
 class Directions {
@@ -42,7 +41,9 @@ class Directions {
   String toString() {
     String value =
         'origin: ${origin.toString()}\ndestination: ${destination.toString()}\ndistance: $distance\nduration: $duration\ndirections ${bounds.toString()}\npolyline: [ ';
-    points.forEach((element) => value += ' [${element.toString()}] ');
+    for (var element in points) {
+      value += ' [${element.toString()}] ';
+    }
     value += ' ]';
     return value;
   }

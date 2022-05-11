@@ -17,11 +17,21 @@ class Address {
   final String? placeId;
 
   /// Constructor for [Address].
-  Address({Coords? coords, Bounds? bounds, String? reference, String? placeId})
-      : this.coords = coords,
-        this.bounds = bounds,
-        this.reference = reference,
-        this.placeId = placeId;
+  Address({
+    required this.coords,
+    required this.bounds,
+    required this.reference,
+    required this.placeId,
+  });
+
+  Address.fromReference({required this.reference, this.placeId})
+      : coords = null,
+        bounds = null;
+
+  Address.fromCoords({required this.coords})
+      : bounds = null,
+        reference = null,
+        placeId = null;
 
   /// Checks if reference exists.
   bool get hasReference =>
@@ -40,13 +50,28 @@ class Address {
   /// Checks if all properties exist.
   bool get isCompleted => hasCoords && hasPlaceId && hasCoords && hasBounds;
 
+  // /// Permits to get an [Address] copy and update its data with other [Address].
+  // Address copyWith(Address newAddress) {
+  //   return Address(
+  //     coords: newAddress.coords ?? coords,
+  //     bounds: newAddress.bounds ?? bounds,
+  //     reference: newAddress.reference ?? reference,
+  //     placeId: newAddress.placeId ?? placeId,
+  //   );
+  // }
+
   /// Permits to get an [Address] copy and update its data with other [Address].
-  Address copyWith(Address newAddress) {
+  Address copyWith({
+    Coords? coordsParam,
+    Bounds? boundsParam,
+    String? referenceParam,
+    String? placeIdParam,
+  }) {
     return Address(
-      coords: newAddress.coords ?? this.coords,
-      bounds: newAddress.bounds ?? this.bounds,
-      reference: newAddress.reference ?? this.reference,
-      placeId: newAddress.placeId ?? this.placeId,
+      coords: coordsParam ?? coords,
+      bounds: boundsParam ?? bounds,
+      reference: referenceParam ?? reference,
+      placeId: placeIdParam ?? placeId,
     );
   }
 

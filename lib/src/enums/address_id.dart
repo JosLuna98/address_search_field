@@ -1,4 +1,3 @@
-part of 'package:address_search_field/address_search_field.dart';
 
 /// `enum` which identifies [Address] in [_AddrComm] class.
 enum AddressId {
@@ -9,5 +8,5 @@ enum AddressId {
   destination,
 
   /// Identify [List] of [Address].
-  _waypoints
+  waypoint,
 }

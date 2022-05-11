@@ -1,29 +1,34 @@
-part of 'package:address_search_field/address_search_field.dart';
+import 'dart:async';
+import 'package:address_search_field/src/widgets/address_search_dialog.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-/// Callback method.
-typedef LocatorCallback = Future<void> Function(
-    Future<Address> Function(Coords coords) relocate);
+import 'package:address_search_field/src/models/address.dart';
+import 'package:address_search_field/src/models/coords.dart';
+import 'package:address_search_field/src/services/geo_methods.dart';
 
-/// Sets an initital address reference in the [TextEditingController].
-class AddressLocator extends StatelessWidget {
-  /// Consturtor for [AddressLocator].
-  const AddressLocator({
+typedef SetAddressCallback = void Function(Address origin);
+
+class AddressLocator extends ConsumerStatefulWidget {
+  AddressLocator({
+    required this.coords,
     required this.geoMethods,
-    required this.controller,
-    required this.locator,
     required this.child,
-    this.onAddressLoading = 'Loading...',
-    this.onAddressError = 'Unidentifed place',
-  });
+    TextEditingController? controller,
+    this.onDone,
+    this.onAddressLoading = 'Loading..',
+    this.onAddressError = 'Unidentified place',
+    Key? key,
+  })  : controller = controller ?? TextEditingController(),
+        super(key: key);
+
+  final Coords coords;
 
   /// [GeoMethods] instance to use Google APIs.
   final GeoMethods geoMethods;
 
   /// controller for text used to search an [Address].
   final TextEditingController controller;
-
-  /// Callback to get an [Address] by [Coords].
-  final LocatorCallback locator;
 
   /// It's usually a [TextField].
   final Widget child;
@@ -34,18 +39,36 @@ class AddressLocator extends StatelessWidget {
   /// Text to show when origin location fails.
   final String onAddressError;
 
+  /// Variable for [AddressDialog].
+  final OnDoneCallback? onDone;
+
   @override
-  Widget build(BuildContext context) {
-    locator(_relocate);
-    return child;
+  ConsumerState<AddressLocator> createState() => _AddressLocatorState();
+}
+
+class _AddressLocatorState extends ConsumerState<AddressLocator> {
+  @override
+  void initState() {
+    super.initState();
+    _setInitialLocation();
   }
 
-  /// Gets an address reference by [Coords].
-  Future<Address> _relocate(Coords coords) async {
-    controller.text = onAddressLoading;
-    final Address? address = await geoMethods.geoLocatePlace(coords: coords);
+  @override
+  Widget build(BuildContext context) {
+    return widget.child;
+  }
+
+  Future<void> _setInitialLocation() async {
+    widget.controller.text = widget.onAddressLoading;
+    final Address? address =
+        await widget.geoMethods.geoLocatePlace(coords: widget.coords);
     final bool found = address?.isCompleted ?? false;
-    controller.text = found ? address!.reference! : onAddressError;
-    return found ? address! : Address(coords: coords);
+    final addressResult =
+        found ? address! : Address.fromCoords(coords: widget.coords);
+    widget.controller.text =
+        found ? address!.reference! : widget.onAddressError;
+    if (widget.onDone != null) {
+      await widget.onDone!(addressResult);
+    }
   }
 }

@@ -1,11 +1,15 @@
-import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:dio/dio.dart';
+
+import 'package:address_search_field/src/enums/directions_mode.dart';
+import 'package:address_search_field/src/enums/directions_units.dart';
 import 'package:address_search_field/src/models/directions.dart';
 import 'package:address_search_field/src/models/address.dart';
 import 'package:address_search_field/src/models/bounds.dart';
 import 'package:address_search_field/src/models/coords.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+
+part 'package:address_search_field/src/utils/http_client.dart';
 
 /// Provides methods to call Google places, geocode and directions APIs
 class GeoMethods {
@@ -32,7 +36,10 @@ class GeoMethods {
   final String city;
 
   /// By default, directions are calculated as `driving` directions. It can also be `walking`, `bicycling`, `transit`. See [documentation](https://developers.google.com/maps/documentation/directions/overview#TravelModes).
-  final String mode;
+  final DirectionsMode mode;
+
+  // /// By default, directions are calculated as `driving` directions. It can also be `walking`, `bicycling`, `transit`. See [documentation](https://developers.google.com/maps/documentation/directions/overview#TravelModes).
+  final DirectionsUnits units;
 
   /// Contructor for [GeoMethods].
   GeoMethods({
@@ -42,7 +49,8 @@ class GeoMethods {
     this.countryCodes = const <String>[],
     this.country = '',
     this.city = '',
-    this.mode = 'driving',
+    this.mode = DirectionsMode.driving,
+    this.units = DirectionsUnits.metric,
   })  : assert(countryCode == '' || countryCode.length == 2,
             'country must be passed as two character, ISO 3166-1 Alpha-2 compatible country code'),
         assert(countryCodes.length <= 5, 'just can filter up to 5 countries'),
@@ -57,7 +65,8 @@ class GeoMethods {
     List<String>? countryCodesParam,
     String? countryParam,
     String? cityParam,
-    String? modeParam,
+    DirectionsMode? modeParam,
+    DirectionsUnits? untisParam,
   }) =>
       GeoMethods(
         googleApiKey: apiKeyParam ?? googleApiKey,
@@ -67,42 +76,43 @@ class GeoMethods {
         country: countryParam ?? country,
         city: cityParam ?? city,
         mode: modeParam ?? mode,
+        units: untisParam ?? units,
       );
 
   /// Calls AutoComplete of Google Place API sending a `query`.
   /// Each [Address] just have `reference` and `place_id`.
-  Future<List<Address>?> autocompletePlace({required String query}) async {
-    if (query.isEmpty) return <Address>[];
-    final uri = Uri.https(
-      'maps.googleapis.com',
-      '/maps/api/place/autocomplete/json',
-      {
+  Future<List<Address>> autocompletePlace({required String query}) async {
+    final list = <Address>[];
+    if (query.isNotEmpty) {
+      final queryParameters = {
         'key': googleApiKey,
         'language': language,
         'input': query +
             (city.isNotEmpty ? ', $city' : '') +
             (country.isNotEmpty ? ', $country' : ''),
-        if (countryCodes.isNotEmpty)
-          'components': countryCodes.map((c) => 'country:$c').join('|')
-        else if (countryCode.isNotEmpty)
-          'components': 'country:$countryCode',
-      },
-    );
-    try {
-      final response = await http.get(uri);
-      final list = <Address>[];
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body)['predictions'];
-        jsonResponse.forEach((element) => list.add(Address(
-            reference: element['description'], placeId: element['place_id'])));
-      } else {
-        throw 'Request failed with status: ${response.statusCode}';
+      };
+      if (countryCodes.isNotEmpty) {
+        queryParameters['components'] =
+            countryCodes.map((c) => 'country:$c').join('|');
+      } else if (countryCode.isNotEmpty) {
+        queryParameters['components'] = 'country:$countryCode';
       }
-      return list;
-    } catch (e) {
-      debugPrint(e.toString());
-      return null;
+      final uri = Uri.https(
+        'maps.googleapis.com',
+        '/maps/api/place/autocomplete/json',
+        queryParameters,
+      );
+      try {
+        final response = await _httpClient(uri);
+        response['predictions'].forEach((element) => list.add(
+            Address.fromReference(
+                reference: element['description'],
+                placeId: element['place_id'])));
+      } catch (e) {
+        debugPrint(e.toString());
+      }
     }
+    return list;
   }
 
   /// Calls Details of Google Place API sending a `place_id`.
@@ -122,19 +132,15 @@ class GeoMethods {
       },
     );
     try {
-      final response = await http.get(uri);
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        final coords = jsonResponse['result']['geometry']['location'];
-        final bounds = jsonResponse['result']['geometry']['viewport'];
-        return Address(
-            coords: Coords.fromJson(coords),
-            bounds: Bounds.fromJson(bounds),
-            reference: reference,
-            placeId: placeId);
-      } else {
-        throw 'Request failed with status: ${response.statusCode}';
-      }
+      final response = await _httpClient(uri);
+      final coords = response['result']['geometry']['location'];
+      final bounds = response['result']['geometry']['viewport'];
+      return Address(
+        coords: Coords.fromJson(coords),
+        bounds: Bounds.fromJson(bounds),
+        reference: reference,
+        placeId: placeId,
+      );
     } catch (e) {
       debugPrint(e.toString());
       return null;
@@ -154,20 +160,16 @@ class GeoMethods {
       },
     );
     try {
-      final response = await http.get(uri);
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        final bounds = jsonResponse['results'][0]['geometry']['viewport'];
-        final reference = jsonResponse['results'][0]['formatted_address'];
-        return Address(
-          coords: coords,
-          bounds: Bounds.fromJson(bounds),
-          reference: reference,
-          placeId: jsonResponse['results'][0]['place_id'] ?? '',
-        );
-      } else {
-        throw 'Request failed with status: ${response.statusCode}';
-      }
+      final response = await _httpClient(uri);
+      final bounds = response['results'][0]['geometry']['viewport'];
+      final reference = response['results'][0]['formatted_address'];
+      final placeId = response['results'][0]['place_id'] ?? '';
+      return Address(
+        coords: coords,
+        bounds: Bounds.fromJson(bounds),
+        reference: reference,
+        placeId: placeId,
+      );
     } catch (e) {
       debugPrint(e.toString());
       return null;
@@ -178,7 +180,7 @@ class GeoMethods {
   Future<Directions?> getDirections({
     required Address origin,
     required Address destination,
-    List<Address?> waypoints = const <Address>[],
+    List<Address> waypoints = const <Address>[],
   }) async {
     assert(countryCode.isNotEmpty,
         'countryCode parameter is required to get Directions');
@@ -188,42 +190,37 @@ class GeoMethods {
     String wps = '';
     if (waypoints.isNotEmpty) {
       waypoints.asMap().forEach((index, element) {
-        if (element!.hasCoords)
+        if (element.hasCoords) {
           wps += (index != waypoints.length - 1)
-              ? '${element.coords.toString()}|'
-              : '${element.coords.toString()}';
-        else
-          print("waypoint $index doesn't have coords");
+              ? element.coords.toString() + '|'
+              : element.coords.toString();
+        } else {
+          debugPrint("waypoint $index doesn't have coords");
+        }
       });
     }
     final uri = Uri.https('maps.googleapis.com', '/maps/api/directions/json', {
       'origin': origin.coords.toString(),
       'destination': destination.coords.toString(),
       'language': language,
-      'units': 'metric',
+      'units': units.name,
       'region': countryCode,
-      'mode': mode,
+      'mode': mode.name,
       'key': googleApiKey,
       if (wps.isNotEmpty) 'waypoints': wps,
     });
     try {
-      final response = await http.get(uri);
-      if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(response.body);
-        final routes = jsonResponse['routes'][0];
-        return Directions(
-          origin: origin,
-          destination: destination,
-          waypoints: waypoints as List<Address>,
-          distance: _calcDistance(routes['legs']),
-          duration: _calcDuration(routes['legs']),
-          bounds: Bounds.fromJson(routes['bounds']),
-          points: decodeEncodedPolyline(
-              encoded: routes['overview_polyline']['points']),
-        );
-      } else {
-        throw 'Request failed with status: ${response.statusCode}';
-      }
+      final response = await _httpClient(uri);
+      final routes = response['routes'][0];
+      return Directions(
+        origin: origin,
+        destination: destination,
+        waypoints: waypoints,
+        distance: _calcDistance(routes['legs']),
+        duration: _calcDuration(routes['legs']),
+        bounds: Bounds.fromJson(routes['bounds']),
+        points: decodeEncodedPolyline(routes['overview_polyline']['points']),
+      );
     } catch (e) {
       debugPrint(e.toString());
       return null;
@@ -235,14 +232,17 @@ class GeoMethods {
     int value = 0;
     String suffix = 'm';
     try {
-      distances.forEach(
-          (element) => value += (element['distance']['value'] as int?)!);
+      for (var element in distances) {
+        value += (element['distance']['value'] as int);
+      }
       if (value > 999) {
         // meters to kilometers
         value = (value / 1000).round();
         suffix = 'km';
       }
-    } catch (e) {}
+    } catch (e) {
+      debugPrint(e.toString());
+    }
     return '$value $suffix';
   }
 
@@ -251,8 +251,9 @@ class GeoMethods {
     int value = 0;
     String suffix = 'sec';
     try {
-      durations.forEach(
-          (element) => value += (element['duration']['value'] as int?)!);
+      for (var element in durations) {
+        value += (element['duration']['value'] as int);
+      }
       if (value > 60) {
         // seconds to minutes
         value = (value / 60).round();
@@ -268,12 +269,14 @@ class GeoMethods {
         value = (value / 24).round();
         suffix = 'd';
       }
-    } catch (e) {}
+    } catch (e) {
+      debugPrint(e.toString());
+    }
     return '$value $suffix';
   }
 
   /// Decodes an `encoded` [String] to create a [Polyline].
-  static List<Coords> decodeEncodedPolyline({required String encoded}) {
+  static List<Coords> decodeEncodedPolyline(String encoded) {
     assert(encoded.isNotEmpty, "encoded can't be empty");
     final points = <Coords>[];
     final len = encoded.length;

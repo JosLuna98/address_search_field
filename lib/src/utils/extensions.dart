@@ -4,14 +4,14 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 /// extensions for [LatLng].
 extension LatLngConvert on LatLng {
   /// Converts [LatLng] to [Coords].
-  Coords toCoords() => Coords(this.latitude, this.longitude);
+  Coords toCoords() => Coords(latitude, longitude);
 }
 
 /// extensions for [LatLngBounds].
 extension LatLngBoundsConvert on LatLngBounds {
   /// Converts [LatLngBounds] to [Bounds].
-  Bounds toBounds() => Bounds(
-      southwest: this.southwest as Coords, northeast: this.northeast as Coords);
+  Bounds toBounds() =>
+      Bounds(southwest: southwest.toCoords(), northeast: northeast.toCoords());
 }
 
 /// extensions for [List<Address>].
@@ -19,9 +19,9 @@ extension AddressListConvert on List<Address> {
   /// Converts [List<Address>] to [List<Coords>].
   List<Coords> toCoordsList() {
     final coords = <Coords>[];
-    this.forEach((element) {
+    for (var element in this) {
       if (element.hasCoords) coords.add(element.coords!);
-    });
+    }
     return coords;
   }
 }
@@ -31,7 +31,20 @@ extension CoordsListConvert on List<Coords> {
   /// Converts [List<Coords>] to [List<Address>].
   List<Address> toAddressList() {
     final addresses = <Address>[];
-    this.forEach((element) => addresses.add(Address(coords: element)));
+    for (var element in this) {
+      addresses.add(Address.fromCoords(coords: element));
+    }
     return addresses;
+  }
+}
+
+extension WaypointRangeException on List<Address> {
+  /// 
+  String? getReference(int index) {
+    try {
+      return this[index].reference;
+    } catch (e) {
+      return null;
+    }
   }
 }

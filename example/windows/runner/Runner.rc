@@ -89,11 +89,11 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "josluna98" "\0"
-            VALUE "FileDescription", "Demonstrates how to use the address_search_field plugin." "\0"
+            VALUE "CompanyName", "dev.jostech" "\0"
+            VALUE "FileDescription", "address_search_field_example" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "address_search_field_example" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2021 josluna98. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2022 dev.jostech. All rights reserved." "\0"
             VALUE "OriginalFilename", "address_search_field_example.exe" "\0"
             VALUE "ProductName", "address_search_field_example" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"

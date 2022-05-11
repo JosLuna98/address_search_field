@@ -10,16 +10,11 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 /// A web implementation of the AddressSearchField plugin.
 class AddressSearchFieldWeb {
-  /// Constructor.
-  const AddressSearchFieldWeb();
-
-  /// Register method.
   static void registerWith(Registrar registrar) {
     final MethodChannel channel = MethodChannel(
       'address_search_field',
       const StandardMethodCodec(),
-      // ignore: deprecated_member_use
-      registrar.messenger,
+      registrar,
     );
 
     final pluginInstance = AddressSearchFieldWeb();
@@ -33,13 +28,10 @@ class AddressSearchFieldWeb {
     switch (call.method) {
       case 'getPlatformVersion':
         return getPlatformVersion();
-        // ignore: dead_code
-        break;
       default:
         throw PlatformException(
           code: 'Unimplemented',
-          details:
-              'address_search_field for web doesn\'t implement \'${call.method}\'',
+          details: 'address_search_field for web doesn\'t implement \'${call.method}\'',
         );
     }
   }
