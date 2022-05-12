@@ -1,3 +1,5 @@
+## [5.0.0]
+* ## BREAKING CHANGES: read documentation is needed.
 ## [4.0.0]
 * Fix null safety migration.
 ## [3.1.0-nullsafety.0]
@@ -47,7 +49,7 @@
 ## [3.0.1]
 * Function in WaypointsManager added to remove elements in the list of waypoints.
 ## [3.0.0]
-* ## BREAK CHANGES: read documentation is needed.
+* ## BREAKING CHANGES: read documentation is needed.
 ## [2.1.0+1]
 * Documentation improved.
 * Better implementation of dart extensions in example.

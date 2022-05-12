@@ -1,4 +1,4 @@
-/// Identifies [Address] in a [RouteBox] widget.
+/// Identifies [Address] in a [RouteSearchBox] widget.
 enum AddressId {
   /// Identify [Address] object.
   origin,

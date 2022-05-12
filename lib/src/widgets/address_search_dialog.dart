@@ -77,7 +77,7 @@ class AddressSearchDialog extends ConsumerStatefulWidget {
         addressId = null,
         super(key: key);
 
-  /// Constructor used to work in a [RouteBox].
+  /// Constructor used to work in a [RouteSearchBox].
   AddressSearchDialog.withProvider({
     required this.provider,
     required this.addressId,
@@ -103,7 +103,7 @@ class AddressSearchDialog extends ConsumerStatefulWidget {
         addressId = null,
         super(key: key);
 
-  /// Constructor used to create a custom [Dialog] and work in a [RouteBox].
+  /// Constructor used to create a custom [Dialog] and work in a [RouteSearchBox].
   AddressSearchDialog.customWithProvider({
     required this.builder,
     required this.provider,

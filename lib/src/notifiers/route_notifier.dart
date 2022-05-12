@@ -21,7 +21,7 @@ class LocationSetter {
   final AddressId addressId;
 }
 
-/// Notifier to work with two or more points in [RouteBox].
+/// Notifier to work with two or more points in [RouteSearchBox].
 class RouteNotifier extends ChangeNotifier {
   late final GeoMethods _geoMethods;
 

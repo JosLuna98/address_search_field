@@ -49,7 +49,9 @@ class MyApp extends StatelessWidget {
                   if (snapshot.hasData) {
                     return Example(snapshot.data!);
                   } else {
-                    return const Text('Location not found!');
+                    return const Center(
+                      child: Text('Location not found!'),
+                    );
                   }
                 }
               },
@@ -93,7 +95,7 @@ class _ExampleState extends State<Example> {
 
   @override
   Widget build(BuildContext context) {
-    return RouteBox(
+    return RouteSearchBox(
       provider: routeProvider,
       geoMethods: geoMethods,
       originController: origCtrl,
@@ -109,8 +111,8 @@ class _ExampleState extends State<Example> {
           Expanded(
             child: GoogleMap(
               compassEnabled: true,
-              myLocationEnabled: true,
-              myLocationButtonEnabled: true,
+              myLocationEnabled: false,
+              myLocationButtonEnabled: false,
               rotateGesturesEnabled: true,
               zoomControlsEnabled: true,
               initialCameraPosition: CameraPosition(
@@ -155,8 +157,7 @@ class _ExampleState extends State<Example> {
                   ),
                 ),
                 Consumer(
-                  builder:
-                      (BuildContext context, WidgetRef ref, Widget? _child) {
+                  builder: (BuildContext context, WidgetRef ref, Widget? _) {
                     return Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [

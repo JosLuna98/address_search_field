@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Wrapper to work with provider and call Google Directions API and get [Directions] beetwen two or more points.
-class RouteBox extends ConsumerStatefulWidget {
-  /// Constructor for [RouteBox].
-  const RouteBox({
+class RouteSearchBox extends ConsumerStatefulWidget {
+  /// Constructor for [RouteSearchBox].
+  const RouteSearchBox({
     required this.provider,
     required this.geoMethods,
     required this.originController,
@@ -34,10 +34,10 @@ class RouteBox extends ConsumerStatefulWidget {
   final Widget child;
 
   @override
-  ConsumerState<RouteBox> createState() => _RouteBoxState();
+  ConsumerState<RouteSearchBox> createState() => _RouteSearchBoxState();
 }
 
-class _RouteBoxState extends ConsumerState<RouteBox> {
+class _RouteSearchBoxState extends ConsumerState<RouteSearchBox> {
   @override
   void initState() {
     super.initState();

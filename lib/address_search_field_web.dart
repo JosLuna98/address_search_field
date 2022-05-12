@@ -31,7 +31,8 @@ class AddressSearchFieldWeb {
       default:
         throw PlatformException(
           code: 'Unimplemented',
-          details: 'address_search_field for web doesn\'t implement \'${call.method}\'',
+          details:
+              'address_search_field for web doesn\'t implement \'${call.method}\'',
         );
     }
   }
