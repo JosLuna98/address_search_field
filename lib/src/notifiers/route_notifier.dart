@@ -23,6 +23,9 @@ class LocationSetter {
 
 /// Notifier to work with two or more points in [RouteSearchBox].
 class RouteNotifier extends ChangeNotifier {
+  /// Constructor for [RouteNotifier].
+  RouteNotifier();
+
   late final GeoMethods _geoMethods;
 
   /// [GeoMethods] instance to use Google APIs.

@@ -1,3 +1,7 @@
+/// An address search field which helps to autocomplete an address by a reference.
+/// It can be used to get Directions beetwen two points.
+library address_search_field_web;
+
 import 'dart:async';
 // In order to *not* need this ignore, consider extracting the "web" version
 // of your plugin as a separate package, instead of inlining it in the same
@@ -10,6 +14,7 @@ import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 /// A web implementation of the AddressSearchField plugin.
 class AddressSearchFieldWeb {
+  /// Register the web plugin.
   static void registerWith(Registrar registrar) {
     final MethodChannel channel = MethodChannel(
       'address_search_field',

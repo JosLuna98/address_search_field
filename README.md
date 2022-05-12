@@ -1,6 +1,6 @@
 # Address Search Field
 Widget builders to create 'address search widgets' which helps to autocomplete an address using a reference. They can be used to get Directions beetwen two places with optional waypoints. These widgets are made to be showed by `onTap` in a `TextField` with the `showDialog` function.
-It uses [Dio](https://pub.dev/packages/dio/versions/4.0.6), [Google Maps for Flutter](https://pub.dev/packages/google_maps_flutter/versions/2.1.5), [Flutter Riverpod](https://pub.dev/packages/flutter_riverpod/versions/1.0.3) plugins. (This last plugin is to use extended objects that can be usable with `GoogleMap` Widget).
+It uses [Dio](https://pub.dev/packages/dio/versions/4.0.6), [Google Maps for Flutter](https://pub.dev/packages/google_maps_flutter/versions/2.1.5), [Flutter Riverpod](https://pub.dev/packages/flutter_riverpod/versions/1.0.3) plugins. (This last plugin is to use extended objects that can be usable with `GoogleMap` Widget).  
 ![](https://raw.githubusercontent.com/JosLuna98/address_search_field/master/screenshot/address_search_field.gif)
 ## Getting Started
 To use this plugin, add `address_search_field` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
@@ -35,7 +35,6 @@ GeoMethods(
 * This object makes calls to Google APIs using the parameters set. It can do requests to Google places, geocode and directions APIs [Get API key](https://developers.google.com/maps/documentation/embed/get-api-key).
 * Language support list [here](https://developers.google.com/maps/faq#languagesupport).
 * List of countries [here](https://en.wikipedia.org/wiki/List_of_ISO_3166_country_codes).
-
 Example:
 ```dart
 final geoMethods = GeoMethods(
@@ -46,11 +45,24 @@ final geoMethods = GeoMethods(
   country: 'United States',
   city: 'New York',
 );
-    
-geoMethods.autocompletePlace(query: 'place streets or reference'); // It will search in unite states, espain and colombia. It just can filter up to 5 countries.
-geoMethods.geoLocatePlace(coords: Coords(0.10, 0.10));
-geoMethods.getPlaceGeometry(reference: 'place streets', placeId: 'ajFDN3662fNsa4hhs42FAjeb5n');
-geoMethods.getDirections(origin: Address(coords: Coords(0.10, 0.10)), destination: Address(coords: Coords(0.10, 0.10))); // It needs a specific region, it will search in unite states.
+
+// It will search in unite states, espain and colombia. It just can filter up to 5 countries.
+geoMethods.autocompletePlace(query: 'place streets or reference');
+
+geoMethods.geoLocatePlace(
+    coords: Coords(0.10, 0.10,)
+);
+
+geoMethods.getPlaceGeometry(
+    reference: 'place streets',
+    placeId: 'ajFDN3662fNsa4hhs42FAjeb5n',
+);
+
+// It needs a specific region, it will search in unite states.
+geoMethods.getDirections(
+    origin: Address(coords: Coords(0.10, 0.10)), 
+    destination: Address(coords: Coords(0.10, 0.10))
+);
 ```
 ## AddressSearchBuilder
 This widget can search addresses and permits you to work with them using an `Address` object.
@@ -119,8 +131,8 @@ GeoMethods geoMethods;
 TextEditingController controller;
 Address initialAddress;
 
+// using coordinates you can get an address reference to be predefined in the widget and save all the address data in a variable.
 AddressLocator(
-  // using coordinates you can get an address reference to be predefined in the widget and save all the address data in a variable.
   coords: coords,
   geoMethods: geoMethods,
   controller: controller,
