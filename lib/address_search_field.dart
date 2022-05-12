@@ -20,4 +20,4 @@ export 'package:address_search_field/src/utils/extensions.dart';
 
 export 'package:address_search_field/src/widgets/address_locator.dart';
 export 'package:address_search_field/src/widgets/address_search_dialog.dart';
-export 'package:address_search_field/src/widgets/route_box.dart';
+export 'package:address_search_field/src/widgets/route_search_box.dart';
