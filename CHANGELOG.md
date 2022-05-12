@@ -1,4 +1,4 @@
-## [5.0.0]
+## [5.0.1]
 * ## BREAKING CHANGES: read documentation is needed.
 ## [4.0.0]
 * Fix null safety migration.

@@ -6,7 +6,7 @@ It uses [Dio](https://pub.dev/packages/dio/versions/4.0.6), [Google Maps for Flu
 To use this plugin, add `address_search_field` as a [dependency in your pubspec.yaml file](https://flutter.io/platform-plugins/). For example:
 ```yaml
 dependencies:
-  address_search_field: ^5.0.0
+  address_search_field: ^5.0.1
 ```
 ## Permissions
 ### Android
