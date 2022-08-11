@@ -193,7 +193,7 @@ class GeoMethods {
       waypoints.asMap().forEach((index, element) {
         if (element.hasCoords) {
           wps += (index != waypoints.length - 1)
-              ? element.coords.toString() + '|'
+              ? '${element.coords}|'
               : element.coords.toString();
         } else {
           debugPrint("waypoint $index doesn't have coords");

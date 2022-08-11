@@ -19,9 +19,9 @@ class Bounds extends LatLngBounds {
       'bounds:\n\tnortheast: [${northeast.toString()}]\n\tsouthwest: [${southwest.toString()}]';
 
   @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) return true;
-    return o is Bounds && o.southwest == southwest && o.northeast == northeast;
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Bounds && other.southwest == southwest && other.northeast == northeast;
   }
 
   @override

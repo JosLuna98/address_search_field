@@ -13,9 +13,9 @@ class Coords extends LatLng {
   String toString() => '$latitude,$longitude';
 
   @override
-  bool operator ==(Object o) {
-    if (identical(this, o)) return true;
-    return o is Coords && o.latitude == latitude && o.longitude == longitude;
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Coords && other.latitude == latitude && other.longitude == longitude;
   }
 
   @override
