@@ -45,5 +45,7 @@
 	<false/>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Permission to get your location</string>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
 </dict>
 </plist>

@@ -1,3 +1,6 @@
+## [5.0.2]
+* Add style options for icon and text colors.
+* Update dependencies.
 ## [5.0.1]
 * ## BREAKING CHANGES: read documentation is needed.
 ## [4.0.0]

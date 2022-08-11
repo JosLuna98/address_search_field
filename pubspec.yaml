@@ -1,6 +1,6 @@
 name: address_search_field
 description: An address search field which helps to autocomplete an address by a reference. It can be used to get Directions beetwen two points.
-version: 5.0.1
+version: 5.0.2
 homepage: https://github.com/JosLuna98/address_search_field
 
 environment:
@@ -12,14 +12,14 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  google_maps_flutter: ^2.1.5
-  flutter_riverpod: ^1.0.3
+  google_maps_flutter: ^2.1.10
+  flutter_riverpod: ^1.0.4
   dio: ^4.0.6
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^1.0.4
+  flutter_lints: ^2.0.1
 
 flutter:
   plugin:

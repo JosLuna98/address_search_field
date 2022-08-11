@@ -12,10 +12,10 @@ dependencies:
   address_search_field:
     path: ../
 
-  cupertino_icons: ^1.0.4
-  google_maps_flutter: ^2.1.5
-  location: ^4.3.0
-  flutter_riverpod: ^1.0.3
+  cupertino_icons: ^1.0.5
+  google_maps_flutter: ^2.1.10
+  location: ^4.4.0
+  flutter_riverpod: ^1.0.4
 
 dev_dependencies:
   flutter_test:
