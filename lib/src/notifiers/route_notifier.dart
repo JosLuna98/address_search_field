@@ -132,10 +132,10 @@ class RouteNotifier extends ChangeNotifier {
   Future<void> setLocation(AddressId addressId, Address address) async {
     if (addressId == AddressId.origin) {
       _origin = address;
-      _originController.text = address.reference!;
+      _originController.text = address.reference ?? '';
     } else if (addressId == AddressId.destination) {
       _destination = address;
-      _destinationController.text = address.reference!;
+      _destinationController.text = address.reference ?? '';
     } else if (addressId == AddressId.waypoint) {
       addWaypoint(address);
     }

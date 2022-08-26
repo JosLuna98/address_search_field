@@ -1,3 +1,5 @@
+## [5.0.3]
+* Fix null check operator in setLocation method.
 ## [5.0.2]
 * Add style options for icon and text colors.
 * Update dependencies.
