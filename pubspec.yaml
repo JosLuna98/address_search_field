@@ -12,8 +12,8 @@ dependencies:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
-  google_maps_flutter: ^2.1.10
-  flutter_riverpod: ^1.0.4
+  google_maps_flutter: ^2.2.1
+  flutter_riverpod: ^2.1.1
   dio: ^4.0.6
 
 dev_dependencies:
