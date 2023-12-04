@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'package:address_search_field/src/widgets/address_search_dialog.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:address_search_field/src/models/address.dart';
 import 'package:address_search_field/src/models/coords.dart';
 import 'package:address_search_field/src/services/geo_methods.dart';
+import 'package:address_search_field/src/widgets/address_search_dialog.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Callback method.
 typedef SetAddressCallback = void Function(Address origin);

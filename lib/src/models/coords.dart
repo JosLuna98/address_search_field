@@ -1,4 +1,3 @@
-import 'package:flutter/widgets.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 ///  Latitude and longitude coordinates as degrees.
@@ -19,5 +18,5 @@ class Coords extends LatLng {
   }
 
   @override
-  int get hashCode => hashValues(latitude, longitude);
+  int get hashCode => Object.hash(latitude, longitude);
 }

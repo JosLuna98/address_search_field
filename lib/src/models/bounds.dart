@@ -1,6 +1,5 @@
-import 'package:flutter/widgets.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:address_search_field/src/models/coords.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// Geographical bounding box by coordinates of [LatLng] object.
 class Bounds extends LatLngBounds {
@@ -25,5 +24,5 @@ class Bounds extends LatLngBounds {
   }
 
   @override
-  int get hashCode => hashValues(southwest, northeast);
+  int get hashCode => Object.hash(southwest, northeast);
 }

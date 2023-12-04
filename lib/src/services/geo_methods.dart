@@ -1,13 +1,12 @@
-import 'package:flutter/foundation.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:dio/dio.dart';
-
 import 'package:address_search_field/src/enums/directions_mode.dart';
 import 'package:address_search_field/src/enums/directions_units.dart';
-import 'package:address_search_field/src/models/directions.dart';
 import 'package:address_search_field/src/models/address.dart';
 import 'package:address_search_field/src/models/bounds.dart';
 import 'package:address_search_field/src/models/coords.dart';
+import 'package:address_search_field/src/models/directions.dart';
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 part 'package:address_search_field/src/utils/http_client.dart';
 

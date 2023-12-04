@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:address_search_field/src/enums/address_id.dart';
 import 'package:address_search_field/src/models/address.dart';
 import 'package:address_search_field/src/notifiers/route_notifier.dart';
 import 'package:address_search_field/src/services/geo_methods.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// Callback method.
 typedef OnDoneCallback = FutureOr<void> Function(Address address);
