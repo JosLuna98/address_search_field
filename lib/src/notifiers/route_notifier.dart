@@ -1,8 +1,8 @@
 import 'package:address_search_field/src/enums/address_id.dart';
-import 'package:address_search_field/src/models/coords.dart';
-import 'package:address_search_field/src/models/directions.dart';
 import 'package:address_search_field/src/enums/route_error.dart';
 import 'package:address_search_field/src/models/address.dart';
+import 'package:address_search_field/src/models/coords.dart';
+import 'package:address_search_field/src/models/directions.dart';
 import 'package:address_search_field/src/services/geo_methods.dart';
 import 'package:flutter/widgets.dart';
 

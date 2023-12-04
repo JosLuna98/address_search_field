@@ -1,7 +1,6 @@
 import 'package:address_search_field/src/models/address.dart';
-import 'package:flutter/widgets.dart';
-import 'package:address_search_field/src/models/coords.dart';
 import 'package:address_search_field/src/models/bounds.dart';
+import 'package:address_search_field/src/models/coords.dart';
 
 /// Result of request to Google Directions API
 class Directions {
@@ -62,6 +61,6 @@ class Directions {
   }
 
   @override
-  int get hashCode => hashValues(
+  int get hashCode => Object.hash(
       origin, destination, waypoints, distance, duration, bounds, points);
 }

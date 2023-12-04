@@ -14,7 +14,7 @@ dependencies:
     sdk: flutter
   google_maps_flutter: ^2.1.10
   flutter_riverpod: ^1.0.4
-  dio: ^4.0.6
+  dio: ^5.2.0
 
 dev_dependencies:
   flutter_test:
